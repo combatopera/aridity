@@ -159,7 +159,8 @@ templatecases = [
 yay
 )\thoupla  ''',
     '1',
-    '$id(.1)'
+    '$id(.1)',
+    '100woo',
 ]
 
 template = (OneOrMore(Optional(text) + action) + Optional(text) | number | text | Empty()).parseWithTabs().setParseAction(Concat.pa)
