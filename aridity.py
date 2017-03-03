@@ -64,7 +64,9 @@ numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
 def scalar(s, l, t):
     text, = t
     m = numberpattern.search(text)
-    return Text(text) if m is None else Number(Decimal(text))
+    if m is None: return Text(text)
+    if '.' in text: return Number(Decimal(text))
+    return Number(int(text))
 
 class ArgSep:
 
