@@ -11,7 +11,7 @@ class Cat:
         return "%s(%r)" % (type(self).__name__, self.parts)
 
     def __call__(self, config):
-        return ''.join(part(config) for part in self.parts)
+        return Literal(None, None, [''.join(part(config).cat() for part in self.parts)])
 
 class Literal:
 
@@ -22,6 +22,9 @@ class Literal:
         return "%s(%r)" % (type(self).__name__, self.text)
 
     def __call__(self, config):
+        return self
+
+    def cat(self):
         return self.text
 
 class ArgSep:
@@ -40,7 +43,19 @@ class ArgSep:
 class Functions:
 
     def get(config, key):
-        return config[key]
+        return config[key.cat()]
+
+    def a(config):
+        return Literal(None, None, ['A'])
+
+    def b(config):
+        return Literal(None, None, ['B'])
+
+    def ac(config, x):
+        return Literal(None, None, ['ac.' + x(config).cat()])
+
+    def act(config, x, y):
+        return Literal(None, None, ['act.' + x(config).cat() + '.' + y(config).cat()])
 
 class Call:
 
@@ -85,9 +100,9 @@ actioncases = [
 ]
 
 text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Literal)
-for case in textcases:
-    print( case)
-    text.parseString(case, parseAll = True).pprint()
+#for case in textcases:
+#    print( case)
+#    text.parseString(case, parseAll = True).pprint()
 
 action = Forward()
 def clauses():
@@ -97,8 +112,8 @@ def clauses():
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
-for case in actioncases:
-    print(repr(case), Parser(action)(case))
+#for case in actioncases:
+#    print(repr(case), Parser(action)(case))
 
 templatecases = [
     '',
@@ -111,8 +126,8 @@ yay
 
 template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat)
 
-config = {'yay': 'YAY'}
-for case in templatecases:
+config = {'yay': Literal(None, None, ['YAY'])}
+for case in textcases+actioncases+ templatecases:
     print(repr(case))
     expr = Parser(template)(case)
     print(expr)
