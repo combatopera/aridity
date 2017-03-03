@@ -1,4 +1,5 @@
 from pyparsing import *
+from decimal import Decimal
 
 class Concat:
 
@@ -39,6 +40,24 @@ class Text:
     def cat(self):
         return self.text
 
+class Number:
+
+    isarg = True
+
+    @classmethod
+    def pa(cls, s, l, t):
+        val, = t
+        return cls(Decimal(val))
+
+    def __init__(self, val):
+        self.val = val
+
+    def __call__(self, config):
+        return self
+
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.val)
+
 class ArgSep:
 
     isarg = False
@@ -65,6 +84,9 @@ class Functions:
 
     def ac(config, x):
         return Text('ac.' + x(config).cat())
+
+    def id(config, x):
+        return x
 
     def act(config, x, y):
         return Text('act.' + x(config).cat() + '.' + y(config).cat())
@@ -112,6 +134,8 @@ actioncases = [
 ]
 
 text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Text.pa)
+number = Regex('[0-9]+|[0-9]*[.][0-9]+').setParseAction(Number.pa)
+
 #for case in textcases:
 #    print( case)
 #    text.parseString(case, parseAll = True).pprint()
@@ -120,7 +144,7 @@ action = Forward()
 def clauses():
     for o, c in '()', '[]':
         argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Concat.pa)
+        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | number | argtext).leaveWhitespace().setParseAction(Concat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
@@ -134,9 +158,11 @@ templatecases = [
     '''woo $get(
 yay
 )\thoupla  ''',
+    '1',
+    '$id(.1)'
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Concat.pa)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | number | text | Empty()).parseWithTabs().setParseAction(Concat.pa)
 
 config = {'yay': Text('YAY')}
 for case in textcases+actioncases+ templatecases:
