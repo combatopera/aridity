@@ -175,7 +175,7 @@ yay
     '100woo',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(scalar) | Empty()).parseWithTabs().setParseAction(Concat.pa)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(scalar) | Empty().setParseAction(lambda *args: Text(''))).parseWithTabs().setParseAction(Concat.pa)
 
 config = {'yay': Text('YAY')}
 for case in textcases+actioncases+ templatecases:
