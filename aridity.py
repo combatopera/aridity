@@ -12,6 +12,22 @@ class Cat:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
 
+    def __call__(self, config):
+        return ''.join(part(config) for part in self.parts)
+
+class Literal:
+
+    @classmethod
+    def pa(cls, s, l, t):
+        text, = t
+        return cls(text)
+
+    def __init__(self, text):
+        self.text = text
+
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.text)
+
 class ArgSep:
 
     @classmethod
@@ -68,7 +84,7 @@ actioncases = [
     '$act[\rx$b()z  yy\t]',
 ]
 
-text = Regex('[^$]+').leaveWhitespace().parseWithTabs()
+text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Literal.pa)
 for case in textcases:
     print( case)
     text.parseString(case, parseAll = True).pprint()
@@ -95,6 +111,8 @@ yay
 
 template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat.pa)
 
+config = {}
 for case in templatecases:
-    print(repr(case), Parser(template)(case))
+    expr = Parser(template)(case)
+    print(repr(case), expr, expr(config))
 
