@@ -4,8 +4,13 @@ class Cat:
 
     isarg = True
 
-    def __init__(self, s, l, t):
-        self.parts = t.asList()
+    @classmethod
+    def pa(cls, s, l, t):
+        parts = t.asList()
+        return parts[0] if 1 == len(parts) else cls(parts)
+
+    def __init__(self, parts):
+        self.parts = parts
 
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
@@ -14,6 +19,8 @@ class Cat:
         return Literal(None, None, [''.join(part(config).cat() for part in self.parts)])
 
 class Literal:
+
+    isarg = True
 
     def __init__(self, s, l, t):
         self.text, = t
@@ -108,7 +115,7 @@ action = Forward()
 def clauses():
     for o, c in '()', '[]':
         argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Literal)
-        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Cat)
+        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Cat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
@@ -124,7 +131,7 @@ yay
 )\thoupla  ''',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat.pa)
 
 config = {'yay': Literal(None, None, ['YAY'])}
 for case in textcases+actioncases+ templatecases:
