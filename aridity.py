@@ -1,5 +1,6 @@
 from pyparsing import *
 from decimal import Decimal
+import re
 
 class Concat:
 
@@ -57,6 +58,13 @@ class Number:
 
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.val)
+
+numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
+
+def scalar(s, l, t):
+    text, = t
+    m = numberpattern.search(text)
+    return Text(text) if m is None else Number(Decimal(text))
 
 class ArgSep:
 
@@ -133,8 +141,8 @@ actioncases = [
     '$act[\rx$b()z  yy\t]',
 ]
 
-text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Text.pa)
-number = Regex('[0-9]+|[0-9]*[.][0-9]+').setParseAction(Number.pa)
+rawtext = Regex('[^$]+').leaveWhitespace().parseWithTabs()
+text = rawtext.setParseAction(Text.pa)
 
 #for case in textcases:
 #    print( case)
@@ -143,8 +151,9 @@ number = Regex('[0-9]+|[0-9]*[.][0-9]+').setParseAction(Number.pa)
 action = Forward()
 def clauses():
     for o, c in '()', '[]':
-        argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | number | argtext).leaveWhitespace().setParseAction(Concat.pa)
+        rawargtext = Regex(r'[^$\s\%s]+' % c)
+        argtext = rawargtext.setParseAction(Text.pa)
+        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
@@ -164,7 +173,7 @@ yay
     '100woo',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | number | text | Empty()).parseWithTabs().setParseAction(Concat.pa)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(scalar) | Empty()).parseWithTabs().setParseAction(Concat.pa)
 
 config = {'yay': Text('YAY')}
 for case in textcases+actioncases+ templatecases:
