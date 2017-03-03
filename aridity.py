@@ -63,6 +63,7 @@ numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
 
 def scalar(s, l, t):
     text, = t
+    if 'true' == text or 'false' == text: return Number('true'==text)
     m = numberpattern.search(text)
     if m is None: return Text(text)
     if '.' in text: return Number(Decimal(text))
@@ -173,6 +174,10 @@ yay
     '$id(.1)',
     '$id(.1woo)',
     '100woo',
+    'false',
+    '$id(true)',
+    '$id(falseyay)',
+    'truewoo',
 ]
 
 template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(scalar) | Empty().setParseAction(lambda *args: Text(''))).parseWithTabs().setParseAction(Concat.pa)
