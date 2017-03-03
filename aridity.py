@@ -69,7 +69,7 @@ def scalar(s, l, t):
     if '.' in text: return Number(Decimal(text))
     return Number(int(text))
 
-class ArgSep:
+class Blank:
 
     isarg = False
 
@@ -156,8 +156,8 @@ def clauses():
     for o, c in '()', '[]':
         rawargtext = Regex(r'[^$\s\%s]+' % c)
         argtext = rawargtext.setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
-        yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
+        arg = Optional(White().setParseAction(Blank)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
+        yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
 #for case in actioncases:
