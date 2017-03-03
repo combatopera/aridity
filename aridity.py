@@ -4,7 +4,7 @@ import re
 
 class Concat:
 
-    isarg = True
+    ignorable = False
 
     @classmethod
     def pa(cls, s, l, t):
@@ -22,7 +22,7 @@ class Concat:
 
 class Text:
 
-    isarg = True
+    ignorable = False
 
     @classmethod
     def pa(cls, s, l, t):
@@ -43,7 +43,7 @@ class Text:
 
 class Number:
 
-    isarg = True
+    ignorable = False
 
     @classmethod
     def pa(cls, s, l, t):
@@ -71,7 +71,7 @@ def scalar(s, l, t):
 
 class Blank:
 
-    isarg = False
+    ignorable = True
 
     def __init__(self, s, l, t):
         self.text, = t
@@ -112,7 +112,7 @@ class Call:
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
 
     def __call__(self, config):
-        return getattr(Functions, self.name)(*[config] + [a(config) for a in self.args if a.isarg])
+        return getattr(Functions, self.name)(*[config] + [a(config) for a in self.args if not a.ignorable])
 
 class Parser:
 
