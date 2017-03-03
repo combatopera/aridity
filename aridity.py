@@ -17,8 +17,8 @@ class Concat:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
 
-    def __call__(self, config):
-        return Text(''.join(part(config).cat() for part in self.parts))
+    def resolve(self, config):
+        return Text(''.join(part.resolve(config).cat() for part in self.parts))
 
 class Text:
 
@@ -35,7 +35,7 @@ class Text:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
 
-    def __call__(self, config):
+    def resolve(self, config):
         return self
 
     def cat(self):
@@ -53,7 +53,7 @@ class Number:
     def __init__(self, val):
         self.val = val
 
-    def __call__(self, config):
+    def resolve(self, config):
         return self
 
     def __repr__(self):
@@ -79,7 +79,7 @@ class Blank:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
 
-    def __call__(self, config):
+    def resolve(self, config):
         return self.text
 
 class Functions:
@@ -94,13 +94,13 @@ class Functions:
         return Text('B')
 
     def ac(config, x):
-        return Text('ac.' + x(config).cat())
+        return Text('ac.' + x.resolve(config).cat())
 
     def id(config, x):
         return x
 
     def act(config, x, y):
-        return Text('act.' + x(config).cat() + '.' + y(config).cat())
+        return Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
 
 class Call:
 
@@ -111,8 +111,8 @@ class Call:
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
 
-    def __call__(self, config):
-        return getattr(Functions, self.name)(*[config] + [a(config) for a in self.args if not a.ignorable])
+    def resolve(self, config):
+        return getattr(Functions, self.name)(*[config] + [a.resolve(config) for a in self.args if not a.ignorable])
 
 class Parser:
 
@@ -187,5 +187,5 @@ for case in textcases+actioncases+ templatecases:
     print(repr(case))
     expr = Parser(template)(case)
     print(expr)
-    print(repr(expr(config)))
+    print(repr(expr.resolve(config)))
 
