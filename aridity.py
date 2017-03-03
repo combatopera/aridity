@@ -1,6 +1,6 @@
 from pyparsing import *
 
-class Cat:
+class Concat:
 
     isarg = True
 
@@ -16,14 +16,19 @@ class Cat:
         return "%s(%r)" % (type(self).__name__, self.parts)
 
     def __call__(self, config):
-        return Literal(None, None, [''.join(part(config).cat() for part in self.parts)])
+        return Text(''.join(part(config).cat() for part in self.parts))
 
-class Literal:
+class Text:
 
     isarg = True
 
-    def __init__(self, s, l, t):
-        self.text, = t
+    @classmethod
+    def pa(cls, s, l, t):
+        text, = t
+        return cls(text)
+
+    def __init__(self, text):
+        self.text = text
 
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
@@ -53,16 +58,16 @@ class Functions:
         return config[key.cat()]
 
     def a(config):
-        return Literal(None, None, ['A'])
+        return Text('A')
 
     def b(config):
-        return Literal(None, None, ['B'])
+        return Text('B')
 
     def ac(config, x):
-        return Literal(None, None, ['ac.' + x(config).cat()])
+        return Text('ac.' + x(config).cat())
 
     def act(config, x, y):
-        return Literal(None, None, ['act.' + x(config).cat() + '.' + y(config).cat()])
+        return Text('act.' + x(config).cat() + '.' + y(config).cat())
 
 class Call:
 
@@ -106,7 +111,7 @@ actioncases = [
     '$act[\rx$b()z  yy\t]',
 ]
 
-text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Literal)
+text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Text.pa)
 #for case in textcases:
 #    print( case)
 #    text.parseString(case, parseAll = True).pprint()
@@ -114,8 +119,8 @@ text = Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(Literal)
 action = Forward()
 def clauses():
     for o, c in '()', '[]':
-        argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Literal)
-        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Cat.pa)
+        argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Text.pa)
+        arg = Optional(White().setParseAction(ArgSep)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Concat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
@@ -131,9 +136,9 @@ yay
 )\thoupla  ''',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat.pa)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Concat.pa)
 
-config = {'yay': Literal(None, None, ['YAY'])}
+config = {'yay': Text('YAY')}
 for case in textcases+actioncases+ templatecases:
     print(repr(case))
     expr = Parser(template)(case)
