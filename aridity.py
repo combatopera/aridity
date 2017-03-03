@@ -2,6 +2,8 @@ from pyparsing import *
 
 class Cat:
 
+    isarg = True
+
     @classmethod
     def pa(cls, s, l, t):
         return cls(t.asList())
@@ -28,7 +30,12 @@ class Literal:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
 
+    def __call__(self, config):
+        return self.text
+
 class ArgSep:
+
+    isarg = False
 
     @classmethod
     def pa(cls, s, l, t):
@@ -40,6 +47,14 @@ class ArgSep:
 
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
+
+    def __call__(self, config):
+        return self.text
+
+class Functions:
+
+    def get(config, key):
+        return config[key]
 
 class Call:
 
@@ -53,6 +68,9 @@ class Call:
 
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
+
+    def __call__(self, config):
+        return getattr(Functions, self.name)(*[config] + [a(config) for a in self.args if a.isarg])
 
 class Parser:
 
@@ -92,7 +110,7 @@ for case in textcases:
 action = Forward()
 def clauses():
     for o, c in '()', '[]':
-        argtext = Regex(r'[^$\s\%s]+' % c)
+        argtext = Regex(r'[^$\s\%s]+' % c).setParseAction(Literal.pa)
         arg = Optional(White().setParseAction(ArgSep.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | argtext).leaveWhitespace().setParseAction(Cat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(ArgSep.pa)) + Suppress(c)
 
@@ -111,8 +129,10 @@ yay
 
 template = (OneOrMore(Optional(text) + action) + Optional(text) | text | Empty()).parseWithTabs().setParseAction(Cat.pa)
 
-config = {}
+config = {'yay': 'YAY'}
 for case in templatecases:
+    print(repr(case))
     expr = Parser(template)(case)
-    print(repr(case), expr, expr(config))
+    print(expr)
+    print(repr(expr(config)))
 
