@@ -43,6 +43,16 @@ class Blank(SimpleValue):
 class Scalar(SimpleValue):
 
     ignorable = False
+    numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
+
+    @classmethod
+    def pa(cls, s, l, t):
+        text, = t
+        if 'true' == text or 'false' == text: return Number('true'==text)
+        m = cls.numberpattern.search(text)
+        if m is None: return Text(text)
+        if '.' in text: return Number(Decimal(text))
+        return Number(int(text))
 
 class Text(Scalar):
 
@@ -52,16 +62,6 @@ class Text(Scalar):
 class Number(Scalar):
 
     pass
-
-numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
-
-def scalar(s, l, t):
-    text, = t
-    if 'true' == text or 'false' == text: return Number('true'==text)
-    m = numberpattern.search(text)
-    if m is None: return Text(text)
-    if '.' in text: return Number(Decimal(text))
-    return Number(int(text))
 
 class Functions:
 
@@ -141,7 +141,7 @@ def clauses():
     for o, c in '()', '[]':
         rawargtext = Regex(r'[^$\s\%s]+' % c)
         argtext = rawargtext.setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(Blank.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
+        arg = Optional(White().setParseAction(Blank.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank.pa)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call.pa)
@@ -165,7 +165,7 @@ yay
     'truewoo',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(scalar) | Empty().setParseAction(lambda *args: Text(''))).parseWithTabs().setParseAction(Concat.pa)
+template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(Scalar.pa) | Empty().setParseAction(lambda *args: Text(''))).parseWithTabs().setParseAction(Concat.pa)
 
 config = {'yay': Text('YAY')}
 for case in textcases+actioncases+ templatecases:
