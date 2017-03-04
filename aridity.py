@@ -20,44 +20,32 @@ class Concat:
     def resolve(self, config):
         return Text(''.join(part.resolve(config).cat() for part in self.parts))
 
-class Text:
+class Scalar:
 
     ignorable = False
+
+    def __init__(self, value):
+        self.value = value
+
+    def resolve(self, config):
+        return self
+
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.value)
+
+class Text(Scalar):
 
     @classmethod
     def pa(cls, s, l, t):
         text, = t
         return cls(text)
 
-    def __init__(self, text):
-        self.text = text
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.text)
-
-    def resolve(self, config):
-        return self
-
     def cat(self):
-        return self.text
+        return self.value
 
-class Number:
+class Number(Scalar):
 
-    ignorable = False
-
-    @classmethod
-    def pa(cls, s, l, t):
-        val, = t
-        return cls(Decimal(val))
-
-    def __init__(self, val):
-        self.val = val
-
-    def resolve(self, config):
-        return self
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.val)
+    pass
 
 numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
 
