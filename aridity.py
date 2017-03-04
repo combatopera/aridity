@@ -33,12 +33,14 @@ class Scalar:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.value)
 
-class Text(Scalar):
+class SingleToken:
 
     @classmethod
     def pa(cls, s, l, t):
-        text, = t
-        return cls(text)
+        value, = t
+        return cls(value)
+
+class Text(Scalar, SingleToken):
 
     def cat(self):
         return self.value
@@ -57,12 +59,12 @@ def scalar(s, l, t):
     if '.' in text: return Number(Decimal(text))
     return Number(int(text))
 
-class Blank:
+class Blank(SingleToken):
 
     ignorable = True
 
-    def __init__(self, s, l, t):
-        self.text, = t
+    def __init__(self, text):
+        self.text = text
 
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.text)
@@ -144,8 +146,8 @@ def clauses():
     for o, c in '()', '[]':
         rawargtext = Regex(r'[^$\s\%s]+' % c)
         argtext = rawargtext.setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(Blank)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
-        yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank)) + Suppress(c)
+        arg = Optional(White().setParseAction(Blank.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
+        yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank.pa)) + Suppress(c)
 
 action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
 #for case in actioncases:
