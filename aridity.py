@@ -44,16 +44,17 @@ class Scalar(SimpleValue):
 
     ignorable = False
     numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
-    booleans = dict([str(x).lower(), x] for x in [True, False])
 
     @classmethod
     def pa(cls, s, l, t):
         text, = t
         if text in cls.booleans:
-            return Boolean(cls.booleans[text])
+            return cls.booleans[text]
         m = cls.numberpattern.search(text)
-        if m is None: return Text(text)
-        if '.' in text: return Number(Decimal(text))
+        if m is None:
+            return Text(text)
+        if '.' in text:
+            return Number(Decimal(text))
         return Number(int(text))
 
 class Text(Scalar):
@@ -68,6 +69,8 @@ class Number(Scalar):
 class Boolean(Scalar):
 
     pass
+
+Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
 class Functions:
 
