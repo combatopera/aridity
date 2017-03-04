@@ -85,9 +85,13 @@ class Functions:
 
 class Call:
 
-    def __init__(self, s, l, t):
-        self.name = t[0]
-        self.args = t[1:]
+    @classmethod
+    def pa(cls, s, l, t):
+        return cls(t[0], t[1:])
+
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
 
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
@@ -140,7 +144,7 @@ def clauses():
         arg = Optional(White().setParseAction(Blank.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(scalar)).leaveWhitespace().setParseAction(Concat.pa)
         yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank.pa)) + Suppress(c)
 
-action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call)
+action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call.pa)
 #for case in actioncases:
 #    print(repr(case), Parser(action)(case))
 
