@@ -50,7 +50,7 @@ class Scalar(SimpleValue):
     def pa(cls, s, l, t):
         text, = t
         if text in cls.booleans:
-            return Number(cls.booleans[text])
+            return Boolean(cls.booleans[text])
         m = cls.numberpattern.search(text)
         if m is None: return Text(text)
         if '.' in text: return Number(Decimal(text))
@@ -62,6 +62,10 @@ class Text(Scalar):
         return self.value
 
 class Number(Scalar):
+
+    pass
+
+class Boolean(Scalar):
 
     pass
 
