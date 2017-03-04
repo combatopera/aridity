@@ -20,9 +20,12 @@ class Concat:
     def resolve(self, config):
         return Text(''.join(part.resolve(config).cat() for part in self.parts))
 
-class Scalar:
+class SimpleValue:
 
-    ignorable = False
+    @classmethod
+    def pa(cls, s, l, t):
+        value, = t
+        return cls(value)
 
     def __init__(self, value):
         self.value = value
@@ -33,14 +36,15 @@ class Scalar:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.value)
 
-class SingleToken:
+class Blank(SimpleValue):
 
-    @classmethod
-    def pa(cls, s, l, t):
-        value, = t
-        return cls(value)
+    ignorable = True
 
-class Text(Scalar, SingleToken):
+class Scalar(SimpleValue):
+
+    ignorable = False
+
+class Text(Scalar):
 
     def cat(self):
         return self.value
@@ -58,19 +62,6 @@ def scalar(s, l, t):
     if m is None: return Text(text)
     if '.' in text: return Number(Decimal(text))
     return Number(int(text))
-
-class Blank(SingleToken):
-
-    ignorable = True
-
-    def __init__(self, text):
-        self.text = text
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.text)
-
-    def resolve(self, config):
-        return self.text
 
 class Functions:
 
