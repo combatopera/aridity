@@ -74,10 +74,6 @@ Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
 class Call:
 
-    @classmethod
-    def pa(cls, functions, s, l, t):
-        return cls(functions, t[0], t[1:])
-
     def __init__(self, functions, name, args):
         self.functions = functions
         self.name = name
@@ -108,9 +104,9 @@ def createparser(functions):
         for o, c in '()', '[]':
             def getargtext(pa):
                 return Regex(r'[^$\s\%s]+' % c).setParseAction(pa)
-            argtext = getargtext(Text.pa)
-            arg = (OneOrMore(Optional(argtext) + action) + Optional(argtext) | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
+            optargtext = Optional(getargtext(Text.pa))
+            arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
             yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call.pa(functions, s, l, t))
+    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(functions, t[0], t[1:]))
     template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
     return Parser(template)
