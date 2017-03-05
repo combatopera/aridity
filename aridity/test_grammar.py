@@ -42,13 +42,13 @@ class TestGrammar(unittest.TestCase):
             ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p(text))
         for text in '$act(\rx$b()z  yy\t)', '$act(\rx$b[]z  yy\t)', '$act[\rx$b[]z  yy\t]', '$act[\rx$b()z  yy\t]':
             ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p(text))
+        ae(Text(''), p(''))
+        ae(Text('woo'), p('woo'))
+        ae(Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')]), p('woo$get(yay)houpla'))
 
 """
 
 templatecases = [
-    '',
-    'woo',
-    'woo$get(yay)houpla',
     '''woo $get(
 yay
 )\thoupla  ''',
