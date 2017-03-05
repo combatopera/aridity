@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import unittest
-from grammar import createparser, Text, Call, Blank, Concat
+from grammar import createparser, Text, Call, Blank, Concat, Number
+from decimal import Decimal
 
 class Functions:
 
@@ -48,14 +49,14 @@ class TestGrammar(unittest.TestCase):
         ae(Concat([Text('woo '), Call('get', [Blank('\n'), Text('yay'), Blank('\n')]), Text('\thoupla  ')]), p('''woo $get(
 yay
 )\thoupla  '''))
+        ae(Number(1), p('1'))
+        ae(Call('id', [Number(Decimal('.1'))]), p('$id(.1)'))
+        ae(Call('id', [Text('.1woo')]), p('$id(.1woo)'))
+        ae(Text('100woo'), p('100woo'))
 
 """
 
 templatecases = [
-    '1',
-    '$id(.1)',
-    '$id(.1woo)',
-    '100woo',
     'false',
     '$id(true)',
     '$id(falseyay)',
