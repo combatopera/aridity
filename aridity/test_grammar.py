@@ -24,6 +24,11 @@ class Functions:
     def act(config, x, y):
         return Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
 
+class Context:
+
+    def function(self, name):
+        return getattr(Functions, name)
+
 class TestGrammar(unittest.TestCase):
 
     def test_parser(self):
@@ -64,6 +69,11 @@ class TestGrammar(unittest.TestCase):
         ae(Call('id', [Text('falseyay')]), p('$id(falseyay)'))
         ae(Text('truewoo'), p('truewoo'))
 
+    def test_resolve(self):
+        c = Context()
+        ae = self.assertEqual
+        ae(Text(''), Text('').resolve(None))
+        ae(Text('A'), Call('a', []).resolve(c))
 
 """
 
