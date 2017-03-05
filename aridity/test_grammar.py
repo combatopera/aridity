@@ -12,9 +12,6 @@ class Functions:
     def a(config):
         return Text('A')
 
-    def b(config):
-        return Text('B')
-
     def ac(config, x):
         return Text('ac.' + x.resolve(config).cat())
 
@@ -73,7 +70,9 @@ class TestGrammar(unittest.TestCase):
         c = Context()
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
+        ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
         ae(Text('A'), Call('a', []).resolve(c))
+        ae(Text('ac.woo'), Call('ac', [Text('woo')]).resolve(c))
 
 """
 
