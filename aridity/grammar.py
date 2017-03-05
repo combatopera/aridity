@@ -30,6 +30,9 @@ class SimpleValue:
     def __init__(self, value):
         self.value = value
 
+    def __eq__(self, that):
+        return type(self) == type(that) and self.value == that.value
+
     def resolve(self, config):
         return self
 
@@ -75,9 +78,12 @@ Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 class Call:
 
     def __init__(self, functions, name, args):
-        self.functions = functions
+        self.functions = functions # FIXME: pass into resolve instead
         self.name = name
         self.args = args
+
+    def __eq__(self, that):
+        return self.name == that.name and self.args == that.args
 
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
