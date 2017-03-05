@@ -1,76 +1,4 @@
-from pyparsing import *
-from decimal import Decimal
-import re
-
-class Concat:
-
-    ignorable = False
-
-    @classmethod
-    def pa(cls, s, l, t):
-        parts = t.asList()
-        return parts[0] if 1 == len(parts) else cls(parts)
-
-    def __init__(self, parts):
-        self.parts = parts
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.parts)
-
-    def resolve(self, config):
-        return Text(''.join(part.resolve(config).cat() for part in self.parts))
-
-class SimpleValue:
-
-    @classmethod
-    def pa(cls, s, l, t):
-        value, = t
-        return cls(value)
-
-    def __init__(self, value):
-        self.value = value
-
-    def resolve(self, config):
-        return self
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.value)
-
-class Blank(SimpleValue):
-
-    ignorable = True
-
-class Scalar(SimpleValue):
-
-    ignorable = False
-    numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
-
-    @classmethod
-    def pa(cls, s, l, t):
-        text, = t
-        if text in cls.booleans:
-            return cls.booleans[text]
-        m = cls.numberpattern.search(text)
-        if m is None:
-            return Text(text)
-        if '.' in text:
-            return Number(Decimal(text))
-        return Number(int(text))
-
-class Text(Scalar):
-
-    def cat(self):
-        return self.value
-
-class Number(Scalar):
-
-    pass
-
-class Boolean(Scalar):
-
-    pass
-
-Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
+from aridity import grammar
 
 class Functions:
 
@@ -78,44 +6,24 @@ class Functions:
         return config[key.cat()]
 
     def a(config):
-        return Text('A')
+        return grammar.Text('A')
 
     def b(config):
-        return Text('B')
+        return grammar.Text('B')
 
     def ac(config, x):
-        return Text('ac.' + x.resolve(config).cat())
+        return grammar.Text('ac.' + x.resolve(config).cat())
 
     def id(config, x):
         return x
 
     def act(config, x, y):
-        return Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
+        return grammar.Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
 
-class Call:
+class FunctionsAccess:
 
-    @classmethod
-    def pa(cls, s, l, t):
-        return cls(t[0], t[1:])
-
-    def __init__(self, name, args):
-        self.name = name
-        self.args = args
-
-    def __repr__(self):
-        return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
-
-    def resolve(self, config):
-        return getattr(Functions, self.name)(*[config] + [a.resolve(config) for a in self.args if not a.ignorable])
-
-class Parser:
-
-    def __init__(self, g):
-        self.g = g
-
-    def __call__(self, text):
-        result, = self.g.parseString(text, parseAll = True)
-        return result
+    def __getitem__(self, key):
+        return getattr(Functions, key)
 
 textcases = [
     'x',
@@ -138,25 +46,6 @@ actioncases = [
     '$act[\rx$b()z  yy\t]',
 ]
 
-rawtext = Regex('[^$]+').leaveWhitespace().parseWithTabs()
-text = rawtext.setParseAction(Text.pa)
-
-#for case in textcases:
-#    print( case)
-#    text.parseString(case, parseAll = True).pprint()
-
-action = Forward()
-def clauses():
-    for o, c in '()', '[]':
-        rawargtext = Regex(r'[^$\s\%s]+' % c)
-        argtext = rawargtext.setParseAction(Text.pa)
-        arg = Optional(White().setParseAction(Blank.pa)) + (OneOrMore(Optional(argtext) + action) + Optional(argtext) | rawargtext.setParseAction(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
-        yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(arg) + Optional(White().setParseAction(Blank.pa)) + Suppress(c)
-
-action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(Call.pa)
-#for case in actioncases:
-#    print(repr(case), Parser(action)(case))
-
 templatecases = [
     '',
     'woo',
@@ -174,12 +63,10 @@ yay
     'truewoo',
 ]
 
-template = (OneOrMore(Optional(text) + action) + Optional(text) | rawtext.setParseAction(Scalar.pa) | Empty().setParseAction(lambda *args: Text(''))).parseWithTabs().setParseAction(Concat.pa)
-
-config = {'yay': Text('YAY')}
+config = {'yay': grammar.Text('YAY')}
 for case in textcases+actioncases+ templatecases:
     print(repr(case))
-    expr = Parser(template)(case)
+    expr = grammar.createparser(FunctionsAccess())(case)
     print(expr)
     print(repr(expr.resolve(config)))
 
