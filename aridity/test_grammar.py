@@ -37,13 +37,13 @@ class TestGrammar(unittest.TestCase):
         ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p('$act(x yy)'))
         ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx  yy\t)'))
         ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx$b()z  yy\t)'))
-        ae(Call('act', []), p('$act(\rx$b[]z  yy\t)'))
+        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx$b[]z  yy\t)'))
         ae(Call('a', []), p('$a[]'))
-        ae(Call('ac', []), p('$ac[x]'))
-        ae(Call('act', []), p('$act[x yy]'))
-        ae(Call('act', []), p('$act[\rx  yy\t]'))
-        ae(Call('act', []), p('$act[\rx$b[]z  yy\t]'))
-        ae(Call('act', []), p('$act[\rx$b()z  yy\t]'))
+        ae(Call('ac', [Text('x')]), p('$ac[x]'))
+        ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p('$act[x yy]'))
+        ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx  yy\t]'))
+        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx$b[]z  yy\t]'))
+        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx$b()z  yy\t]'))
 
 """
 
