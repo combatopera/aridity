@@ -100,7 +100,7 @@ class Parser:
 
 def createparser(functions):
     def gettext(pa):
-        return Regex('[^$]+').leaveWhitespace().parseWithTabs().setParseAction(pa)
+        return Regex('[^$]+').leaveWhitespace().setParseAction(pa)
     opttext = Optional(gettext(Text.pa))
     action = Forward()
     def clauses():
@@ -111,6 +111,6 @@ def createparser(functions):
             argtext = getargtext(Text.pa)
             arg = (OneOrMore(Optional(argtext) + action) + Optional(argtext) | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
             yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-    action << (Suppress('$') + Or(clauses())).parseWithTabs().setParseAction(lambda s, l, t: Call.pa(functions, s, l, t))
+    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call.pa(functions, s, l, t))
     template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
     return Parser(template)
