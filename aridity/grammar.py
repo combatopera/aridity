@@ -95,6 +95,24 @@ class Call:
 
 class Parser:
 
+    @classmethod
+    def create(cls):
+        def gettext(pa):
+            return Regex('[^$]+').leaveWhitespace().setParseAction(pa)
+        opttext = Optional(gettext(Text.pa))
+        action = Forward()
+        def clauses():
+            optblank = Optional(White().setParseAction(Blank.pa))
+            for o, c in '()', '[]':
+                def getargtext(pa):
+                    return Regex(r'[^$\s\%s]+' % c).setParseAction(pa)
+                optargtext = Optional(getargtext(Text.pa))
+                arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
+                yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
+        action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
+        template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
+        return Parser(template)
+
     def __init__(self, g):
         self.g = g
 
@@ -102,19 +120,4 @@ class Parser:
         result, = self.g.parseString(text, parseAll = True)
         return result
 
-def createparser():
-    def gettext(pa):
-        return Regex('[^$]+').leaveWhitespace().setParseAction(pa)
-    opttext = Optional(gettext(Text.pa))
-    action = Forward()
-    def clauses():
-        optblank = Optional(White().setParseAction(Blank.pa))
-        for o, c in '()', '[]':
-            def getargtext(pa):
-                return Regex(r'[^$\s\%s]+' % c).setParseAction(pa)
-            optargtext = Optional(getargtext(Text.pa))
-            arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
-            yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
-    template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
-    return Parser(template)
+parser = Parser.create()

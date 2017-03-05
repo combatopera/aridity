@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-from grammar import createparser, Text, Call, Blank, Concat, Number, Boolean
+from grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean
 from decimal import Decimal
 
 class Functions:
@@ -27,7 +27,6 @@ class Functions:
 class TestGrammar(unittest.TestCase):
 
     def test_parser(self):
-        p = createparser()
         ae = self.assertEqual
         ae(Text('x'), p('x'))
         ae(Text('yy'), p('yy'))
