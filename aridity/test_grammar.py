@@ -32,18 +32,16 @@ class TestGrammar(unittest.TestCase):
         ae(Text('yy'), p('yy'))
         ae(Text('x  y'), p('x  y'))
         ae(Text('\tx  y\r'), p('\tx  y\r'))
-        ae(Call('a', []), p('$a()'))
-        ae(Call('ac', [Text('x')]), p('$ac(x)'))
-        ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p('$act(x yy)'))
-        ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx  yy\t)'))
-        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx$b()z  yy\t)'))
-        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx$b[]z  yy\t)'))
-        ae(Call('a', []), p('$a[]'))
-        ae(Call('ac', [Text('x')]), p('$ac[x]'))
-        ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p('$act[x yy]'))
-        ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx  yy\t]'))
-        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx$b[]z  yy\t]'))
-        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act[\rx$b()z  yy\t]'))
+        for text in '$a()', '$a[]':
+            ae(Call('a', []), p(text))
+        for text in '$ac(x)', '$ac[x]':
+            ae(Call('ac', [Text('x')]), p(text))
+        for text in '$act(x yy)', '$act[x yy]':
+            ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p(text))
+        for text in '$act(\rx  yy\t)', '$act[\rx  yy\t]':
+            ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p(text))
+        for text in '$act(\rx$b()z  yy\t)', '$act(\rx$b[]z  yy\t)', '$act[\rx$b[]z  yy\t]', '$act[\rx$b()z  yy\t]':
+            ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p(text))
 
 """
 
