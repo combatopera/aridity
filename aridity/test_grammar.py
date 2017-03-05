@@ -6,25 +6,31 @@ from decimal import Decimal
 
 class Functions:
 
-    def get(config, key):
-        return config[key.cat()]
+    def get(context, key):
+        return context.value(key.cat())
 
-    def a(config):
+    def a(context):
         return Text('A')
 
-    def ac(config, x):
-        return Text('ac.' + x.resolve(config).cat())
+    def ac(context, x):
+        return Text('ac.' + x.resolve(context).cat())
 
-    def id(config, x):
+    def id(context, x):
         return x
 
-    def act(config, x, y):
-        return Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
+    def act(context, x, y):
+        return Text('act.' + x.resolve(context).cat() + '.' + y.resolve(context).cat())
 
 class Context:
 
+    def __init__(self):
+        self.templates = {}
+
     def function(self, name):
         return getattr(Functions, name)
+
+    def value(self, name):
+        return self.templates[name].resolve(self)
 
 class TestGrammar(unittest.TestCase):
 
@@ -68,6 +74,7 @@ class TestGrammar(unittest.TestCase):
 
     def test_resolve(self):
         c = Context()
+        c.templates['minus124'] = Number(-124)
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
@@ -76,15 +83,16 @@ class TestGrammar(unittest.TestCase):
         ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
         ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
+        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
 
 """
 
-config = {'yay': grammar.Text('YAY')}
+context = {'yay': grammar.Text('YAY')}
 for case in textcases+actioncases+ templatecases:
     print(repr(case))
     expr = grammar.createparser(Functions.__dict__)(case)
     print(expr)
-    print(repr(expr.resolve(config)))
+    print(repr(expr.resolve(context)))
 """
 
 if '__main__' == __name__:
