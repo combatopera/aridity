@@ -72,8 +72,9 @@ class TestGrammar(unittest.TestCase):
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
         ae(Text('A'), Call('a', []).resolve(c))
-        ae(Text('ac.woo'), Call('ac', [Text('woo')]).resolve(c))
-        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Text('yay')]).resolve(c))
+        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c))
+        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
+        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
 
 """
