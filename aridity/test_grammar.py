@@ -52,8 +52,8 @@ class TestGrammar(unittest.TestCase):
         ae(Text(''), p(''))
         ae(Text('woo'), p('woo'))
         ae(Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')]), p('woo$get(yay)houpla'))
-        ae(Concat([Text('woo '), Call('get', [Blank('\n'), Text('yay'), Blank('\n')]), Text('\thoupla  ')]), p('''woo $get(
-yay
+        ae(Concat([Text('woo '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Text('\thoupla  ')]), p('''woo $get(
+ yay
 )\thoupla  '''))
         ae(Number(1), p('1'))
         ae(Call('id', [Number(Decimal('.1'))]), p('$id(.1)'))
