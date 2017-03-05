@@ -85,15 +85,5 @@ class TestGrammar(unittest.TestCase):
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
         ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
 
-"""
-
-context = {'yay': grammar.Text('YAY')}
-for case in textcases+actioncases+ templatecases:
-    print(repr(case))
-    expr = grammar.createparser(Functions.__dict__)(case)
-    print(expr)
-    print(repr(expr.resolve(context)))
-"""
-
 if '__main__' == __name__:
     unittest.main()
