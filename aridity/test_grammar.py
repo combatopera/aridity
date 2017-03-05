@@ -73,6 +73,7 @@ class TestGrammar(unittest.TestCase):
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
         ae(Text('A'), Call('a', []).resolve(c))
         ae(Text('ac.woo'), Call('ac', [Text('woo')]).resolve(c))
+        ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
 
 """
 
