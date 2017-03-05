@@ -45,13 +45,13 @@ class TestGrammar(unittest.TestCase):
         ae(Text(''), p(''))
         ae(Text('woo'), p('woo'))
         ae(Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')]), p('woo$get(yay)houpla'))
+        ae(Concat([Text('woo '), Call('get', [Blank('\n'), Text('yay'), Blank('\n')]), Text('\thoupla  ')]), p('''woo $get(
+yay
+)\thoupla  '''))
 
 """
 
 templatecases = [
-    '''woo $get(
-yay
-)\thoupla  ''',
     '1',
     '$id(.1)',
     '$id(.1woo)',
