@@ -20,8 +20,8 @@ class Concat:
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
 
-    def resolve(self, config):
-        return Text(''.join(part.resolve(config).cat() for part in self.parts))
+    def resolve(self, context):
+        return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
 class SimpleValue:
 
@@ -36,7 +36,7 @@ class SimpleValue:
     def __eq__(self, that):
         return type(self) == type(that) and self.value == that.value
 
-    def resolve(self, config):
+    def resolve(self, context):
         return self
 
     def __repr__(self):
@@ -90,8 +90,8 @@ class Call:
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
 
-    def resolve(self, config):
-        return config.function(self.name)(*[config] + [a.resolve(config) for a in self.args if not a.ignorable])
+    def resolve(self, context):
+        return context.function(self.name)(*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
 
 class Parser:
 
