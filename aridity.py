@@ -20,11 +20,6 @@ class Functions:
     def act(config, x, y):
         return grammar.Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
 
-class FunctionsAccess:
-
-    def __getitem__(self, key):
-        return getattr(Functions, key)
-
 textcases = [
     'x',
     'yy',
@@ -66,7 +61,7 @@ yay
 config = {'yay': grammar.Text('YAY')}
 for case in textcases+actioncases+ templatecases:
     print(repr(case))
-    expr = grammar.createparser(FunctionsAccess())(case)
+    expr = grammar.createparser(Functions.__dict__)(case)
     print(expr)
     print(repr(expr.resolve(config)))
 
