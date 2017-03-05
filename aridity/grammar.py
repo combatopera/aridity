@@ -14,6 +14,9 @@ class Concat:
     def __init__(self, parts):
         self.parts = parts
 
+    def __eq__(self, that):
+        return self.parts == that.parts
+
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
 
@@ -77,8 +80,7 @@ Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
 class Call:
 
-    def __init__(self, functions, name, args):
-        self.functions = functions # FIXME: pass into resolve instead
+    def __init__(self, name, args):
         self.name = name
         self.args = args
 
@@ -89,7 +91,7 @@ class Call:
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
 
     def resolve(self, config):
-        return self.functions[self.name](*[config] + [a.resolve(config) for a in self.args if not a.ignorable])
+        return config.function(self.name)(*[config] + [a.resolve(config) for a in self.args if not a.ignorable])
 
 class Parser:
 
@@ -100,7 +102,7 @@ class Parser:
         result, = self.g.parseString(text, parseAll = True)
         return result
 
-def createparser(functions):
+def createparser():
     def gettext(pa):
         return Regex('[^$]+').leaveWhitespace().setParseAction(pa)
     opttext = Optional(gettext(Text.pa))
@@ -113,6 +115,6 @@ def createparser(functions):
             optargtext = Optional(getargtext(Text.pa))
             arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
             yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(functions, t[0], t[1:]))
+    action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
     template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
     return Parser(template)

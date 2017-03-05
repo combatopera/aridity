@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import unittest, grammar as g
+import unittest
+from grammar import createparser, Text, Call, Blank, Concat
 
 class Functions:
 
@@ -8,51 +9,43 @@ class Functions:
         return config[key.cat()]
 
     def a(config):
-        return g.Text('A')
+        return Text('A')
 
     def b(config):
-        return g.Text('B')
+        return Text('B')
 
     def ac(config, x):
-        return g.Text('ac.' + x.resolve(config).cat())
+        return Text('ac.' + x.resolve(config).cat())
 
     def id(config, x):
         return x
 
     def act(config, x, y):
-        return g.Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
+        return Text('act.' + x.resolve(config).cat() + '.' + y.resolve(config).cat())
 
 class TestGrammar(unittest.TestCase):
 
-    def test_works(self):
-        p = g.createparser(Functions.__dict__)
-        self.assertEqual(g.Text('x'), p('x'))
-        self.assertEqual(g.Text('yy'), p('yy'))
-        self.assertEqual(g.Text('x  y'), p('x  y'))
-        self.assertEqual(g.Text('\tx  y\r'), p('\tx  y\r'))
-        self.assertEqual(g.Call(None, 'a', []), p('$a()'))
+    def test_parser(self):
+        p = createparser()
+        ae = self.assertEqual
+        ae(Text('x'), p('x'))
+        ae(Text('yy'), p('yy'))
+        ae(Text('x  y'), p('x  y'))
+        ae(Text('\tx  y\r'), p('\tx  y\r'))
+        ae(Call('a', []), p('$a()'))
+        ae(Call('ac', [Text('x')]), p('$ac(x)'))
+        ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p('$act(x yy)'))
+        ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx  yy\t)'))
+        ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p('$act(\rx$b()z  yy\t)'))
+        ae(Call('act', []), p('$act(\rx$b[]z  yy\t)'))
+        ae(Call('a', []), p('$a[]'))
+        ae(Call('ac', []), p('$ac[x]'))
+        ae(Call('act', []), p('$act[x yy]'))
+        ae(Call('act', []), p('$act[\rx  yy\t]'))
+        ae(Call('act', []), p('$act[\rx$b[]z  yy\t]'))
+        ae(Call('act', []), p('$act[\rx$b()z  yy\t]'))
 
 """
-textcases = [
-    'x',
-    'yy',
-    'x  y',
-    '\tx  y\r',
-]
-actioncases = [
-    '$a()',
-    '$ac(x)',
-    '$act(x yy)',
-    '$act(\rx  yy\t)',
-    '$act(\rx$b()z  yy\t)',
-    '$act(\rx$b[]z  yy\t)',
-    '$a[]',
-    '$ac[x]',
-    '$act[x yy]',
-    '$act[\rx  yy\t]',
-    '$act[\rx$b[]z  yy\t]',
-    '$act[\rx$b()z  yy\t]',
-]
 
 templatecases = [
     '',
