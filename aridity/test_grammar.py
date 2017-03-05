@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-from grammar import createparser, Text, Call, Blank, Concat, Number
+from grammar import createparser, Text, Call, Blank, Concat, Number, Boolean
 from decimal import Decimal
 
 class Functions:
@@ -53,15 +53,13 @@ yay
         ae(Call('id', [Number(Decimal('.1'))]), p('$id(.1)'))
         ae(Call('id', [Text('.1woo')]), p('$id(.1woo)'))
         ae(Text('100woo'), p('100woo'))
+        ae(Boolean(False), p('false'))
+        ae(Call('id', [Boolean(True)]), p('$id(true)'))
+        ae(Call('id', [Text('falseyay')]), p('$id(falseyay)'))
+        ae(Text('truewoo'), p('truewoo'))
+
 
 """
-
-templatecases = [
-    'false',
-    '$id(true)',
-    '$id(falseyay)',
-    'truewoo',
-]
 
 config = {'yay': grammar.Text('YAY')}
 for case in textcases+actioncases+ templatecases:
