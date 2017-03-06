@@ -21,14 +21,6 @@ class Functions:
     def act(context, x, y):
         return Text('act.' + x.resolve(context).cat() + '.' + y.resolve(context).cat())
 
-class Context:
-
-    def __init__(self):
-        self.templates = {}
-
-    def __getitem__(self, name):
-        return self.templates[name].resolve(self)
-
 class TestGrammar(unittest.TestCase):
 
     def test_parser(self):
@@ -70,10 +62,10 @@ class TestGrammar(unittest.TestCase):
         ae(Text('truewoo'), p('truewoo'))
 
     def test_resolve(self):
-        c = Context()
+        c = {}
         for name in 'a', 'ac', 'act', 'id', 'get':
-            c.templates[name] = Function(getattr(Functions, name))
-        c.templates['minus124'] = Number(-124)
+            c[name] = Function(getattr(Functions, name))
+        c['minus124'] = Number(-124)
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
