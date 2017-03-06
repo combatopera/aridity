@@ -14,6 +14,12 @@ class Resolvable:
                 return False
         return True
 
+    def __repr__(self):
+        t = type(self)
+        init = t.__init__.__code__
+        args = ', '.join(repr(getattr(self, name)) for name in init.co_varnames[1:init.co_argcount])
+        return "%s(%s)" % (t.__name__, args)
+
 class Concat(Resolvable):
 
     ignorable = False
@@ -25,9 +31,6 @@ class Concat(Resolvable):
 
     def __init__(self, parts):
         self.parts = parts
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.parts)
 
     def resolve(self, context):
         return Text(''.join(part.resolve(context).cat() for part in self.parts))
@@ -44,9 +47,6 @@ class SimpleValue(Resolvable):
 
     def resolve(self, context):
         return self
-
-    def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.value)
 
 class Blank(SimpleValue):
 
@@ -92,13 +92,10 @@ class Call(Resolvable):
         self.name = name
         self.args = args
 
-    def __repr__(self):
-        return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
-
     def resolve(self, context):
         return context[self.name](*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
 
-class Function:
+class Function(Resolvable):
 
     def __init__(self, f):
         self.f = f
