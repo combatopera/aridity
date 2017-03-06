@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import unittest
+import unittest, pyparsing
 from grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean, Function
 from decimal import Decimal
 
@@ -92,6 +92,16 @@ class TestGrammar(unittest.TestCase):
         ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
+
+    def test_whitespace(self):
+        ae = self.assertEqual
+        ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
+        ae([Blank(' '), Blank(' '), Text('x'), Blank(' '), Blank(' ')], p(' $pass( x ) '))
+        for name in 'lit', 'pass':
+            for text in (' $ %s( x ) ' % name,
+                         ' $%s ( x ) ' % name):
+                with self.assertRaises(pyparsing.ParseException):
+                    p(text)
 
 if '__main__' == __name__:
     unittest.main()
