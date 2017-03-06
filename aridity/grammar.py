@@ -109,17 +109,16 @@ class Parser:
 
     @classmethod
     def create(cls):
-        def gettext(pa):
-            return Regex(r'[^$\s]+').leaveWhitespace().setParseAction(pa)
+        def gettext(pa, boundaryornone = None):
+            char = '' if boundaryornone is None else r"\%s" % boundaryornone
+            return Regex(r"[^$\s%s]+" % char).leaveWhitespace().setParseAction(pa)
         opttext = Optional(gettext(Text.pa))
         action = Forward()
         optblank = Optional(White().setParseAction(Blank.pa))
         def clauses():
             for o, c in '()', '[]':
-                def getargtext(pa):
-                    return Regex(r'[^$\s\%s]+' % c).setParseAction(pa)
-                optargtext = Optional(getargtext(Text.pa))
-                arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
+                optargtext = Optional(gettext(Text.pa, c))
+                arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).leaveWhitespace().setParseAction(Concat.pa)
                 yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
         action << (Suppress('$').leaveWhitespace() + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
