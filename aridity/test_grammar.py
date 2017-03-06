@@ -48,7 +48,7 @@ class TestGrammar(unittest.TestCase):
             ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
         ae([], p(''))
         ae([Text('woo')], p('woo'))
-        ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
+        ae([Text('woo'), Call('get', [Text('yay')]), Text('houpla')], p('woo$get(yay)houpla'))
         ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(
  yay
 )\thoupla  '''))
