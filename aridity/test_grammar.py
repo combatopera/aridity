@@ -64,9 +64,7 @@ class TestGrammar(unittest.TestCase):
         ae([Text('truewoo')], p('truewoo'))
 
     def test_resolve(self):
-        c = {}
-        for name in 'a', 'ac', 'act', 'id', 'get':
-            c[name] = Function(getattr(Functions, name))
+        c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
         c['minus124'] = Number(-124)
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
@@ -90,7 +88,10 @@ class TestGrammar(unittest.TestCase):
         ae = self.assertEqual
         ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass( x  y\t)'))
         ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass[ x  y\t]'))
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], p('$act(x $pass[ y\t])'))
+        actual = p('$act(x $pass[ y\t])')
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], actual)
+        c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
+        ae(Text('act.x. y\t'), Concat(actual).resolve(c))
 
 if '__main__' == __name__:
     unittest.main()

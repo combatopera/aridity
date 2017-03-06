@@ -50,7 +50,12 @@ class SimpleValue(Resolvable):
     def resolve(self, context):
         return self
 
-class Blank(SimpleValue):
+class Cat:
+
+    def cat(self):
+        return self.value
+
+class Blank(SimpleValue, Cat):
 
     ignorable = True
 
@@ -68,10 +73,9 @@ class Scalar(SimpleValue):
             m = cls.numberpattern.search(text)
             return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
-class Text(Scalar):
+class Text(Scalar, Cat):
 
-    def cat(self):
-        return self.value
+    pass
 
 class Number(Scalar):
 
