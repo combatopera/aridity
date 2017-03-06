@@ -122,7 +122,7 @@ class Parser:
                 arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
                 yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
         action << (Suppress('$').leaveWhitespace() + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
-        chunk = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)).setParseAction(Concat.pa)
+        chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
         return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
 
     def __init__(self, g):
