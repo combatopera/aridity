@@ -83,6 +83,7 @@ class TestGrammar(unittest.TestCase):
     def test_lit(self):
         ae = self.assertEqual
         ae(Text('$doesNotExist(]'), p('$lit($doesNotExist(])'))
+        ae(Text('$doesNotExist[)'), p('$lit[$doesNotExist[)]'))
 
 if '__main__' == __name__:
     unittest.main()
