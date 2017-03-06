@@ -13,13 +13,13 @@ class Functions:
         return Text('A')
 
     def ac(context, x):
-        return Text('ac.' + x.resolve(context).cat())
+        return Text('ac.' + x.cat())
 
     def id(context, x):
         return x
 
     def act(context, x, y):
-        return Text('act.' + x.resolve(context).cat() + '.' + y.resolve(context).cat())
+        return Text('act.' + x.cat() + '.' + y.cat())
 
 class TestGrammar(unittest.TestCase):
 
