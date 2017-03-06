@@ -20,6 +20,9 @@ class Resolvable:
         args = ', '.join(repr(getattr(self, name)) for name in init.co_varnames[1:init.co_argcount])
         return "%s(%s)" % (t.__name__, args)
 
+    def resolve(self, context):
+        raise NotImplementedError
+
 class Concat(Resolvable):
 
     ignorable = False

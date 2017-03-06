@@ -76,6 +76,7 @@ class TestGrammar(unittest.TestCase):
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
         ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
+        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
 
 if '__main__' == __name__:
     unittest.main()
