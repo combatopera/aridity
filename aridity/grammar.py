@@ -1,4 +1,4 @@
-from pyparsing import Empty, Forward, OneOrMore, Optional, Or, Regex, Suppress, White, ZeroOrMore
+from pyparsing import Empty, Forward, OneOrMore, Optional, Or, Regex, Suppress, White, ZeroOrMore, CharsNotIn
 from decimal import Decimal
 import re
 
@@ -87,6 +87,10 @@ class Call(Resolvable):
 
     ignorable = False
 
+    @classmethod
+    def pa(cls, s, l, t):
+        return cls(t[0], t[1:])
+
     def __init__(self, name, args):
         self.name = name
         self.args = args
@@ -117,10 +121,11 @@ class Parser:
         optblank = Optional(White().setParseAction(Blank.pa))
         def clauses():
             for o, c in '()', '[]':
+                yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
                 arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).leaveWhitespace().setParseAction(Concat.pa)
-                yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-        action << (Suppress('$').leaveWhitespace() + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
+                yield (Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)).setParseAction(Call.pa)
+        action << Suppress('$').leaveWhitespace() + Or(clauses())
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
         return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
 
