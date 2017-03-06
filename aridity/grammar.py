@@ -2,7 +2,19 @@ from pyparsing import Empty, Forward, OneOrMore, Optional, Or, Regex, Suppress, 
 from decimal import Decimal
 import re
 
-class Concat:
+class Resolvable:
+
+    def __eq__(self, that):
+        if type(self) != type(that):
+            return False
+        if self.__dict__.keys() != that.__dict__.keys():
+            return False
+        for k, v in self.__dict__.items():
+            if v != that.__dict__[k]:
+                return False
+        return True
+
+class Concat(Resolvable):
 
     ignorable = False
 
@@ -14,16 +26,13 @@ class Concat:
     def __init__(self, parts):
         self.parts = parts
 
-    def __eq__(self, that):
-        return self.parts == that.parts
-
     def __repr__(self):
         return "%s(%r)" % (type(self).__name__, self.parts)
 
     def resolve(self, context):
         return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
-class SimpleValue:
+class SimpleValue(Resolvable):
 
     @classmethod
     def pa(cls, s, l, t):
@@ -32,9 +41,6 @@ class SimpleValue:
 
     def __init__(self, value):
         self.value = value
-
-    def __eq__(self, that):
-        return type(self) == type(that) and self.value == that.value
 
     def resolve(self, context):
         return self
@@ -78,16 +84,13 @@ class Boolean(Scalar):
 
 Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
-class Call:
+class Call(Resolvable):
 
     ignorable = False
 
     def __init__(self, name, args):
         self.name = name
         self.args = args
-
-    def __eq__(self, that):
-        return self.name == that.name and self.args == that.args
 
     def __repr__(self):
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
