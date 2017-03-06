@@ -93,7 +93,18 @@ class Call:
         return "%s(%r, %r)" % (type(self).__name__, self.name, self.args)
 
     def resolve(self, context):
-        return context.function(self.name)(*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
+        return context[self.name](*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
+
+class Function:
+
+    def __init__(self, f):
+        self.f = f
+
+    def resolve(self, context):
+        return self
+
+    def __call__(self, *args):
+        return self.f(*args)
 
 class Parser:
 

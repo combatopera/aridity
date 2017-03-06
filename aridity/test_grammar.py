@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import unittest
-from grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean
+from grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean, Function
 from decimal import Decimal
 
 class Functions:
 
     def get(context, key):
-        return context.value(key.cat())
+        return context[key.cat()]
 
     def a(context):
         return Text('A')
@@ -26,10 +26,7 @@ class Context:
     def __init__(self):
         self.templates = {}
 
-    def function(self, name):
-        return getattr(Functions, name)
-
-    def value(self, name):
+    def __getitem__(self, name):
         return self.templates[name].resolve(self)
 
 class TestGrammar(unittest.TestCase):
@@ -74,6 +71,8 @@ class TestGrammar(unittest.TestCase):
 
     def test_resolve(self):
         c = Context()
+        for name in 'a', 'ac', 'act', 'id', 'get':
+            c.templates[name] = Function(getattr(Functions, name))
         c.templates['minus124'] = Number(-124)
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
@@ -84,7 +83,7 @@ class TestGrammar(unittest.TestCase):
         ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
         ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
-        ae(Text('A'), Call('a', [Call('a', [])]).resolve(c))
+        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
 
 if '__main__' == __name__:
     unittest.main()
