@@ -29,8 +29,7 @@ class Concat(Resolvable):
 
     @classmethod
     def pa(cls, s, l, t):
-        parts = t.asList()
-        return parts[0] if 1 == len(parts) else cls(parts)
+        return t[0] if 1 == len(t) else cls(t.asList())
 
     def __init__(self, parts):
         self.parts = parts
