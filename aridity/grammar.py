@@ -117,9 +117,9 @@ class Parser:
 
     @classmethod
     def create(cls):
-        def gettext(pa, boundaryornone = None):
-            char = '' if boundaryornone is None else r"\%s" % boundaryornone
-            return Regex(r"[^$\s%s]+" % char).leaveWhitespace().setParseAction(pa)
+        def gettext(pa, boundarycharornone = None):
+            boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
+            return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
         opttext = Optional(gettext(Text.pa))
         action = Forward()
         optblank = Optional(White().setParseAction(Blank.pa))
