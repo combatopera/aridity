@@ -90,6 +90,7 @@ class TestGrammar(unittest.TestCase):
         ae = self.assertEqual
         ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass( x  y\t)'))
         ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass[ x  y\t]'))
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], p('$act(x $pass[ y\t])'))
 
 if '__main__' == __name__:
     unittest.main()
