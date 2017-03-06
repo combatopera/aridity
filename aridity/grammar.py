@@ -1,4 +1,4 @@
-from pyparsing import Empty, Forward, OneOrMore, Optional, Or, Regex, Suppress, White, ZeroOrMore, CharsNotIn
+from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, White, ZeroOrMore, CharsNotIn
 from decimal import Decimal
 import re
 
