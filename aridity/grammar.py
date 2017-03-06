@@ -58,7 +58,7 @@ class Blank(SimpleValue):
 class Scalar(SimpleValue):
 
     ignorable = False
-    numberpattern = re.compile('^(?:[0-9]+|[0-9]*[.][0-9]+)$')
+    numberpattern = re.compile('^-?(?:[0-9]+|[0-9]*[.][0-9]+)$')
 
     @classmethod
     def pa(cls, s, l, t):

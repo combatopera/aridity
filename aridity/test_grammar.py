@@ -53,7 +53,9 @@ class TestGrammar(unittest.TestCase):
  yay
 )\thoupla  '''))
         ae(Number(1), p('1'))
+        ae(Number(-5), p('-5'))
         ae(Call('id', [Number(Decimal('.1'))]), p('$id(.1)'))
+        ae(Call('id', [Number(Decimal('-5.4'))]), p('$id(-5.4)'))
         ae(Call('id', [Text('.1woo')]), p('$id(.1woo)'))
         ae(Text('100woo'), p('100woo'))
         ae(Boolean(False), p('false'))
