@@ -124,6 +124,7 @@ class Parser:
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
                 arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).leaveWhitespace().setParseAction(Concat.pa)
+                yield Suppress('pass') + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
                 yield (Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses())
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)

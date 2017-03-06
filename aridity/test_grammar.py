@@ -84,6 +84,12 @@ class TestGrammar(unittest.TestCase):
         ae = self.assertEqual
         ae([Text('$doesNotExist(]')], p('$lit($doesNotExist(])'))
         ae([Text('$doesNotExist[)')], p('$lit[$doesNotExist[)]'))
+        ae([Text(' \t')], p('$lit[ \t]'))
+
+    def test_pass(self):
+        ae = self.assertEqual
+        ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass( x  y\t)'))
+        ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass[ x  y\t]'))
 
 if '__main__' == __name__:
     unittest.main()
