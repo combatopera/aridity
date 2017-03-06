@@ -80,6 +80,8 @@ Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
 class Call:
 
+    ignorable = False
+
     def __init__(self, name, args):
         self.name = name
         self.args = args
