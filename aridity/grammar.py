@@ -110,26 +110,25 @@ class Parser:
     @classmethod
     def create(cls):
         def gettext(pa):
-            return Regex('[^$]+').leaveWhitespace().setParseAction(pa)
+            return Regex(r'[^$\s]+').leaveWhitespace().setParseAction(pa)
         opttext = Optional(gettext(Text.pa))
         action = Forward()
+        optblank = Optional(White().setParseAction(Blank.pa))
         def clauses():
-            optblank = Optional(White().setParseAction(Blank.pa))
             for o, c in '()', '[]':
                 def getargtext(pa):
                     return Regex(r'[^$\s\%s]+' % c).setParseAction(pa)
                 optargtext = Optional(getargtext(Text.pa))
                 arg = (OneOrMore(optargtext + action) + optargtext | getargtext(Scalar.pa)).leaveWhitespace().setParseAction(Concat.pa)
                 yield Regex('[^%s]+' % o) + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-        action << (Suppress('$') + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
-        template = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa) | Empty().setParseAction(lambda s, l, t: Text(''))).parseWithTabs().setParseAction(Concat.pa)
-        return Parser(template)
+        action << (Suppress('$').leaveWhitespace() + Or(clauses())).setParseAction(lambda s, l, t: Call(t[0], t[1:]))
+        chunk = (OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)).setParseAction(Concat.pa)
+        return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
 
     def __init__(self, g):
         self.g = g
 
     def __call__(self, text):
-        result, = self.g.parseString(text, parseAll = True)
-        return result
+        return self.g.parseString(text, parseAll = True).asList()
 
 parser = Parser.create()

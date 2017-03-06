@@ -25,43 +25,43 @@ class TestGrammar(unittest.TestCase):
 
     def test_parser(self):
         ae = self.assertEqual
-        ae(Text('x'), p('x'))
-        ae(Text('yy'), p('yy'))
-        ae(Text('x  y'), p('x  y'))
-        ae(Text('\tx  y\r'), p('\tx  y\r'))
+        ae([Text('x')], p('x'))
+        ae([Text('yy')], p('yy'))
+        ae([Text('x'), Blank('  '), Text('y')], p('x  y'))
+        ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Blank('\r')], p('\tx  y\r'))
         for text in ('$a()',
                      '$a[]'):
-            ae(Call('a', []), p(text))
+            ae([Call('a', [])], p(text))
         for text in ('$ac(x)',
                      '$ac[x]'):
-            ae(Call('ac', [Text('x')]), p(text))
+            ae([Call('ac', [Text('x')])], p(text))
         for text in ('$act(x yy)',
                      '$act[x yy]'):
-            ae(Call('act', [Text('x'), Blank(' '), Text('yy')]), p(text))
+            ae([Call('act', [Text('x'), Blank(' '), Text('yy')])], p(text))
         for text in ('$act(\rx  yy\t)',
                      '$act[\rx  yy\t]'):
-            ae(Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')]), p(text))
+            ae([Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')])], p(text))
         for text in ('$act(\rx$b()z  yy\t)',
                      '$act(\rx$b[]z  yy\t)',
                      '$act[\rx$b[]z  yy\t]',
                      '$act[\rx$b()z  yy\t]'):
-            ae(Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')]), p(text))
-        ae(Text(''), p(''))
-        ae(Text('woo'), p('woo'))
-        ae(Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')]), p('woo$get(yay)houpla'))
-        ae(Concat([Text('woo '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Text('\thoupla  ')]), p('''woo $get(
+            ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
+        ae([], p(''))
+        ae([Text('woo')], p('woo'))
+        ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
+        ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(
  yay
 )\thoupla  '''))
-        ae(Number(1), p('1'))
-        ae(Number(-5), p('-5'))
-        ae(Call('id', [Number(Decimal('.1'))]), p('$id(.1)'))
-        ae(Call('id', [Number(Decimal('-5.4'))]), p('$id(-5.4)'))
-        ae(Call('id', [Text('.1woo')]), p('$id(.1woo)'))
-        ae(Text('100woo'), p('100woo'))
-        ae(Boolean(False), p('false'))
-        ae(Call('id', [Boolean(True)]), p('$id(true)'))
-        ae(Call('id', [Text('falseyay')]), p('$id(falseyay)'))
-        ae(Text('truewoo'), p('truewoo'))
+        ae([Number(1)], p('1'))
+        ae([Number(-5)], p('-5'))
+        ae([Call('id', [Number(Decimal('.1'))])], p('$id(.1)'))
+        ae([Call('id', [Number(Decimal('-5.4'))])], p('$id(-5.4)'))
+        ae([Call('id', [Text('.1woo')])], p('$id(.1woo)'))
+        ae([Text('100woo')], p('100woo'))
+        ae([Boolean(False)], p('false'))
+        ae([Call('id', [Boolean(True)])], p('$id(true)'))
+        ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
+        ae([Text('truewoo')], p('truewoo'))
 
     def test_resolve(self):
         c = {}
