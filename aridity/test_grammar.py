@@ -80,5 +80,9 @@ class TestGrammar(unittest.TestCase):
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
 
+    def test_lit(self):
+        ae = self.assertEqual
+        ae(Text('$doesNotExist(]'), p('$lit($doesNotExist(])'))
+
 if '__main__' == __name__:
     unittest.main()
