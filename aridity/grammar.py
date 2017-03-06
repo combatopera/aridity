@@ -67,9 +67,7 @@ class Scalar(SimpleValue):
         m = cls.numberpattern.search(text)
         if m is None:
             return Text(text)
-        if '.' in text:
-            return Number(Decimal(text))
-        return Number(int(text))
+        return Number((Decimal if '.' in text else int)(text))
 
 class Text(Scalar):
 
