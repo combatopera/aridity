@@ -129,8 +129,9 @@ class Parser:
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
                 arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).setParseAction(Concat.pa)
-                yield Suppress('pass') + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-                yield (identifier + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)).setParseAction(Call.pa)
+                brackets = Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
+                yield Suppress('pass') + brackets
+                yield (identifier + brackets).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
         return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
