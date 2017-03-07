@@ -120,11 +120,10 @@ class Parser:
         def gettext(pa, boundarycharornone = None):
             boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
-        opttext = Optional(gettext(Text.pa))
         action = Forward()
         optblank = Optional(White().setParseAction(Blank.pa))
-        identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
         def clauses():
+            identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
@@ -133,6 +132,7 @@ class Parser:
                 yield Suppress('pass') + brackets
                 yield (identifier + brackets).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
+        opttext = Optional(gettext(Text.pa))
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
         return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
 
