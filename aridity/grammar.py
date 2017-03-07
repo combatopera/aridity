@@ -128,7 +128,7 @@ class Parser:
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
-                arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).leaveWhitespace().setParseAction(Concat.pa)
+                arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).setParseAction(Concat.pa)
                 yield Suppress('pass') + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
                 yield (identifier + Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
