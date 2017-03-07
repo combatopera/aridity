@@ -2,26 +2,26 @@ from .grammar import Function
 
 class SuperContext:
 
-    @staticmethod
-    def get(context, key):
-        return context[key.cat()]
+    resolvables = {
+        'get': Function(lambda context, key: context[key.cat()]),
+    }
 
     def __getitem__(self, name):
-        return Function(getattr(self, name))
+        return self.resolvables[name]
 
 supercontext = SuperContext()
 
 class Context:
 
     def __init__(self, parent = supercontext):
-        self.values = {}
+        self.resolvables = {}
         self.parent = parent
 
-    def __setitem__(self, name, value):
-        self.values[name] = value
+    def __setitem__(self, name, resolvable):
+        self.resolvables[name] = resolvable
 
     def __getitem__(self, name):
         try:
-            return self.values[name]
+            return self.resolvables[name]
         except KeyError:
             return self.parent[name]
