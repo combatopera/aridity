@@ -60,6 +60,7 @@ class TestGrammar(unittest.TestCase):
         ae([Call('id', [Boolean(True)])], p('$id(true)'))
         ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
         ae([Text('truewoo')], p('truewoo'))
+        ae([Text('100'), Call('a', [])], p('100$a()'))
 
     def test_loader(self):
         ae = self.assertEqual
@@ -89,6 +90,7 @@ class TestGrammar(unittest.TestCase):
         ae([Text('$doesNotExist(]')], p('$lit($doesNotExist(])'))
         ae([Text('$doesNotExist[)')], p('$lit[$doesNotExist[)]'))
         ae([Text(' \t')], p('$lit[ \t]'))
+        ae([Text('10')], p('$lit[10]'))
 
     def test_pass(self):
         ae = self.assertEqual
@@ -98,6 +100,7 @@ class TestGrammar(unittest.TestCase):
         ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
+        ae([Number(10)], p('$pass[10]'))
 
     def test_whitespace(self):
         ae = self.assertEqual
