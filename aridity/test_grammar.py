@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 import unittest, pyparsing
-from grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean, Function
+from .grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean, Function
 from decimal import Decimal
 
 class Functions:
@@ -102,6 +100,3 @@ class TestGrammar(unittest.TestCase):
                          ' $%s ( x ) ' % name):
                 with self.assertRaises(pyparsing.ParseException):
                     p(text)
-
-if '__main__' == __name__:
-    unittest.main()
