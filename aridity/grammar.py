@@ -77,7 +77,10 @@ class Scalar(SimpleValue):
 
 class Text(Scalar, Cat):
 
-    pass
+    @classmethod
+    def pa(cls, s, l, t):
+        text, = t
+        return Text(text)
 
 class Number(Scalar):
 
