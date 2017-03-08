@@ -117,11 +117,20 @@ class Function(Resolvable):
 
 class Entry(Struct):
 
+    @classmethod
+    def pa(cls, s, l, t):
+        resolvables = t[1:]
+        if resolvables and resolvables[-1].ignorable:
+            del resolvables[-1]
+        return cls(t[0], resolvables)
+
     def __init__(self, name, resolvables):
         self.name = name
         self.resolvables = resolvables
 
 class Parser:
+
+    identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
 
     @classmethod
     def create(cls):
@@ -131,14 +140,13 @@ class Parser:
         action = Forward()
         optblank = Optional(White().setParseAction(Blank.pa))
         def clauses():
-            identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
                 arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).setParseAction(Concat.pa)
                 brackets = Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
                 yield Suppress('pass') + brackets
-                yield (identifier + brackets).setParseAction(Call.pa)
+                yield (cls.identifier + brackets).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa))
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
@@ -151,4 +159,4 @@ class Parser:
         return self.g.parseString(text, parseAll = True).asList()
 
 parser = Parser.create()
-loader = Parser(parser.g)
+loader = Parser((Parser.identifier + Suppress(Regex(r'=\s*')) + parser.g).setParseAction(Entry.pa))
