@@ -2,7 +2,7 @@ from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, White, 
 from decimal import Decimal
 import re
 
-class Resolvable:
+class Struct:
 
     def __eq__(self, that):
         if type(self) != type(that):
@@ -19,6 +19,8 @@ class Resolvable:
         init = t.__init__.__code__
         args = ', '.join(repr(getattr(self, name)) for name in init.co_varnames[1:init.co_argcount])
         return "%s(%s)" % (t.__name__, args)
+
+class Resolvable(Struct):
 
     def resolve(self, context):
         raise NotImplementedError
@@ -113,6 +115,12 @@ class Function(Resolvable):
     def __call__(self, *args):
         return self.f(*args)
 
+class Entry(Struct):
+
+    def __init__(self, name, resolvables):
+        self.name = name
+        self.resolvables = resolvables
+
 class Parser:
 
     @classmethod
@@ -134,7 +142,7 @@ class Parser:
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa))
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
-        return Parser((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
+        return cls((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
 
     def __init__(self, g):
         self.g = g
@@ -143,3 +151,4 @@ class Parser:
         return self.g.parseString(text, parseAll = True).asList()
 
 parser = Parser.create()
+loader = Parser(parser.g)

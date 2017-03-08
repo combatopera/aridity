@@ -1,5 +1,5 @@
 import unittest, pyparsing
-from .grammar import parser as p, Text, Call, Blank, Concat, Number, Boolean, Function
+from .grammar import parser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry
 from decimal import Decimal
 
 class Functions:
@@ -60,6 +60,10 @@ class TestGrammar(unittest.TestCase):
         ae([Call('id', [Boolean(True)])], p('$id(true)'))
         ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
         ae([Text('truewoo')], p('truewoo'))
+
+    def test_loader(self):
+        ae = self.assertEqual
+        ae([Entry('x', [Text('y')])], l('x = y'))
 
     def test_resolve(self):
         c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
