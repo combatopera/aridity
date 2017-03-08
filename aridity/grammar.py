@@ -133,12 +133,13 @@ class Parser:
     identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
 
     @classmethod
-    def create(cls):
-        def gettext(pa, boundarycharornone = None):
+    def create(cls, boundarycharornone = None):
+        def gettext(pa, boundarycharornone):
             boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
         action = Forward()
-        optblank = Optional(White().setParseAction(Blank.pa))
+        boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
+        optblank = Optional(Regex(r"[^\S%s]+" % boundaryregex).leaveWhitespace().setParseAction(Blank.pa))
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
@@ -148,9 +149,9 @@ class Parser:
                 yield Suppress('pass') + brackets
                 yield (cls.identifier + brackets).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
-        opttext = Optional(gettext(Text.pa))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa)
-        return cls((ZeroOrMore(optblank + chunk) + optblank).parseWithTabs())
+        opttext = Optional(gettext(Text.pa, boundarycharornone))
+        chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa, boundarycharornone)
+        return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
     def __init__(self, g):
         self.g = g
@@ -158,5 +159,5 @@ class Parser:
     def __call__(self, text):
         return self.g.parseString(text, parseAll = True).asList()
 
-parser = Parser.create()
-loader = Parser((Parser.identifier + Suppress(Regex(r'=\s*')) + parser.g).setParseAction(Entry.pa))
+parser = Parser(Parser.create())
+loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create('\n')).setParseAction(Entry.pa)))

@@ -63,9 +63,11 @@ class TestGrammar(unittest.TestCase):
 
     def test_loader(self):
         ae = self.assertEqual
+        ae([], l(''))
         ae([Entry('x', [])], l('x='))
         ae([Entry('x', [])], l('x=  '))
         ae([Entry('x', [Text('y'), Blank('  '), Text('z')])], l('x = y  z\t'))
+        ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y\nx2=y2'))
 
     def test_resolve(self):
         c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
