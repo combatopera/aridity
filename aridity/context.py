@@ -6,6 +6,9 @@ class SuperContext:
         'get': Function(lambda context, key: context[key.cat()]),
     }
 
+    def namesimpl(self, names):
+        names.update(self.resolvables.keys())
+
     def __getitem__(self, name):
         return self.resolvables[name]
 
@@ -19,6 +22,15 @@ class Context:
 
     def __setitem__(self, name, resolvable):
         self.resolvables[name] = resolvable
+
+    def namesimpl(self, names):
+        self.parent.namesimpl(names)
+        names.update(self.resolvables.keys())
+
+    def names(self):
+        names = set()
+        self.namesimpl(names)
+        return names
 
     def __getitem__(self, name):
         try:

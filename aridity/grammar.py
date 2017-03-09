@@ -1,4 +1,4 @@
-from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, White, ZeroOrMore, CharsNotIn
+from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn
 from decimal import Decimal
 import re
 
@@ -31,7 +31,11 @@ class Concat(Resolvable):
 
     @classmethod
     def pa(cls, s, l, t):
-        return t[0] if 1 == len(t) else cls(t.asList())
+        return cls.unlesssingleton(t.asList())
+
+    @classmethod
+    def unlesssingleton(cls, v):
+        return v[0] if 1 == len(v) else cls(v)
 
     def __init__(self, parts):
         self.parts = parts
@@ -133,7 +137,7 @@ class Entry(Struct):
 
 class Parser:
 
-    identifier = Regex('[A-Za-z_][A-Za-z_0-9]*')
+    identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.]*[A-Za-z_0-9])?')
 
     @classmethod
     def create(cls, boundarycharornone = None):
