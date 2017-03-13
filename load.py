@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
-import sys
-from aridity.grammar import loader, Concat
+import sys, getopt
+from aridity.grammar import loader, Concat, Text
 from aridity.context import Context
 
 def main():
-    path, = sys.argv[1:]
+    pairs, args = getopt.gnu_getopt(sys.argv[1:], 'D:', [])
+    path, = args
     context = Context()
+    for option, value in pairs:
+        if '-D' == option:
+            k, v = value.split('=', 1)
+            context[k] = Text(v) # XXX: Parse the value as a scalar?
     with open(path) as f:
         for entry in loader(f.read()):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
