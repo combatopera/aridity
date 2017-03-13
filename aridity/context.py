@@ -4,6 +4,9 @@ import os
 def screenstr(text):
     return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
 
+def scstr(text):
+    return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+
 def ctrl(spec):
     return eval("'%s'" % spec)
 
@@ -14,6 +17,7 @@ class SuperContext:
         'str': Function(lambda context, obj: obj.totext()),
         '~': Text(os.path.expanduser('~')),
         'screenstr': Function(lambda context, text: Text(screenstr(text.cat()))),
+        'scstr': Function(lambda context, text: Text(scstr(text.cat()))),
         'ctrl': Function(lambda context, spec: Text(ctrl(spec.cat()))),
     }
 
