@@ -7,6 +7,9 @@ def screenstr(text):
 def scstr(text):
     return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
 
+def shstr(text):
+    return "'%s'" % text.replace("'", r"'\''")
+
 class SuperContext:
 
     resolvables = {
@@ -15,6 +18,8 @@ class SuperContext:
         '~': Text(os.path.expanduser('~')),
         'screenstr': Function(lambda context, text: Text(screenstr(text.cat()))),
         'scstr': Function(lambda context, text: Text(scstr(text.cat()))),
+        'shstr': Function(lambda context, text: Text(shstr(text.cat()))),
+        'env': Function(lambda context, key: Text(os.environ[key.cat()])),
         'LF': Text('\n'),
         'EOL': Text(os.linesep),
     }
