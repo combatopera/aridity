@@ -1,10 +1,12 @@
-from .grammar import Function
+from .grammar import Function, Text
+import os
 
 class SuperContext:
 
     resolvables = {
         'get': Function(lambda context, key: context[key.cat()]),
         'str': Function(lambda context, obj: obj.totext()),
+        '~': Text(os.path.expanduser('~')),
     }
 
     def namesimpl(self, names):
