@@ -45,6 +45,8 @@ class Concat(Resolvable):
 
 class SimpleValue(Resolvable):
 
+    serializable = True
+
     @classmethod
     def pa(cls, s, l, t):
         value, = t
@@ -112,6 +114,8 @@ class Call(Resolvable):
         return context[self.name](*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
 
 class Function(Resolvable):
+
+    serializable = False
 
     def __init__(self, f):
         self.f = f

@@ -10,7 +10,12 @@ def main():
     with open(path) as f:
         for entry in loader(f.read()):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
-    print({name: context[name].resolve(context) for name in context.names()})
+    config = {}
+    for name in context.names():
+        obj = context[name].resolve(context)
+        if obj.serializable:
+            config[name] = obj
+    print(config)
 
 if '__main__' == __name__:
     main()
