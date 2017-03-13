@@ -1,12 +1,20 @@
 from .grammar import Function, Text
 import os
 
+def screenstr(text):
+    return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+
+def ctrl(spec):
+    return eval("'%s'" % spec)
+
 class SuperContext:
 
     resolvables = {
         'get': Function(lambda context, key: context[key.cat()]),
         'str': Function(lambda context, obj: obj.totext()),
         '~': Text(os.path.expanduser('~')),
+        'screenstr': Function(lambda context, text: Text(screenstr(text.cat()))),
+        'ctrl': Function(lambda context, spec: Text(ctrl(spec.cat()))),
     }
 
     def namesimpl(self, names):
