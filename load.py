@@ -8,13 +8,13 @@ def main():
     pairs, args = getopt.gnu_getopt(sys.argv[1:], 'D:', [])
     path, = args
     context = Context()
-    for option, value in pairs: # XXX: Maybe these should override file entries?
-        if '-D' == option:
-            k, v = value.split('=', 1)
-            context[k] = Text(v) # XXX: Parse the value as a scalar?
     with open(path) as f:
         for entry in loader(f.read()):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+    for option, value in pairs: # Command line should override loaded entries, if any.
+        if '-D' == option:
+            k, v = value.split('=', 1)
+            context[k] = Text(v) # XXX: Parse the value as a scalar?
     config = {}
     for name in context.names():
         obj = context[name].resolve(context)
