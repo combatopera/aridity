@@ -43,6 +43,8 @@ class Concat(Resolvable):
     def resolve(self, context):
         return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
+class CatNotSupportedException(Exception): pass
+
 class SimpleValue(Resolvable):
 
     serializable = True
@@ -58,12 +60,15 @@ class SimpleValue(Resolvable):
     def resolve(self, context):
         return self
 
+    def cat(self):
+        raise CatNotSupportedException(self)
+
 class Cat:
 
     def cat(self):
         return self.value
 
-class Blank(SimpleValue, Cat):
+class Blank(Cat, SimpleValue):
 
     ignorable = True
 
@@ -81,7 +86,7 @@ class Scalar(SimpleValue):
             m = cls.numberpattern.search(text)
             return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
-class Text(Scalar, Cat):
+class Text(Cat, Scalar):
 
     @classmethod
     def pa(cls, s, l, t): # TODO: Refactor to avoid override.
