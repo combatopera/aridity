@@ -4,6 +4,7 @@ class SuperContext:
 
     resolvables = {
         'get': Function(lambda context, key: context[key.cat()]),
+        'str': Function(lambda context, obj: obj.totext()),
     }
 
     def namesimpl(self, names):

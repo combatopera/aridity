@@ -84,13 +84,14 @@ class Scalar(SimpleValue):
 class Text(Scalar, Cat):
 
     @classmethod
-    def pa(cls, s, l, t):
+    def pa(cls, s, l, t): # TODO: Refactor to avoid override.
         text, = t
         return Text(text)
 
 class Number(Scalar):
 
-    pass
+    def totext(self):
+        return Text(str(self.value)) # XXX: Ideally this would unparse?
 
 class Boolean(Scalar):
 

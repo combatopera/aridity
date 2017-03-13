@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
-import sys, getopt
-from aridity.grammar import Text, parser, Concat
+import sys
+from aridity.grammar import Text, parser, Concat, Number
 from aridity.context import Context
 
 def main():
-    pairs, args = getopt.gnu_getopt(sys.argv[1:], 'D:')
-    path, = args
+    path, = sys.argv[1:]
     context = Context()
-    for option, value in pairs:
-        if '-D' == option:
-            eq = value.index('=')
-            context[value[:eq]] = Text(value[eq + 1:])
+    builtinsname = '__builtins__'
+    scope = {builtinsname: eval(builtinsname)}
+    for t in Text, Number:
+        scope[t.__name__] = t
+    for name, obj in eval(sys.stdin.read(), scope).items():
+        context[name] = obj
     with open(path) as f:
         sys.stdout.write(Concat(parser(f.read())).resolve(context).cat())
 
