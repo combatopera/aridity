@@ -8,7 +8,7 @@ def main():
     pairs, args = getopt.gnu_getopt(sys.argv[1:], 'D:', [])
     path, = args
     context = Context()
-    for option, value in pairs:
+    for option, value in pairs: # XXX: Maybe these should override file entries?
         if '-D' == option:
             k, v = value.split('=', 1)
             context[k] = Text(v) # XXX: Parse the value as a scalar?
