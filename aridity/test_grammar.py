@@ -1,24 +1,24 @@
 import unittest, pyparsing
-from .grammar import parser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry
+from .grammar import parser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List
 from decimal import Decimal
 from .context import Context
 
 class Functions:
 
     def get(context, key):
-        return context[key.cat()]
+        return context[key.resolve(context, None).cat()]
 
     def a(context):
         return Text('A')
 
     def ac(context, x):
-        return Text('ac.' + x.cat())
+        return Text('ac.' + x.resolve(context, None).cat())
 
     def id(context, x):
         return x
 
     def act(context, x, y):
-        return Text('act.' + x.cat() + '.' + y.cat())
+        return Text('act.' + x.resolve(context, None).cat() + '.' + y.resolve(context, None).cat())
 
 class TestGrammar(unittest.TestCase):
 
@@ -119,4 +119,4 @@ class TestGrammar(unittest.TestCase):
 
     def test_map(self):
         call, = p('$map($list(a b c) x $get(x)2)')
-        self.assertEqual(['a2', 'b2', 'c2'], call.resolve(Context(), None))
+        self.assertEqual(List([Text('a2'), Text('b2'), Text('c2')]), call.resolve(Context(), None))

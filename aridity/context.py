@@ -12,20 +12,20 @@ def shstr(text):
 
 def mapobjs(context, objs, name, expr):
     v = []
-    for obj in objs:
+    for obj in objs.resolve(context, None):
         c = Context(context)
-        c[name] = obj
-        v.append(expr(c))
+        c[name.cat()] = obj
+        v.append(expr.resolve(c, None))
     return List(v)
 
 class SuperContext:
 
     resolvables = collections.OrderedDict([
         ['get', Function(lambda context, key: context[key.cat()])],
-        ['str', Function(lambda context, obj: obj.totext())],
+        ['str', Function(lambda context, obj: obj.resolve(context, None).totext())],
         ['~', Text(os.path.expanduser('~'))],
-        ['screenstr', Function(lambda context, text: Text(screenstr(text.cat())))],
-        ['scstr', Function(lambda context, text: Text(scstr(text.cat())))],
+        ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context, None).cat())))],
+        ['scstr', Function(lambda context, text: Text(scstr(text.resolve(context, None).cat())))],
         ['shstr', Function(lambda context, text: Text(shstr(text.cat())))],
         ['env', Function(lambda context, key: Text(os.environ[key.cat()]))],
         ['LF', Text('\n')],

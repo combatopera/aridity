@@ -126,7 +126,7 @@ class Call(Resolvable):
         self.args = args
 
     def resolveimpl(self, context):
-        return context[self.name](*[context] + [a.resolve(context, None) for a in self.args if not a.ignorable])
+        return context[self.name](*[context] + [a for a in self.args if not a.ignorable])
 
 class List(Resolvable):
 
@@ -140,6 +140,9 @@ class List(Resolvable):
 
     def modify(self, obj):
         self.objs.append(obj)
+
+    def __iter__(self):
+        return iter(self.objs)
 
 class Function(Resolvable):
 
