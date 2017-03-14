@@ -1,5 +1,5 @@
 from .grammar import Function, Text, List
-import os
+import os, collections
 
 def screenstr(text):
     return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
@@ -26,7 +26,7 @@ class SuperContext:
     }
 
     def namesimpl(self, names):
-        names.update(self.resolvables.keys())
+        names.update([name, None] for name in self.resolvables.keys())
 
     def __getitem__(self, name):
         return self.resolvables[name]
@@ -44,12 +44,12 @@ class Context:
 
     def namesimpl(self, names):
         self.parent.namesimpl(names)
-        names.update(self.resolvables.keys())
+        names.update([name, None] for name in self.resolvables.keys())
 
     def names(self):
-        names = set()
+        names = collections.OrderedDict()
         self.namesimpl(names)
-        return names
+        return names.keys()
 
     def __getitem__(self, name):
         try:
