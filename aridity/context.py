@@ -18,6 +18,9 @@ def mapobjs(context, objs, name, expr):
         v.append(expr.resolve(c, None))
     return List(v)
 
+def join(context, resolvables, separator):
+    return Text(separator.cat().join(r.cat() for r in resolvables.resolve(context, None)))
+
 class SuperContext:
 
     resolvables = collections.OrderedDict([
@@ -32,6 +35,7 @@ class SuperContext:
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
         ['map', Function(mapobjs)],
+        ['join', Function(join)],
     ])
 
     def namesimpl(self, names):
