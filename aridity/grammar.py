@@ -181,18 +181,22 @@ class Parser:
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
         action = Forward()
         boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
-        optblank = Optional(Regex(r"[^\S%s]+" % boundaryregex).leaveWhitespace().setParseAction(Blank.pa))
+        def getoptblank(pa):
+            return Optional(Regex(r"[^\S%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa))
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
                 arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).setParseAction(Concat.pa)
-                brackets = Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-                yield Suppress('pass') + brackets
-                yield (cls.identifier + brackets).setParseAction(Call.pa)
+                def getbrackets(pa):
+                    optblank = getoptblank(pa)
+                    return Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
+                yield Suppress('pass') + getbrackets(Text.pa)
+                yield (cls.identifier + getbrackets(Blank.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarycharornone))
         chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa, boundarycharornone)
+        optblank = getoptblank(Blank.pa)
         return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
     def __init__(self, g):

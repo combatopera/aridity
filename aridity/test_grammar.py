@@ -97,21 +97,21 @@ class TestGrammar(unittest.TestCase):
 
     def test_pass(self):
         ae = self.assertEqual
-        ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass( x  y\t)'))
-        ae([Blank(' '), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('$pass[ x  y\t]'))
+        ae([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')], p('$pass( x  y\t)'))
+        ae([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')], p('$pass[ x  y\t]'))
         actual = p('$act(x $pass[ y\t])')
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], actual)
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
         ae(Text('act.x. y\t'), Concat(actual).resolve(c, None))
         ae([Number(10)], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
-        ae([Text('x()'), Blank(' ')], p('$pass[x() ]'))
+        ae([Text('x()'), Text(' ')], p('$pass[x() ]'))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c, None))
 
     def test_whitespace(self):
         ae = self.assertEqual
         ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
-        ae([Blank(' '), Blank(' '), Text('x'), Blank(' '), Blank(' ')], p(' $pass( x ) '))
+        ae([Blank(' '), Text(' '), Text('x'), Text(' '), Blank(' ')], p(' $pass( x ) '))
         for name in 'lit', 'pass':
             for text in (' $ %s( x ) ' % name,
                          ' $%s ( x ) ' % name):
