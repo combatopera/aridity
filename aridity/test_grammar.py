@@ -1,6 +1,7 @@
 import unittest, pyparsing
 from .grammar import parser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry
 from decimal import Decimal
+from .context import Context
 
 class Functions:
 
@@ -115,3 +116,7 @@ class TestGrammar(unittest.TestCase):
                          ' $%s ( x ) ' % name):
                 with self.assertRaises(pyparsing.ParseException):
                     p(text)
+
+    def test_map(self):
+        call, = p('$map($list(a b c) x $get(x)2)')
+        self.assertEqual(['a2', 'b2', 'c2'], call.resolve(Context(), None))

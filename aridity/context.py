@@ -10,6 +10,14 @@ def scstr(text):
 def shstr(text):
     return "'%s'" % text.replace("'", r"'\''")
 
+def mapobjs(context, objs, name, expr):
+    v = []
+    for obj in objs:
+        c = Context(context)
+        c[name] = obj
+        v.append(expr(c))
+    return List(v)
+
 class SuperContext:
 
     resolvables = collections.OrderedDict([
@@ -23,6 +31,7 @@ class SuperContext:
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
+        ['map', Function(mapobjs)],
     ])
 
     def namesimpl(self, names):
