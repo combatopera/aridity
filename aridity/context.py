@@ -36,7 +36,7 @@ supercontext = SuperContext()
 class Context:
 
     def __init__(self, parent = supercontext):
-        self.resolvables = {}
+        self.resolvables = collections.OrderedDict()
         self.parent = parent
 
     def __setitem__(self, name, resolvable):
