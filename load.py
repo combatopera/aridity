@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, getopt
+import sys, getopt, collections
 from aridity.grammar import loader, Concat, Text
 from aridity.context import Context
 
@@ -15,7 +15,7 @@ def main():
         if '-D' == option:
             k, v = value.split('=', 1)
             context[k] = Text(v) # XXX: Parse the value as a scalar?
-    config = {}
+    config = collections.OrderedDict()
     for name in context.names():
         obj = context[name].resolve(context, name)
         if obj.serializable:
