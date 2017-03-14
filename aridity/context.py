@@ -12,18 +12,18 @@ def shstr(text):
 
 class SuperContext:
 
-    resolvables = {
-        'get': Function(lambda context, key: context[key.cat()]),
-        'str': Function(lambda context, obj: obj.totext()),
-        '~': Text(os.path.expanduser('~')),
-        'screenstr': Function(lambda context, text: Text(screenstr(text.cat()))),
-        'scstr': Function(lambda context, text: Text(scstr(text.cat()))),
-        'shstr': Function(lambda context, text: Text(shstr(text.cat()))),
-        'env': Function(lambda context, key: Text(os.environ[key.cat()])),
-        'LF': Text('\n'),
-        'EOL': Text(os.linesep),
-        'list': Function(lambda context, *objs: List(list(objs))),
-    }
+    resolvables = collections.OrderedDict([
+        ['get', Function(lambda context, key: context[key.cat()])],
+        ['str', Function(lambda context, obj: obj.totext())],
+        ['~', Text(os.path.expanduser('~'))],
+        ['screenstr', Function(lambda context, text: Text(screenstr(text.cat())))],
+        ['scstr', Function(lambda context, text: Text(scstr(text.cat())))],
+        ['shstr', Function(lambda context, text: Text(shstr(text.cat())))],
+        ['env', Function(lambda context, key: Text(os.environ[key.cat()]))],
+        ['LF', Text('\n')],
+        ['EOL', Text(os.linesep)],
+        ['list', Function(lambda context, *objs: List(list(objs)))],
+    ])
 
     def namesimpl(self, names):
         names.update([name, None] for name in self.resolvables.keys())
