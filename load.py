@@ -17,7 +17,7 @@ def main():
             context[k] = Text(v) # XXX: Parse the value as a scalar?
     config = {}
     for name in context.names():
-        obj = context[name].resolve(context)
+        obj = context[name].resolve(context, name)
         if obj.serializable:
             config[name] = obj
     print(config)

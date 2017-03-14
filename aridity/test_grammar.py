@@ -73,17 +73,19 @@ class TestGrammar(unittest.TestCase):
     def test_resolve(self):
         c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
         c['minus124'] = Number(-124)
+        c['minus124txt'] = Text('minus124')
         ae = self.assertEqual
-        ae(Text(''), Text('').resolve(None))
-        ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
-        ae(Text('A'), Call('a', []).resolve(c))
-        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c))
-        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
-        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
-        ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
-        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
-        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
-        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
+        ae(Text(''), Text('').resolve(None, None))
+        ae(Text('\r\n\t'), Text('\r\n\t').resolve(None, None))
+        ae(Text('A'), Call('a', []).resolve(c, None))
+        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c, None))
+        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c, None))
+        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c, None))
+        ae(Number(-123), Call('id', [Number(-123)]).resolve(c, None))
+        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c, None))
+        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c, None))
+        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c, None))
+        ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c, None))
 
     def test_lit(self):
         ae = self.assertEqual
@@ -99,7 +101,7 @@ class TestGrammar(unittest.TestCase):
         actual = p('$act(x $pass[ y\t])')
         ae([Call('act', [Text('x'), Blank(' '), Concat([Blank(' '), Text('y'), Blank('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
-        ae(Text('act.x. y\t'), Concat(actual).resolve(c))
+        ae(Text('act.x. y\t'), Concat(actual).resolve(c, None))
         ae([Number(10)], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
         ae([Text('x()'), Blank(' ')], p('$pass[x() ]'))

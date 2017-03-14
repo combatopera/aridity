@@ -1,4 +1,4 @@
-from .grammar import Function, Text
+from .grammar import Function, Text, List
 import os
 
 def screenstr(text):
@@ -22,6 +22,7 @@ class SuperContext:
         'env': Function(lambda context, key: Text(os.environ[key.cat()])),
         'LF': Text('\n'),
         'EOL': Text(os.linesep),
+        'list': Function(lambda context, *objs: List(list(objs))),
     }
 
     def namesimpl(self, names):

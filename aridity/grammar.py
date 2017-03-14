@@ -22,8 +22,17 @@ class Struct:
 
 class Resolvable(Struct):
 
-    def resolve(self, context):
+    def resolveimpl(self, context):
         raise NotImplementedError
+
+    def resolve(self, context, name):
+        obj = self.resolveimpl(context)
+        if name is not None:
+            prefix = name + '#'
+            for modname in context.names():
+                if modname.startswith(prefix):
+                    obj.modify(context[modname].resolve(context, modname))
+        return obj
 
 class Concat(Resolvable):
 
@@ -40,8 +49,8 @@ class Concat(Resolvable):
     def __init__(self, parts):
         self.parts = parts
 
-    def resolve(self, context):
-        return Text(''.join(part.resolve(context).cat() for part in self.parts))
+    def resolveimpl(self, context):
+        return Text(''.join(part.resolve(context, None).cat() for part in self.parts))
 
 class CatNotSupportedException(Exception): pass
 
@@ -57,7 +66,7 @@ class SimpleValue(Resolvable):
     def __init__(self, value):
         self.value = value
 
-    def resolve(self, context):
+    def resolveimpl(self, context):
         return self
 
     def cat(self):
@@ -116,8 +125,21 @@ class Call(Resolvable):
         self.name = name
         self.args = args
 
-    def resolve(self, context):
-        return context[self.name](*[context] + [a.resolve(context) for a in self.args if not a.ignorable])
+    def resolveimpl(self, context):
+        return context[self.name](*[context] + [a.resolve(context, None) for a in self.args if not a.ignorable])
+
+class List(Resolvable):
+
+    serializable = True
+
+    def __init__(self, objs):
+        self.objs = objs
+
+    def resolveimpl(self, context):
+        return self
+
+    def modify(self, obj):
+        self.objs.append(obj)
 
 class Function(Resolvable):
 
@@ -126,7 +148,7 @@ class Function(Resolvable):
     def __init__(self, f):
         self.f = f
 
-    def resolve(self, context):
+    def resolveimpl(self, context):
         return self
 
     def __call__(self, *args):
