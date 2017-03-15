@@ -84,21 +84,11 @@ class Blank(Cat, SimpleValue):
 class Scalar(SimpleValue):
 
     ignorable = False
-    numberpattern = re.compile('^-?(?:[0-9]+|[0-9]*[.][0-9]+)$')
-
-    @classmethod
-    def pa(cls, s, l, t):
-        text, = t
-        if text in cls.booleans:
-            return cls.booleans[text]
-        else:
-            m = cls.numberpattern.search(text)
-            return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
 class Text(Cat, Scalar):
 
     @classmethod
-    def pa(cls, s, l, t): # TODO: Refactor to avoid override.
+    def pa(cls, s, l, t):
         text, = t
         return Text(text)
 
@@ -111,7 +101,19 @@ class Boolean(Scalar):
 
     pass
 
-Scalar.booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
+class AnyScalar:
+
+    numberpattern = re.compile('^-?(?:[0-9]+|[0-9]*[.][0-9]+)$')
+    booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
+
+    @classmethod
+    def pa(cls, s, l, t):
+        text, = t
+        if text in cls.booleans:
+            return cls.booleans[text]
+        else:
+            m = cls.numberpattern.search(text)
+            return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
 class Call(Resolvable):
 
@@ -187,7 +189,7 @@ class Parser:
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
-                arg = (OneOrMore(optargtext + action) + optargtext | gettext(Scalar.pa, c)).setParseAction(Concat.pa)
+                arg = (OneOrMore(optargtext + action) + optargtext | gettext(AnyScalar.pa, c)).setParseAction(Concat.pa)
                 def getbrackets(pa):
                     optblank = getoptblank(pa)
                     return Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
@@ -195,7 +197,7 @@ class Parser:
                 yield (cls.identifier + getbrackets(Blank.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarycharornone))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(Scalar.pa, boundarycharornone)
+        chunk = OneOrMore(opttext + action) + opttext | gettext(AnyScalar.pa, boundarycharornone)
         optblank = getoptblank(Blank.pa)
         return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
