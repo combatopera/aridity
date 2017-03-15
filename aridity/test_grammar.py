@@ -74,9 +74,12 @@ class TestGrammar(unittest.TestCase):
         ae([Entry('x', [Boolean(True)])], l('x =true '))
 
     def test_resolve(self):
-        c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
+        c = Context()
+        for name in 'a', 'ac', 'act', 'id', 'get':
+            c[name] = Function(getattr(Functions, name))
         c['minus124'] = Number(-124)
         c['minus124txt'] = Text('minus124')
+        c['gett'], = p('$get(get)')
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
@@ -86,6 +89,7 @@ class TestGrammar(unittest.TestCase):
         ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
         ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
+        ae(Number(-124), Call('gett', [Text('minus124')]).resolve(c))
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
         ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
@@ -103,7 +107,9 @@ class TestGrammar(unittest.TestCase):
         ae([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')], p('$pass[ x  y\t]'))
         actual = p('$act(x $pass[ y\t])')
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
-        c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
+        c = Context()
+        for name in 'act',:
+            c[name] = Function(getattr(Functions, name))
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
         ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
