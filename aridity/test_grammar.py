@@ -107,6 +107,7 @@ class TestGrammar(unittest.TestCase):
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
         ae([Text('x()'), Text(' ')], p('$pass[x() ]'))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c, None))
+        ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c, None))
 
     def test_whitespace(self):
         ae = self.assertEqual
