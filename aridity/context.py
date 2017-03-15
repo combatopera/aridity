@@ -19,7 +19,7 @@ def mapobjs(context, objs, name, expr):
     return List(v)
 
 def join(context, resolvables, separator):
-    return Text(separator.cat().join(r.cat() for r in resolvables.resolve(context, None)))
+    return Text(separator.resolve(context, None).cat().join(r.cat() for r in resolvables.resolve(context, None)))
 
 class SuperContext:
 
