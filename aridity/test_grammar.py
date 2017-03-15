@@ -128,3 +128,12 @@ class TestGrammar(unittest.TestCase):
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')
         self.assertEqual(Text('a-bb-ccc'), call.resolve(Context(), None))
+
+    def test_modifiers(self):
+        context = Context()
+        for entry in l('v = $list()\nv#one = $list()\nv#one#1 = uno'):
+            context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+        ae = self.assertEqual
+        ae(Text('uno'), context['v#one#1'])
+        ae(List([Text('uno')]), context['v#one'].resolve(context, None))
+        ae(List([List([Text('uno')])]), context['v'].resolve(context, None))
