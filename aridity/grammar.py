@@ -174,7 +174,7 @@ class Entry(Struct):
 
 class Parser:
 
-    identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.]*[A-Za-z_0-9])?')
+    identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?')
 
     @classmethod
     def create(cls, scalarpa, boundarycharornone = None):
