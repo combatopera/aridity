@@ -69,7 +69,8 @@ class TestGrammar(unittest.TestCase):
         ae([Entry('x', [])], l('x='))
         ae([Entry('x', [])], l('x=  '))
         ae([Entry('x', [Text('y'), Blank('  '), Text('z')])], l('x = y  z\t'))
-        ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y\nx2=y2'))
+        for eol in '\n', '\r', '\r\n':
+            ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y%sx2=y2' % eol))
         ae([Entry('x', [Boolean(True)])], l('x = true'))
         ae([Entry('x', [Boolean(True)])], l('x =true '))
 
