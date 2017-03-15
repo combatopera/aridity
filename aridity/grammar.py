@@ -189,12 +189,13 @@ class Parser:
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 optargtext = Optional(gettext(Text.pa, c))
-                arg = (OneOrMore(optargtext + action) + optargtext | gettext(AnyScalar.pa, c)).setParseAction(Concat.pa)
-                def getbrackets(pa):
-                    optblank = getoptblank(pa)
-                    return Suppress(o) + ZeroOrMore(optblank + arg) + optblank + Suppress(c)
-                yield Suppress('pass') + getbrackets(Text.pa)
-                yield (cls.identifier + getbrackets(Blank.pa)).setParseAction(Call.pa)
+                def getarg(scalarpa):
+                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, c)).setParseAction(Concat.pa)
+                def getbrackets(blankpa, scalarpa):
+                    optblank = getoptblank(blankpa)
+                    return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
+                yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
+                yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarycharornone))
         chunk = OneOrMore(opttext + action) + opttext | gettext(AnyScalar.pa, boundarycharornone)

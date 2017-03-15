@@ -103,7 +103,7 @@ class TestGrammar(unittest.TestCase):
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
         ae(Text('act.x. y\t'), Concat(actual).resolve(c, None))
-        ae([Number(10)], p('$pass[10]'))
+        ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
         ae([Text('x()'), Text(' ')], p('$pass[x() ]'))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c, None))
