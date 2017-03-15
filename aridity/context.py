@@ -69,3 +69,11 @@ class Context:
             return self.resolvables[name]
         except KeyError:
             return self.parent[name]
+
+    def resolve(self, name):
+        obj = self[name].resolve(self)
+        prefix = name + '#'
+        for name in self.names():
+            if name.startswith(prefix):
+                obj.modify(self[name])
+        return obj

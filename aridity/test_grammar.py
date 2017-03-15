@@ -134,6 +134,6 @@ class TestGrammar(unittest.TestCase):
         for entry in l('v = $list()\nv#one = $list()\nv#one#1 = uno'):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
         ae = self.assertEqual
-        ae(Text('uno'), context['v#one#1'])
-        ae(List([Text('uno')]), context['v#one'].resolve(context))
-        ae(List([List([Text('uno')])]), context['v'].resolve(context))
+        ae(Text('uno'), context.resolve('v#one#1'))
+        ae(List([Text('uno')]), context.resolve('v#one'))
+        ae(List([List([Text('uno')])]), context.resolve('v'))
