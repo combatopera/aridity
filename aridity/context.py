@@ -75,5 +75,5 @@ class Context:
         prefix = name + '#'
         for name in self.names():
             if name.startswith(prefix):
-                obj.modify(self[name])
+                obj.modify(self.resolve(name))
         return obj
