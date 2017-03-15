@@ -168,11 +168,10 @@ class Parser:
     identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?')
 
     @classmethod
-    def create(cls, scalarpa, boundarycharornone = None):
+    def create(cls, scalarpa, boundaryregex):
         def gettext(pa, boundaryregex):
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
         action = Forward()
-        boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
         def getoptblank(pa):
             return Optional(Regex(r"[^\S%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa))
         def clauses():
@@ -198,6 +197,6 @@ class Parser:
     def __call__(self, text):
         return self.g.parseString(text, parseAll = True).asList()
 
-expressionparser = Parser(Parser.create(AnyScalar.pa))
-templateparser = Parser(Parser.create(Text.pa))
+expressionparser = Parser(Parser.create(AnyScalar.pa, ''))
+templateparser = Parser(Parser.create(Text.pa, ''))
 loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create(AnyScalar.pa, '\n')).setParseAction(Entry.pa)))
