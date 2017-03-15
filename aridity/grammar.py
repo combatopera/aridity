@@ -168,26 +168,26 @@ class Parser:
     identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?')
 
     @classmethod
-    def create(cls, scalarpa, boundaryregex):
-        def gettext(pa, boundaryregex):
-            return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
+    def create(cls, scalarpa, boundarychars):
+        def gettext(pa, boundarychars):
+            return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
         action = Forward()
         def getoptblank(pa):
-            return Optional(Regex(r"[^\S%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa))
+            return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                optargtext = Optional(gettext(Text.pa, re.escape(c)))
+                optargtext = Optional(gettext(Text.pa, c))
                 def getarg(scalarpa):
-                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, re.escape(c))).setParseAction(Concat.pa)
+                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, c)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = getoptblank(blankpa)
                     return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
-        opttext = Optional(gettext(Text.pa, boundaryregex))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundaryregex)
+        opttext = Optional(gettext(Text.pa, boundarychars))
+        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)
         optblank = getoptblank(Blank.pa)
         return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
@@ -199,4 +199,4 @@ class Parser:
 
 expressionparser = Parser(Parser.create(AnyScalar.pa, ''))
 templateparser = Parser(Parser.create(Text.pa, ''))
-loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create(AnyScalar.pa, '\n')).setParseAction(Entry.pa)))
+loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create(AnyScalar.pa, '\r\n')).setParseAction(Entry.pa)))
