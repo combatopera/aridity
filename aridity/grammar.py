@@ -177,7 +177,7 @@ class Parser:
     identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.]*[A-Za-z_0-9])?')
 
     @classmethod
-    def create(cls, boundarycharornone = None):
+    def create(cls, scalarpa, boundarycharornone = None):
         def gettext(pa, boundarycharornone):
             boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
@@ -198,7 +198,7 @@ class Parser:
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarycharornone))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(AnyScalar.pa, boundarycharornone)
+        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarycharornone)
         optblank = getoptblank(Blank.pa)
         return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
@@ -208,5 +208,6 @@ class Parser:
     def __call__(self, text):
         return self.g.parseString(text, parseAll = True).asList()
 
-parser = Parser(Parser.create())
-loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create('\n')).setParseAction(Entry.pa)))
+expressionparser = Parser(Parser.create(AnyScalar.pa))
+templateparser = Parser(Parser.create(Text.pa))
+loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create(AnyScalar.pa, '\n')).setParseAction(Entry.pa)))

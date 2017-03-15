@@ -1,5 +1,5 @@
 import unittest, pyparsing
-from .grammar import parser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List
+from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List
 from decimal import Decimal
 from .context import Context
 
@@ -70,6 +70,8 @@ class TestGrammar(unittest.TestCase):
         ae([Entry('x', [])], l('x=  '))
         ae([Entry('x', [Text('y'), Blank('  '), Text('z')])], l('x = y  z\t'))
         ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y\nx2=y2'))
+        ae([Entry('x', [Boolean(True)])], l('x = true'))
+        ae([Entry('x', [Boolean(True)])], l('x =true '))
 
     def test_resolve(self):
         c = dict([name, Function(getattr(Functions, name))] for name in ['a', 'ac', 'act', 'id', 'get'])
