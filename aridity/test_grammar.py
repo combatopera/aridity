@@ -6,19 +6,19 @@ from .context import Context
 class Functions:
 
     def get(context, key):
-        return context[key.resolve(context, None).cat()]
+        return context[key.resolve(context).cat()]
 
     def a(context):
         return Text('A')
 
     def ac(context, x):
-        return Text('ac.' + x.resolve(context, None).cat())
+        return Text('ac.' + x.resolve(context).cat())
 
     def id(context, x):
         return x
 
     def act(context, x, y):
-        return Text('act.' + x.resolve(context, None).cat() + '.' + y.resolve(context, None).cat())
+        return Text('act.' + x.resolve(context).cat() + '.' + y.resolve(context).cat())
 
 class TestGrammar(unittest.TestCase):
 
@@ -78,17 +78,17 @@ class TestGrammar(unittest.TestCase):
         c['minus124'] = Number(-124)
         c['minus124txt'] = Text('minus124')
         ae = self.assertEqual
-        ae(Text(''), Text('').resolve(None, None))
-        ae(Text('\r\n\t'), Text('\r\n\t').resolve(None, None))
-        ae(Text('A'), Call('a', []).resolve(c, None))
-        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c, None))
-        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c, None))
-        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c, None))
-        ae(Number(-123), Call('id', [Number(-123)]).resolve(c, None))
-        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c, None))
-        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c, None))
-        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c, None))
-        ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c, None))
+        ae(Text(''), Text('').resolve(None))
+        ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
+        ae(Text('A'), Call('a', []).resolve(c))
+        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c))
+        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
+        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
+        ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
+        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
+        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
+        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
+        ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
 
     def test_lit(self):
         ae = self.assertEqual
@@ -104,12 +104,12 @@ class TestGrammar(unittest.TestCase):
         actual = p('$act(x $pass[ y\t])')
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
         c = dict([name, Function(getattr(Functions, name))] for name in ['act'])
-        ae(Text('act.x. y\t'), Concat(actual).resolve(c, None))
+        ae(Text('act.x. y\t'), Concat(actual).resolve(c))
         ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
         ae([Text('x()'), Text(' ')], p('$pass[x() ]'))
-        ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c, None))
-        ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c, None))
+        ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c))
+        ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c))
 
     def test_whitespace(self):
         ae = self.assertEqual
@@ -123,11 +123,11 @@ class TestGrammar(unittest.TestCase):
 
     def test_map(self):
         call, = p('$map($list(a b c) x $get(x)2)')
-        self.assertEqual(List([Text('a2'), Text('b2'), Text('c2')]), call.resolve(Context(), None))
+        self.assertEqual(List([Text('a2'), Text('b2'), Text('c2')]), call.resolve(Context()))
 
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')
-        self.assertEqual(Text('a-bb-ccc'), call.resolve(Context(), None))
+        self.assertEqual(Text('a-bb-ccc'), call.resolve(Context()))
 
     def test_modifiers(self):
         context = Context()
@@ -135,5 +135,5 @@ class TestGrammar(unittest.TestCase):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
         ae = self.assertEqual
         ae(Text('uno'), context['v#one#1'])
-        ae(List([Text('uno')]), context['v#one'].resolve(context, None))
-        ae(List([List([Text('uno')])]), context['v'].resolve(context, None))
+        ae(List([Text('uno')]), context['v#one'].resolve(context))
+        ae(List([List([Text('uno')])]), context['v'].resolve(context))

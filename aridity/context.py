@@ -12,23 +12,23 @@ def shstr(text):
 
 def mapobjs(context, objs, name, expr):
     v = []
-    for obj in objs.resolve(context, None):
+    for obj in objs.resolve(context):
         c = Context(context)
         c[name.cat()] = obj
-        v.append(expr.resolve(c, None))
+        v.append(expr.resolve(c))
     return List(v)
 
 def join(context, resolvables, separator):
-    return Text(separator.resolve(context, None).cat().join(r.cat() for r in resolvables.resolve(context, None)))
+    return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
 
 class SuperContext:
 
     resolvables = collections.OrderedDict([
         ['get', Function(lambda context, key: context[key.cat()])],
-        ['str', Function(lambda context, obj: obj.resolve(context, None).totext())],
+        ['str', Function(lambda context, obj: obj.resolve(context).totext())],
         ['~', Text(os.path.expanduser('~'))],
-        ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context, None).cat())))],
-        ['scstr', Function(lambda context, text: Text(scstr(text.resolve(context, None).cat())))],
+        ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context).cat())))],
+        ['scstr', Function(lambda context, text: Text(scstr(text.resolve(context).cat())))],
         ['shstr', Function(lambda context, text: Text(shstr(text.cat())))],
         ['env', Function(lambda context, key: Text(os.environ[key.cat()]))],
         ['LF', Text('\n')],

@@ -12,7 +12,7 @@ def resolvetemplate(template):
         scope[t.__name__] = t
     for name, obj in eval(sys.stdin.read(), scope).items():
         context[name] = obj
-    sys.stdout.write(Concat(templateparser(template)).resolve(context, None).cat())
+    sys.stdout.write(Concat(templateparser(template)).resolve(context).cat())
 
 def main():
     path, = sys.argv[1:]
