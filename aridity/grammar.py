@@ -169,8 +169,7 @@ class Parser:
 
     @classmethod
     def create(cls, scalarpa, boundarycharornone = None):
-        def gettext(pa, boundarycharornone):
-            boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
+        def gettext(pa, boundaryregex):
             return Regex(r"[^$\s%s]+" % boundaryregex).leaveWhitespace().setParseAction(pa)
         action = Forward()
         boundaryregex = '' if boundarycharornone is None else r"\%s" % boundarycharornone
@@ -179,17 +178,17 @@ class Parser:
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                optargtext = Optional(gettext(Text.pa, c))
+                optargtext = Optional(gettext(Text.pa, re.escape(c)))
                 def getarg(scalarpa):
-                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, c)).setParseAction(Concat.pa)
+                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, re.escape(c))).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = getoptblank(blankpa)
                     return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
-        opttext = Optional(gettext(Text.pa, boundarycharornone))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarycharornone)
+        opttext = Optional(gettext(Text.pa, boundaryregex))
+        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundaryregex)
         optblank = getoptblank(Blank.pa)
         return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
 
