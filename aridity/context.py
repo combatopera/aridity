@@ -74,6 +74,6 @@ class Context:
         obj = self[name].resolve(self)
         prefix = name + '#'
         for name in self.names():
-            if name.startswith(prefix):
+            if name.startswith(prefix) and '#' not in name[len(prefix):]:
                 obj.modify(self.resolve(name))
         return obj
