@@ -76,12 +76,12 @@ class Context:
         except KeyError:
             return self.parent[name]
 
-    def resolve(self, name):
+    def resolved(self, name):
         obj = self[name].resolve(self)
         prefix = name + '#'
         for name in self.names():
             if name.startswith(prefix):
                 modname = name[len(prefix):]
                 if '#' not in modname:
-                    obj.modify(modname, self.resolve(name))
+                    obj.modify(modname, self.resolved(name))
         return obj

@@ -119,7 +119,7 @@ class Call(Resolvable):
         self.args = args
 
     def resolve(self, context):
-        return context.resolve(self.name)(*[context] + [a for a in self.args if not a.ignorable])
+        return context.resolved(self.name)(*[context] + [a for a in self.args if not a.ignorable])
 
 class List(Resolvable):
 
