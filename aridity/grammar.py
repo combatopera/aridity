@@ -150,6 +150,9 @@ class Fork(Struct):
     def __getitem__(self, name):
         return self.objs[name]
 
+    def resolved(self, name):
+        return self.objs[name]
+
 class Function(Resolvable):
 
     serializable = False
