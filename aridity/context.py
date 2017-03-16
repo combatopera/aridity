@@ -1,4 +1,4 @@
-from .grammar import Function, Text, List
+from .grammar import Function, Text, List, Fork
 import os, collections
 
 def screenstr(text):
@@ -21,10 +21,15 @@ def mapobjs(context, objs, name, expr):
 def join(context, resolvables, separator):
     return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
 
+def get(context, *keys):
+    for key in keys:
+        context = context[key.cat()]
+    return context
+
 class SuperContext:
 
     resolvables = collections.OrderedDict([
-        ['get', Function(lambda context, key: context[key.cat()])],
+        ['get', Function(get)],
         ['str', Function(lambda context, obj: obj.resolve(context).totext())],
         ['~', Text(os.path.expanduser('~'))],
         ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context).cat())))],
@@ -34,6 +39,7 @@ class SuperContext:
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
+        ['fork', Function(lambda context: Fork(collections.OrderedDict()))],
         ['map', Function(mapobjs)],
         ['join', Function(join)],
     ])
@@ -74,6 +80,8 @@ class Context:
         obj = self[name].resolve(self)
         prefix = name + '#'
         for name in self.names():
-            if name.startswith(prefix) and '#' not in name[len(prefix):]:
-                obj.modify(self.resolve(name))
+            if name.startswith(prefix):
+                modname = name[len(prefix):]
+                if '#' not in modname:
+                    obj.modify(modname, self.resolve(name))
         return obj

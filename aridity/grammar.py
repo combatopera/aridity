@@ -131,11 +131,24 @@ class List(Resolvable):
     def resolve(self, context):
         return self
 
-    def modify(self, obj):
+    def modify(self, name, obj):
         self.objs.append(obj)
 
     def __iter__(self):
         return iter(self.objs)
+
+class Fork(Struct):
+
+    serializable = True
+
+    def __init__(self, objs):
+        self.objs = objs
+
+    def modify(self, name, obj):
+        self.objs[name] = obj
+
+    def __getitem__(self, name):
+        return self.objs[name]
 
 class Function(Resolvable):
 
