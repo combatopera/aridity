@@ -149,10 +149,12 @@ class TestGrammar(unittest.TestCase):
 
     def test_fork(self):
         context = Context()
-        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno'):
+        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\nv#two#hmm = yay'):
             context[entry.name] = Concat.unlesssingleton(entry.resolvables)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1'))
         ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
+        ae(OrderedDict([('hmm', Text('yay'))]), context.resolved('v#two').objs)
         ae(Text('woo'), context.resolved('v#one').resolved('hmm'))
-        ae([OrderedDict([('1', Text('uno'))])], [f.objs for f in context.resolved('v')])
+        ae(Text('yay'), context.resolved('v#two').resolved('hmm'))
+        ae([OrderedDict([('1', Text('uno'))]), OrderedDict([('hmm', Text('yay'))])], [f.objs for f in context.resolved('v')])
