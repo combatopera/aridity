@@ -83,6 +83,10 @@ class Text(Cat, Scalar):
         text, = t
         return Text(text)
 
+    def resolved(self, name):
+        import sys
+        return getattr(sys.modules['aridity.context'], 'supercontext')[name]
+
 class Number(Scalar):
 
     def totext(self):

@@ -10,11 +10,9 @@ def scstr(text):
 def shstr(text):
     return "'%s'" % text.replace("'", r"'\''")
 
-def mapobjs(context, objs, name, expr):
+def mapobjs(context, objs, expr):
     v = []
-    for obj in objs.resolve(context):
-        c = Context(context)
-        c[name.cat()] = obj
+    for c in objs.resolve(context):
         v.append(expr.resolve(c))
     return List(v)
 
@@ -22,6 +20,8 @@ def join(context, resolvables, separator):
     return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
 
 def get(context, *keys):
+    if not keys:
+        return context
     for key in keys[:-1]:
         context = context[key.cat()]
     return context.resolved(keys[-1].cat())
