@@ -28,7 +28,7 @@ def main():
                 context[entry.name] = Concat.unlesssingleton(entry.resolvables)
         else:
             name, arg = m.groups()
-            getattr(Directive, name)(context, arg)
+            getattr(Directive, name)(context, arg) # TODO: Strip trailing whitespace from arg.
 
 if '__main__' == __name__:
     main()
