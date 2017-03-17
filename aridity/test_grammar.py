@@ -2,6 +2,7 @@ import unittest, pyparsing
 from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List
 from decimal import Decimal
 from .context import Context
+from collections import OrderedDict
 
 class Functions:
 
@@ -145,3 +146,13 @@ class TestGrammar(unittest.TestCase):
         ae(List([Text('uno')]), context.resolved('v#one#1'))
         ae(List([List([Text('uno')])]), context.resolved('v#one'))
         ae(List([List([List([Text('uno')])])]), context.resolved('v'))
+
+    def test_fork(self):
+        context = Context()
+        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno'):
+            context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+        ae = self.assertEqual
+        ae(Text('uno'), context.resolved('v#one#1'))
+        ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
+        ae(Text('woo'), context.resolved('v#one').resolved('hmm'))
+        ae([OrderedDict([('1', Text('uno'))])], [f.objs for f in context.resolved('v')])

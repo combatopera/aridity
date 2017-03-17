@@ -50,7 +50,7 @@ class SuperContext:
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
-        ['fork', Function(lambda context: Fork(collections.OrderedDict()))],
+        ['fork', Function(lambda context: Fork(context, collections.OrderedDict()))],
         ['map', Function(mapobjs)],
         ['join', Function(join)],
         ['stdout', Function(sys.stdout.write)],

@@ -141,7 +141,8 @@ class Fork(Struct):
 
     serializable = True
 
-    def __init__(self, objs):
+    def __init__(self, parent, objs):
+        self.parent = parent
         self.objs = objs
 
     def modify(self, name, obj):
@@ -151,7 +152,10 @@ class Fork(Struct):
         return self.objs[name]
 
     def resolved(self, name):
-        return self.objs[name]
+        try:
+            return self.objs[name]
+        except KeyError:
+            return self.parent.resolved(name)
 
 class Function(Resolvable):
 
