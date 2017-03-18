@@ -205,12 +205,12 @@ class Parser:
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                def getarg(scalarpa):
-                    optargtext = Optional(cls.gettext(Text.pa, c))
-                    return (OneOrMore(optargtext + action) + optargtext | cls.gettext(scalarpa, c)).setParseAction(Concat.pa)
+                def getarg(scalarpa, boundarychars):
+                    opttext = Optional(cls.gettext(Text.pa, boundarychars))
+                    return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
-                    return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
+                    return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa, c)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
