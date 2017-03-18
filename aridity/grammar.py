@@ -205,8 +205,8 @@ class Parser:
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                optargtext = Optional(cls.gettext(Text.pa, c))
                 def getarg(scalarpa):
+                    optargtext = Optional(cls.gettext(Text.pa, c))
                     return (OneOrMore(optargtext + action) + optargtext | cls.gettext(scalarpa, c)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
