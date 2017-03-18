@@ -28,7 +28,8 @@ class TestGrammar(unittest.TestCase):
         ae([Text('x')], p('x'))
         ae([Text('yy')], p('yy'))
         ae([Text('x'), Blank('  '), Text('y')], p('x  y'))
-        ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Blank('\r')], p('\tx  y\r'))
+        ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('\tx  y\t'))
+        ae([Blank('\t'), Text('x'), Blank('  '), Text('y')], p('\tx  y\r'))
         for text in ('$a()',
                      '$a[]'):
             ae([Call('a', [])], p(text))

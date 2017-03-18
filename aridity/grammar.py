@@ -221,6 +221,6 @@ class Parser:
     def __call__(self, text):
         return self.g.parseString(text, parseAll = True).asList()
 
-expressionparser = Parser(Parser.create(AnyScalar.pa, ''))
+expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
 templateparser = Parser(Parser.create(Text.pa, ''))
-loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + Parser.create(AnyScalar.pa, '\r\n')).setParseAction(Entry.pa)))
+loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + expressionparser.g).setParseAction(Entry.pa)))
