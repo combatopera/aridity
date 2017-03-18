@@ -200,7 +200,7 @@ class Parser:
         return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
 
     @classmethod
-    def getarg(cls, scalarpa, boundarychars):
+    def getaction(cls):
         action = Forward()
         def clauses():
             for o, c in '()', '[]':
@@ -214,8 +214,12 @@ class Parser:
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
+        return action
+
+    @classmethod
+    def getarg(cls, scalarpa, boundarychars):
         opttext = Optional(cls.gettext(Text.pa, boundarychars))
-        return OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)
+        return OneOrMore(opttext + cls.getaction()) + opttext | cls.gettext(scalarpa, boundarychars)
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
