@@ -195,25 +195,27 @@ class Parser:
     def getoptblank(pa, boundarychars):
         return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
 
+    @staticmethod
+    def gettext(pa, boundarychars):
+        return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
+
     @classmethod
     def getarg(cls, scalarpa, boundarychars):
-        def gettext(pa, boundarychars):
-            return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
         action = Forward()
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                optargtext = Optional(gettext(Text.pa, c))
+                optargtext = Optional(cls.gettext(Text.pa, c))
                 def getarg(scalarpa):
-                    return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, c)).setParseAction(Concat.pa)
+                    return (OneOrMore(optargtext + action) + optargtext | cls.gettext(scalarpa, c)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
                     return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
-        opttext = Optional(gettext(Text.pa, boundarychars))
-        return OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)
+        opttext = Optional(cls.gettext(Text.pa, boundarychars))
+        return OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
