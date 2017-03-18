@@ -26,17 +26,6 @@ def get(context, *keys):
         context = context[key.cat()]
     return context.resolved(keys[-1].cat())
 
-class openpath:
-
-    def __init__(self, context, path):
-        self.f = None
-        self.path = path.resolve(context).cat()
-
-    def __call__(self, text):
-        if self.f is None:
-            self.f = open(self.path, 'w')
-        self.f.write(text)
-
 class SuperContext:
 
     resolvables = collections.OrderedDict([
@@ -54,7 +43,6 @@ class SuperContext:
         ['map', Function(mapobjs)],
         ['join', Function(join)],
         ['stdout', Function(sys.stdout.write)],
-        ['open', Function(openpath)],
     ])
 
     def namesimpl(self, names):

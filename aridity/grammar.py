@@ -209,6 +209,9 @@ class Entry(Struct):
     def execute(self, context):
         if Text('=') == self.word(1):
             context[self.word(0).cat()] = self.phrase(2)
+        elif Text('redirect') == self.word(0):
+            f = open(self.phrase(1).resolve(context).cat(), 'w')
+            context['stdout'] = Function(f.write)
         elif Text('echo') == self.word(0):
             template = self.phrase(1).resolve(context).cat()
             context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
