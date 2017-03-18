@@ -1,6 +1,6 @@
 from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
 from decimal import Decimal
-import re
+import re, itertools
 
 class Struct:
 
@@ -69,6 +69,10 @@ class Cat:
         return self.value
 
 class Blank(Cat, SimpleValue):
+
+    ignorable = True
+
+class Boundary(SimpleValue):
 
     ignorable = True
 
@@ -178,14 +182,27 @@ class Entry(Struct):
 
     @classmethod
     def pa(cls, s, l, t):
-        resolvables = t[1:]
-        if resolvables and resolvables[-1].ignorable:
-            del resolvables[-1]
-        return cls(t[0], resolvables)
+        return cls(t.asList())
 
-    def __init__(self, name, resolvables):
-        self.name = name
+    def __init__(self, resolvables):
         self.resolvables = resolvables
+
+    def word(self, i):
+        word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
+        return word
+
+    def phrase(self, i):
+        phrase = list(self.resolvables)
+        def trim(end):
+            while phrase and phrase[end].ignorable:
+                del phrase[end]
+        while i:
+            trim(0)
+            del phrase[0]
+            i -= 1
+        for end in 0, -1:
+            trim(end)
+        return phrase
 
 class Parser:
 
@@ -201,7 +218,7 @@ class Parser:
 
     @staticmethod
     def getoptboundary(pa, boundarychars):
-        return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(Blank.pa) if boundarychars else NoMatch())
+        return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa) if boundarychars else NoMatch())
 
     @classmethod
     def getaction(cls):
@@ -224,9 +241,9 @@ class Parser:
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
-        optboundary = cls.getoptboundary(Blank.pa, boundarychars)
+        optboundary = cls.getoptboundary(Boundary.pa, boundarychars)
         optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return optboundary + ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank
+        return OneOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
 
     def __init__(self, g):
         self.g = g.parseWithTabs()
@@ -236,4 +253,4 @@ class Parser:
 
 expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
 templateparser = Parser(Parser.create(Text.pa, ''))
-loader = Parser(ZeroOrMore((Parser.identifier + Suppress(Regex(r'=\s*')) + expressionparser.g).setParseAction(Entry.pa)))
+loader = Parser(ZeroOrMore(Parser.create(AnyScalar.pa, '\r\n').setParseAction(Entry.pa)))

@@ -9,7 +9,8 @@ class Directive:
     def include(context, path):
         with open(path) as f:
             for entry in loader(f.read()):
-                context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+                if '=' == entry.word(1).cat():
+                    context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
 
     def eval(context, template):
         context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
@@ -28,7 +29,8 @@ def main():
         m = directive.search(line)
         if m is None:
             for entry in loader(line):
-                context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+                if '=' == entry.word(1).cat():
+                    context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
         else:
             args = [g for g in m.groups()[1:] if g is not None]
             getattr(Directive, m.group(1))(context, *args) # TODO: Strip trailing whitespace from arg.

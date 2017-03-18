@@ -1,5 +1,5 @@
 import unittest, pyparsing
-from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List
+from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
 from .context import Context
 from collections import OrderedDict
@@ -29,7 +29,7 @@ class TestGrammar(unittest.TestCase):
         ae([Text('yy')], p('yy'))
         ae([Text('x'), Blank('  '), Text('y')], p('x  y'))
         ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('\tx  y\t'))
-        ae([Blank('\t'), Text('x'), Blank('  '), Text('y')], p('\tx  y\r'))
+        ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Boundary('\r')], p('\tx  y\r'))
         for text in ('$a()',
                      '$a[]'):
             ae([Call('a', [])], p(text))
@@ -47,7 +47,6 @@ class TestGrammar(unittest.TestCase):
                      '$act[\rx$b[]z  yy\t]',
                      '$act[\rx$b()z  yy\t]'):
             ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
-        ae([], p(''))
         ae([Text('woo')], p('woo'))
         ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
         ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(
@@ -69,15 +68,15 @@ class TestGrammar(unittest.TestCase):
     def test_loader(self):
         ae = self.assertEqual
         ae([], l(''))
-        ae([Entry('x', [])], l('x='))
-        ae([Entry('x', [])], l('x=  '))
-        ae([Entry('x', [Text('y'), Blank('  '), Text('z')])], l('x = y  z\t'))
-        ae([Entry('x', [Text('y'), Blank('\t'), Text('z')])], l('x = y\tz  '))
+        ae([Entry([Text('x=')])], l('x='))
+        ae([Entry([Text('x='), Blank('  ')])], l('x=  '))
+        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Text('y'), Blank('  '), Text('z'), Blank('\t')])], l('x = y  z\t'))
+        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Text('y'), Blank('\t'), Text('z'), Blank('  ')])], l('x = y\tz  '))
         for eol in '\n', '\r', '\r\n':
-            ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y%sx2=y2' % eol))
-        ae([Entry('x', [Boolean(True)])], l('x = true'))
-        ae([Entry('x', [Boolean(True)])], l('x =true '))
-        ae([Entry('x', [Call('a', [Blank('\n'), Text('b'), Blank('\r')])])], l('x = $a(\nb\r)'))
+            ae([Entry([Text('x=y'), Boundary(eol)]), Entry([Text('x2=y2')])], l('x=y%sx2=y2' % eol))
+        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Boolean(True)])], l('x = true'))
+        ae([Entry([Text('x'), Blank(' '), Text('=true'), Blank(' ')])], l('x =true '))
+        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Call('a', [Blank('\n'), Text('b'), Blank('\r')])])], l('x = $a(\nb\r)'))
 
     def test_resolve(self):
         c = Context()
@@ -144,7 +143,7 @@ class TestGrammar(unittest.TestCase):
     def test_modifiers(self):
         context = Context()
         for entry in l('v = $list()\nv#one = $list()\nv#one#1 = $list()\nv#one#1#un = uno'):
-            context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+            context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1#un'))
         ae(List([Text('uno')]), context.resolved('v#one#1'))
@@ -153,8 +152,8 @@ class TestGrammar(unittest.TestCase):
 
     def test_fork(self):
         context = Context()
-        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\nv#two#hmm = yay'):
-            context[entry.name] = Concat.unlesssingleton(entry.resolvables)
+        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay'):
+            context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1'))
         ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
