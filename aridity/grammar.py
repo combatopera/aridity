@@ -216,6 +216,11 @@ class Entry(Struct):
             path = self.phrase(1).resolve(context).cat()
             with open(path) as f:
                 context.resolved('stdout')(Concat(templateparser(f.read())).resolve(context).cat())
+        elif Text('source') == self.word(0):
+            path = self.phrase(1).resolve(context).cat()
+            with open(path) as f:
+                for entry in loader(f.read()):
+                    entry.execute(context)
         else:
             raise UnsupportedEntryException(self)
 

@@ -6,11 +6,6 @@ from aridity.context import Context
 
 class Directive:
 
-    def include(context, path):
-        with open(path) as f:
-            for entry in loader(f.read()):
-                entry.execute(context)
-
     def scalar(context, name, scalar):
         context[name] = AnyScalar.pa(None, None, [scalar])
 
