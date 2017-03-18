@@ -49,7 +49,7 @@ class TestGrammar(unittest.TestCase):
             ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
         ae([], p(''))
         ae([Text('woo')], p('woo'))
-        ae([Text('woo'), Call('get', [Text('yay')]), Text('houpla')], p('woo$get(yay)houpla'))
+        ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
         ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(
  yay
 )\thoupla  '''))
@@ -63,7 +63,7 @@ class TestGrammar(unittest.TestCase):
         ae([Call('id', [Boolean(True)])], p('$id(true)'))
         ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
         ae([Text('truewoo')], p('truewoo'))
-        ae([Text('100'), Call('a', [])], p('100$a()'))
+        ae([Concat([Text('100'), Call('a', [])])], p('100$a()'))
         ae([Call('aaa', [Call('bbb', [Text('ccc)ddd')])])], p('$aaa($bbb[ccc)ddd])'))
 
     def test_loader(self):
@@ -109,8 +109,8 @@ class TestGrammar(unittest.TestCase):
 
     def test_pass(self):
         ae = self.assertEqual
-        ae([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')], p('$pass( x  y\t)'))
-        ae([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')], p('$pass[ x  y\t]'))
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass( x  y\t)'))
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass[ x  y\t]'))
         actual = p('$act(x $pass[ y\t])')
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
         c = Context()
@@ -119,14 +119,14 @@ class TestGrammar(unittest.TestCase):
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
         ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
-        ae([Text('x()'), Text(' ')], p('$pass[x() ]'))
+        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c))
         ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c))
 
     def test_whitespace(self):
         ae = self.assertEqual
         ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
-        ae([Blank(' '), Text(' '), Text('x'), Text(' '), Blank(' ')], p(' $pass( x ) '))
+        ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $pass( x ) '))
         for name in 'lit', 'pass':
             for text in (' $ %s( x ) ' % name,
                          ' $%s ( x ) ' % name):

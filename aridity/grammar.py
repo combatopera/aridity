@@ -219,7 +219,7 @@ class Parser:
     @classmethod
     def getarg(cls, scalarpa, boundarychars):
         opttext = Optional(cls.gettext(Text.pa, boundarychars))
-        return OneOrMore(opttext + cls.getaction()) + opttext | cls.gettext(scalarpa, boundarychars)
+        return (OneOrMore(opttext + cls.getaction()) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
