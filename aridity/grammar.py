@@ -224,10 +224,10 @@ class Parser:
     @classmethod
     def create(cls, scalarpa, boundarychars):
         optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return (ZeroOrMore(optblank + cls.getarg(scalarpa, boundarychars)) + optblank).parseWithTabs()
+        return (ZeroOrMore(optblank + cls.getarg(scalarpa, boundarychars)) + optblank)
 
     def __init__(self, g):
-        self.g = g
+        self.g = g.parseWithTabs()
 
     def __call__(self, text):
         return self.g.parseString(text, parseAll = True).asList()
