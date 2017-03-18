@@ -178,6 +178,8 @@ class Function(Resolvable):
     def __call__(self, *args):
         return self.f(*args)
 
+class UnsupportedEntryException(Exception): pass
+
 class Entry(Struct):
 
     @classmethod
@@ -203,6 +205,12 @@ class Entry(Struct):
         for end in 0, -1:
             trim(end)
         return phrase
+
+    def execute(self, context):
+        if '=' == self.word(1).cat():
+            context[self.word(0).cat()] = Concat.unlesssingleton(self.phrase(2))
+        else:
+            raise UnsupportedEntryException
 
 class Parser:
 

@@ -143,7 +143,7 @@ class TestGrammar(unittest.TestCase):
     def test_modifiers(self):
         context = Context()
         for entry in l('v = $list()\nv#one = $list()\nv#one#1 = $list()\nv#one#1#un = uno'):
-            context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
+            entry.execute(context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1#un'))
         ae(List([Text('uno')]), context.resolved('v#one#1'))
@@ -153,7 +153,7 @@ class TestGrammar(unittest.TestCase):
     def test_fork(self):
         context = Context()
         for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay'):
-            context[entry.word(0).cat()] = Concat.unlesssingleton(entry.phrase(2))
+            entry.execute(context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1'))
         ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
