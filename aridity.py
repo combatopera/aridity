@@ -1,25 +1,13 @@
 #!/usr/bin/env python3
 
-import sys, re
-from aridity.grammar import loader, Concat, templateparser, AnyScalar
+import sys
+from aridity.grammar import loader
 from aridity.context import Context
-
-class Directive:
-
-    def scalar(context, name, scalar):
-        context[name] = AnyScalar.pa(None, None, [scalar])
 
 def main():
     context = Context()
-    directive = re.compile('^#([^\s(]+)(?:[(]([^)]+)[)])?\s+(.+)')
-    for line in sys.stdin:
-        m = directive.search(line)
-        if m is None:
-            for entry in loader(line):
-                entry.execute(context)
-        else:
-            args = [g for g in m.groups()[1:] if g is not None]
-            getattr(Directive, m.group(1))(context, *args) # TODO: Strip trailing whitespace from arg.
+    for entry in loader(sys.stdin.read()):
+        entry.execute(context)
 
 if '__main__' == __name__:
     main()
