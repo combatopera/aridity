@@ -1,4 +1,4 @@
-from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn
+from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
 from decimal import Decimal
 import re
 
@@ -199,6 +199,10 @@ class Parser:
     def gettext(pa, boundarychars):
         return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
 
+    @staticmethod
+    def getoptboundary(pa, boundarychars):
+        return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(Blank.pa) if boundarychars else NoMatch())
+
     @classmethod
     def getaction(cls):
         action = Forward()
@@ -220,8 +224,9 @@ class Parser:
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
+        optboundary = cls.getoptboundary(Blank.pa, boundarychars)
         optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return (ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank)
+        return optboundary + ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank
 
     def __init__(self, g):
         self.g = g.parseWithTabs()
