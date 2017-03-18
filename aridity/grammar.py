@@ -205,26 +205,23 @@ class Parser:
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
-                def getarg(scalarpa, boundarychars):
-                    opttext = Optional(cls.gettext(Text.pa, boundarychars))
-                    return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
-                    return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa, c)) + optblank + Suppress(c)
+                    return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         return action
 
     @classmethod
-    def getarg(cls, scalarpa, boundarychars):
+    def getarg(cls, action, scalarpa, boundarychars):
         opttext = Optional(cls.gettext(Text.pa, boundarychars))
-        return (OneOrMore(opttext + cls.getaction()) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
+        return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
 
     @classmethod
     def create(cls, scalarpa, boundarychars):
         optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return (ZeroOrMore(optblank + cls.getarg(scalarpa, boundarychars)) + optblank)
+        return (ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank)
 
     def __init__(self, g):
         self.g = g.parseWithTabs()
