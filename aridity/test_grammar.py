@@ -63,6 +63,7 @@ class TestGrammar(unittest.TestCase):
         ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
         ae([Text('truewoo')], p('truewoo'))
         ae([Text('100'), Call('a', [])], p('100$a()'))
+        ae([Call('aaa', [Call('bbb', [Text('ccc)ddd')])])], p('$aaa($bbb[ccc)ddd])'))
 
     def test_loader(self):
         ae = self.assertEqual
@@ -74,6 +75,7 @@ class TestGrammar(unittest.TestCase):
             ae([Entry('x', [Text('y')]), Entry('x2', [Text('y2')])], l('x=y%sx2=y2' % eol))
         ae([Entry('x', [Boolean(True)])], l('x = true'))
         ae([Entry('x', [Boolean(True)])], l('x =true '))
+        ae([Entry('x', [Call('a', [Blank('\n'), Text('b'), Blank('\r')])])], l('x = $a(\nb\r)'))
 
     def test_resolve(self):
         c = Context()
