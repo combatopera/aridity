@@ -211,9 +211,9 @@ class Parser:
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarychars))
-        chunk = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)
+        arg = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)
         optblank = getoptblank(Blank.pa)
-        return (ZeroOrMore(optblank + chunk) + optblank).parseWithTabs()
+        return (ZeroOrMore(optblank + arg) + optblank).parseWithTabs()
 
     def __init__(self, g):
         self.g = g
