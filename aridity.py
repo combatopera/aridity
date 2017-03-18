@@ -11,13 +11,6 @@ class Directive:
             for entry in loader(f.read()):
                 entry.execute(context)
 
-    def eval(context, template):
-        context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
-
-    def evalfile(context, path):
-        with open(path) as f:
-            return Directive.eval(context, f.read())
-
     def scalar(context, name, scalar):
         context[name] = AnyScalar.pa(None, None, [scalar])
 

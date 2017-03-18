@@ -204,13 +204,20 @@ class Entry(Struct):
             i -= 1
         for end in 0, -1:
             trim(end)
-        return phrase
+        return Concat.unlesssingleton(phrase)
 
     def execute(self, context):
-        if '=' == self.word(1).cat():
-            context[self.word(0).cat()] = Concat.unlesssingleton(self.phrase(2))
+        if Text('=') == self.word(1):
+            context[self.word(0).cat()] = self.phrase(2)
+        elif Text('echo') == self.word(0):
+            template = self.phrase(1).resolve(context).cat()
+            context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
+        elif Text('cat') == self.word(0):
+            path = self.phrase(1).resolve(context).cat()
+            with open(path) as f:
+                context.resolved('stdout')(Concat(templateparser(f.read())).resolve(context).cat())
         else:
-            raise UnsupportedEntryException
+            raise UnsupportedEntryException(self)
 
 class Parser:
 
