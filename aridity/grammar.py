@@ -191,13 +191,15 @@ class Parser:
 
     identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?')
 
+    @staticmethod
+    def getoptblank(pa, boundarychars):
+        return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
+
     @classmethod
     def create(cls, scalarpa, boundarychars):
         def gettext(pa, boundarychars):
             return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
         action = Forward()
-        def getoptblank(pa, boundarychars):
-            return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
         def clauses():
             for o, c in '()', '[]':
                 yield (Suppress('lit') + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
@@ -205,14 +207,14 @@ class Parser:
                 def getarg(scalarpa):
                     return (OneOrMore(optargtext + action) + optargtext | gettext(scalarpa, c)).setParseAction(Concat.pa)
                 def getbrackets(blankpa, scalarpa):
-                    optblank = getoptblank(blankpa, '')
+                    optblank = cls.getoptblank(blankpa, '')
                     return Suppress(o) + ZeroOrMore(optblank + getarg(scalarpa)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         opttext = Optional(gettext(Text.pa, boundarychars))
         arg = OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)
-        optblank = getoptblank(Blank.pa, boundarychars)
+        optblank = cls.getoptblank(Blank.pa, boundarychars)
         return (ZeroOrMore(optblank + arg) + optblank).parseWithTabs()
 
     def __init__(self, g):
