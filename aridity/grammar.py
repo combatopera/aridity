@@ -165,6 +165,9 @@ class Fork(Struct):
         except KeyError:
             return self.parent.resolved(name)
 
+    def __iter__(self):
+        return iter(self.objs.values())
+
 class Function(Resolvable):
 
     serializable = False
