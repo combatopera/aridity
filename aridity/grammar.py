@@ -1,6 +1,6 @@
 from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
 from decimal import Decimal
-import re, itertools
+import re, itertools, os
 
 class Struct:
 
@@ -224,6 +224,8 @@ class Entry(Struct):
             with open(path) as f:
                 for entry in loader(f.read()):
                     entry.execute(context)
+        elif Text('cd') == self.word(0):
+            os.chdir(self.phrase(1).resolve(context).cat())
         else:
             raise UnsupportedEntryException(self)
 
