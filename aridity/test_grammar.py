@@ -151,8 +151,14 @@ class TestGrammar(unittest.TestCase):
         ae(List([List([List([Text('uno')])])]), context.resolved('v'))
 
     def test_fork(self):
+        self.fork('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay')
+
+    def test_fork2(self):
+        self.fork('hmm = woo\nv#one#1 = uno\n\r\r\nv#two#hmm = yay')
+
+    def fork(self, text):
         context = Context()
-        for entry in l('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay'):
+        for entry in l(text):
             entry.execute(context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1'))
