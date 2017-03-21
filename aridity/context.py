@@ -26,6 +26,8 @@ def get(context, *keys):
         context = context[key.cat()]
     return context.resolved(keys[-1].cat())
 
+class NoSuchPathException(Exception): pass
+
 class SuperContext:
 
     resolvables = collections.OrderedDict([
@@ -49,7 +51,10 @@ class SuperContext:
         names.update([name, None] for name in self.resolvables.keys())
 
     def __getitem__(self, name):
-        return self.resolvables[name]
+        try:
+            return self.resolvables[name]
+        except KeyError:
+            raise NoSuchPathException(name)
 
 supercontext = SuperContext()
 

@@ -1,7 +1,7 @@
 import unittest, pyparsing
 from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
-from .context import Context
+from .context import Context, NoSuchPathException
 from collections import OrderedDict
 
 class Functions:
@@ -167,3 +167,8 @@ class TestGrammar(unittest.TestCase):
         ae(Text('woo'), context.resolved('v#one').resolved('hmm'))
         ae(Text('yay'), context.resolved('v#two').resolved('hmm'))
         ae([OrderedDict([('1', Text('uno'))]), OrderedDict([('hmm', Text('yay'))])], [f.objs for f in context.resolved('v')])
+
+    def test_absent(self):
+        c = Context()
+        with self.assertRaises(NoSuchPathException):
+            c.resolved('hmm')
