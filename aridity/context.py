@@ -83,11 +83,23 @@ class Context:
             return self.parent[name]
 
     def resolved(self, name):
-        obj = self[name].resolve(self)
         prefix = name + '#'
-        for name in self.names():
-            if name.startswith(prefix):
-                modname = name[len(prefix):]
-                if '#' not in modname:
-                    obj.modify(modname, self.resolved(name))
+        modnames = collections.OrderedDict()
+        for modname in self.names():
+            if modname.startswith(prefix):
+                nexthash = modname.find('#', len(prefix))
+                if -1 == nexthash:
+                    nexthash = None
+                modnames[modname[:nexthash]] = None
+        try:
+            resolvable = self[name]
+        except NoSuchPathException:
+            if not modnames:
+                raise
+        try:
+            obj = resolvable.resolve(self)
+        except NameError:
+            obj = Fork(self, collections.OrderedDict())
+        for modname in modnames:
+            obj.modify(modname[len(prefix):], self.resolved(modname))
         return obj
