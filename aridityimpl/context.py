@@ -45,6 +45,7 @@ class SuperContext:
         ['map', Function(mapobjs)],
         ['join', Function(join)],
         ['stdout', Function(sys.stdout.write)],
+        ['/', Text(os.sep)],
     ])
 
     def namesimpl(self, names):
