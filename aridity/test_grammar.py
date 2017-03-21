@@ -141,14 +141,20 @@ class TestGrammar(unittest.TestCase):
         self.assertEqual(Text('a-bb-ccc'), call.resolve(Context()))
 
     def test_modifiers(self):
+        self.modifiers('v = $list()\nv#one = $list()\nv#one#1 = $list()\nv#one#1#un = uno')
+
+    def test_modifiers2(self):
+        self.modifiers('v#one#1#un = uno')
+
+    def modifiers(self, text):
         context = Context()
-        for entry in l('v = $list()\nv#one = $list()\nv#one#1 = $list()\nv#one#1#un = uno'):
+        for entry in l(text):
             entry.execute(context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1#un'))
-        ae(List([Text('uno')]), context.resolved('v#one#1'))
-        ae(List([List([Text('uno')])]), context.resolved('v#one'))
-        ae(List([List([List([Text('uno')])])]), context.resolved('v'))
+        ae([Text('uno')], list(context.resolved('v#one#1')))
+        ae([[Text('uno')]], [list(x) for x in context.resolved('v#one')])
+        ae([[[Text('uno')]]], [[list(y) for y in x] for x in context.resolved('v')])
 
     def test_fork(self):
         self.fork('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay')
