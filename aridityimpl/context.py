@@ -1,4 +1,4 @@
-from .grammar import Function, Text, List, Fork
+from .grammar import Function, Text, List, Fork, WriteAndFlush
 import os, collections, sys
 
 def screenstr(text):
@@ -44,7 +44,7 @@ class SuperContext:
         ['fork', Function(lambda context: Fork(context, collections.OrderedDict()))],
         ['map', Function(mapobjs)],
         ['join', Function(join)],
-        ['stdout', Function(sys.stdout.write)],
+        ['stdout', WriteAndFlush(sys.stdout)],
         ['/', Text(os.sep)],
     ])
 

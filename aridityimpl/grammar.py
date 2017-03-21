@@ -181,6 +181,18 @@ class Function(Resolvable):
     def __call__(self, *args):
         return self.f(*args)
 
+class WriteAndFlush:
+
+    def __init__(self, f):
+        self.f = f
+
+    def resolve(self, context):
+        return self
+
+    def __call__(self, text):
+        self.f.write(text)
+        self.f.flush()
+
 class UnsupportedEntryException(Exception): pass
 
 class Entry(Struct):
@@ -214,7 +226,7 @@ class Entry(Struct):
             context[self.word(0).cat()] = self.phrase(2)
         elif Text('redirect') == self.word(0):
             f = open(self.phrase(1).resolve(context).cat(), 'w')
-            context['stdout'] = Function(f.write)
+            context['stdout'] = WriteAndFlush(f)
         elif Text('echo') == self.word(0):
             template = self.phrase(1).resolve(context).cat()
             context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
