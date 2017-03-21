@@ -89,7 +89,7 @@ class Text(Cat, Scalar):
 
     def resolved(self, name):
         import sys
-        return getattr(sys.modules['aridity.context'], 'supercontext')[name]
+        return getattr(sys.modules['aridityimpl.context'], 'supercontext')[name]
 
 class Number(Scalar):
 

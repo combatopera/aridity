@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
-from aridity.grammar import loader
-from aridity.context import Context
+from aridityimpl.grammar import loader
+from aridityimpl.context import Context
 
 def main(script):
     context = Context()
