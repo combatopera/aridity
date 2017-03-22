@@ -132,8 +132,8 @@ class TestGrammar(unittest.TestCase):
                 with self.assertRaises(pyparsing.ParseException):
                     p(text)
 
-    def test_map(self):
-        call, = p('$map($list(a b 0) $str($get())2)')
+    def test_map(self): # TODO: Also test 2-arg form.
+        call, = p('$map($list(a b 0) x $str($get(x))2)')
         self.assertEqual(List([Text('a2'), Text('b2'), Text('02')]), call.resolve(Context()))
 
     def test_join(self):

@@ -78,10 +78,6 @@ class Scalar(SimpleValue):
 
     ignorable = False
 
-    def resolved(self, name): # FIXME: Sucks.
-        import sys
-        return getattr(sys.modules['aridityimpl.context'], 'supercontext').getresolvable(name)
-
 class Text(Cat, Scalar):
 
     @classmethod
