@@ -71,6 +71,8 @@ class SuperContext:
 
 supercontext = SuperContext()
 
+class NotStringException(Exception): pass
+
 class NotResolvableException(Exception): pass
 
 class Context:
@@ -80,6 +82,8 @@ class Context:
         self.parent = parent
 
     def __setitem__(self, name, resolvable):
+        if str != type(name):
+            raise NotStringException(name)
         if not isinstance(resolvable, Resolvable):
             raise NotResolvableException(resolvable)
         self.resolvables[name] = resolvable
