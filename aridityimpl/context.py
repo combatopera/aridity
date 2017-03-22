@@ -41,35 +41,13 @@ def get(context, *keys):
 
 class NoSuchPathException(Exception): pass
 
-class SuperContext:
-
-    resolvables = collections.OrderedDict([
-        ['get', Function(get)],
-        ['str', Function(lambda context, obj: obj.resolve(context).totext())],
-        ['~', Text(os.path.expanduser('~'))],
-        ['screenstr', Function(screenstr)],
-        ['scstr', Function(scstr)],
-        ['pystr', Function(pystr)],
-        ['LF', Text('\n')],
-        ['EOL', Text(os.linesep)],
-        ['list', Function(lambda context, *objs: List(list(objs)))],
-        ['fork', Function(lambda context: Fork(context))],
-        ['map', Function(mapobjs)],
-        ['join', Function(join)],
-        ['stdout', WriteAndFlush(sys.stdout)],
-        ['/', Text(os.sep)],
-    ])
+class EmptyContext:
 
     def namesimpl(self, names):
-        names.update(self.resolvables.keys())
+        pass
 
     def getresolvable(self, name):
-        try:
-            return self.resolvables[name]
-        except KeyError:
-            raise NoSuchPathException(name)
-
-supercontext = SuperContext()
+        raise NoSuchPathException(name)
 
 class NotStringException(Exception): pass
 
@@ -77,9 +55,9 @@ class NotResolvableException(Exception): pass
 
 class Context:
 
-    def __init__(self, parent = supercontext):
+    def __init__(self, parent = None):
         self.resolvables = collections.OrderedDict()
-        self.parent = parent
+        self.parent = supercontext if parent is None else parent
 
     def __setitem__(self, name, resolvable):
         if str != type(name):
@@ -124,3 +102,24 @@ class Context:
         for modname in modnames:
             obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj
+
+class SuperContext(Context):
+
+    def __init__(self):
+        super().__init__(EmptyContext())
+        self['get'] = Function(get)
+        self['str'] = Function(lambda context, obj: obj.resolve(context).totext())
+        self['~'] = Text(os.path.expanduser('~'))
+        self['screenstr'] = Function(screenstr)
+        self['scstr'] = Function(scstr)
+        self['pystr'] = Function(pystr)
+        self['LF'] = Text('\n')
+        self['EOL'] = Text(os.linesep)
+        self['list'] = Function(lambda context, *objs: List(list(objs)))
+        self['fork'] = Function(lambda context: Fork(context))
+        self['map'] = Function(mapobjs)
+        self['join'] = Function(join)
+        self['stdout'] = WriteAndFlush(sys.stdout)
+        self['/'] = Text(os.sep)
+
+supercontext = SuperContext()

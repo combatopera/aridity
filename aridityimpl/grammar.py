@@ -176,7 +176,7 @@ class Function(Resolvable):
     def __call__(self, *args):
         return self.f(*args)
 
-class WriteAndFlush:
+class WriteAndFlush(Resolvable):
 
     def __init__(self, f):
         self.f = f
