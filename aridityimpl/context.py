@@ -10,6 +10,9 @@ def scstr(context, text):
     text = text.resolve(context).cat()
     return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
+def pystr(context, text):
+    return Text(repr(text.resolve(context).cat()))
+
 def mapobjs(context, objs, *args):
     if 1 == len(args):
         expr, = args
@@ -46,6 +49,7 @@ class SuperContext:
         ['~', Text(os.path.expanduser('~'))],
         ['screenstr', Function(screenstr)],
         ['scstr', Function(scstr)],
+        ['pystr', Function(pystr)],
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
