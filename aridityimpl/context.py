@@ -8,10 +8,7 @@ def scstr(text):
     return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
 
 def mapobjs(context, objs, expr):
-    v = []
-    for c in objs.resolve(context):
-        v.append(expr.resolve(c))
-    return List(v)
+    return List([expr.resolve(c) for c in objs.resolve(context)])
 
 def join(context, resolvables, separator):
     return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
