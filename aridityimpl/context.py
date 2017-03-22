@@ -1,11 +1,13 @@
 from .grammar import Function, Text, List, Fork, WriteAndFlush
 import os, collections, sys
 
-def screenstr(text):
-    return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+def screenstr(context, text):
+    text = text.resolve(context).cat()
+    return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-def scstr(text):
-    return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+def scstr(context, text):
+    text = text.resolve(context).cat()
+    return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
 def mapobjs(context, objs, expr):
     return List([expr.resolve(c) for c in objs.resolve(context)])
@@ -28,8 +30,8 @@ class SuperContext:
         ['get', Function(get)],
         ['str', Function(lambda context, obj: obj.resolve(context).totext())],
         ['~', Text(os.path.expanduser('~'))],
-        ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context).cat())))],
-        ['scstr', Function(lambda context, text: Text(scstr(text.resolve(context).cat())))],
+        ['screenstr', Function(screenstr)],
+        ['scstr', Function(scstr)],
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
