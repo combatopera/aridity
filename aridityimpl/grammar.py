@@ -124,7 +124,11 @@ class Call(Resolvable):
         self.args = args
 
     def resolve(self, context):
-        return context.resolved(self.name)(*[context] + [a for a in self.args if not a.ignorable])
+        args = [a for a in self.args if not a.ignorable]
+        for name in reversed(self.name.split('$')):
+            args = [context.resolved(name)(*[context] + args)]
+        result, = args
+        return result
 
 class List(Resolvable):
 
@@ -237,7 +241,8 @@ class Entry(Struct):
 
 class Parser:
 
-    identifier = Regex('[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?')
+    idregex = '[A-Za-z_](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?'
+    identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
     @staticmethod
     def getoptblank(pa, boundarychars):
