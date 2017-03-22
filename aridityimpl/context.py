@@ -1,4 +1,4 @@
-from .grammar import Function, Text, List, Fork, WriteAndFlush
+from .grammar import Function, Text, List, Fork, WriteAndFlush, Resolvable
 from .util import OrderedSet
 import os, collections, sys
 
@@ -71,6 +71,8 @@ class SuperContext:
 
 supercontext = SuperContext()
 
+class NotResolvableException(Exception): pass
+
 class Context:
 
     def __init__(self, parent = supercontext):
@@ -78,6 +80,8 @@ class Context:
         self.parent = parent
 
     def __setitem__(self, name, resolvable):
+        if not isinstance(resolvable, Resolvable):
+            raise NotResolvableException(resolvable)
         self.resolvables[name] = resolvable
 
     def namesimpl(self, names):
