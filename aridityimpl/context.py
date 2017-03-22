@@ -88,13 +88,12 @@ class Context:
                 modnames.add(modname[:nexthash])
         try:
             resolvable = self.getresolvable(name)
+            found = True
         except NoSuchPathException:
             if not modnames:
                 raise
-        try:
-            obj = resolvable.resolve(self)
-        except NameError:
-            obj = Fork(self)
+            found = False
+        obj = resolvable.resolve(self) if found else Fork(self)
         for modname in modnames:
             obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj
