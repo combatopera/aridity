@@ -36,9 +36,9 @@ class Functions:
             separator = ''
         return Text(separator.join(r.cat() for r in resolvables.resolve(context)))
 
-    def get(context, *keys):
-        for key in keys:
-            context = context.resolved(key.cat())
+    def get(context, *resolvables):
+        for r in resolvables:
+            context = context.resolved(r.resolve(context).cat())
         return context
 
     def str(context, resolvable):

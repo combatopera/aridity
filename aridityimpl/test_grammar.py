@@ -6,9 +6,6 @@ from collections import OrderedDict
 
 class Functions:
 
-    def get(context, key):
-        return context.getresolvable(key.resolve(context).cat())
-
     def a(context):
         return Text('A')
 
@@ -80,7 +77,7 @@ class TestGrammar(unittest.TestCase):
 
     def test_resolve(self):
         c = Context()
-        for name in 'a', 'ac', 'act', 'id', 'get':
+        for name in 'a', 'ac', 'act', 'id':
             c[name] = Function(getattr(Functions, name))
         c['minus124'] = Number(-124)
         c['minus124txt'] = Text('minus124')
