@@ -30,18 +30,19 @@ class Functions:
 
     def join(context, resolvables, *args):
         if args:
-            separator, = args
+            r, = args
+            separator = r.resolve(context).cat()
         else:
-            separator = Text('')
-        return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
+            separator = ''
+        return Text(separator.join(r.cat() for r in resolvables.resolve(context)))
 
     def get(context, *keys):
         for key in keys:
             context = context.resolved(key.cat())
         return context
 
-    def str(context, obj):
-        return obj.resolve(context).totext()
+    def str(context, resolvable):
+        return resolvable.resolve(context).totext()
 
     def list(context, *objs):
         return List(list(objs))
