@@ -133,8 +133,8 @@ class TestGrammar(unittest.TestCase):
                     p(text)
 
     def test_map(self):
-        call, = p('$map($list(a b c) $get()2)')
-        self.assertEqual(List([Text('a2'), Text('b2'), Text('c2')]), call.resolve(Context()))
+        call, = p('$map($list(a b 0) $str($get())2)')
+        self.assertEqual(List([Text('a2'), Text('b2'), Text('02')]), call.resolve(Context()))
 
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')

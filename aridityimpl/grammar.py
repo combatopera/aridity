@@ -78,6 +78,10 @@ class Scalar(SimpleValue):
 
     ignorable = False
 
+    def resolved(self, name): # FIXME: Sucks.
+        import sys
+        return getattr(sys.modules['aridityimpl.context'], 'supercontext').getresolvable(name)
+
 class Text(Cat, Scalar):
 
     @classmethod
@@ -85,9 +89,8 @@ class Text(Cat, Scalar):
         text, = t
         return Text(text)
 
-    def resolved(self, name): # FIXME: Sucks.
-        import sys
-        return getattr(sys.modules['aridityimpl.context'], 'supercontext').getresolvable(name)
+    def totext(self):
+        return self
 
 class Number(Scalar):
 
