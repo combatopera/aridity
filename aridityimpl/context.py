@@ -24,7 +24,11 @@ def mapobjs(context, objs, *args):
                 yield expr.resolve(c)
         return List(list(g()))
 
-def join(context, resolvables, separator):
+def join(context, resolvables, *args):
+    if args:
+        separator, = args
+    else:
+        separator = Text('')
     return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
 
 def get(context, *keys):
