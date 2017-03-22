@@ -8,6 +8,10 @@ class OrderedSet:
     def add(self, x):
         self.d[x] = None
 
+    def update(self, g):
+        for x in g:
+            self.add(x)
+
     def __iter__(self):
         return iter(self.d.keys())
 

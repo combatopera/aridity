@@ -42,7 +42,7 @@ class SuperContext:
     ])
 
     def namesimpl(self, names):
-        names.update([name, None] for name in self.resolvables.keys())
+        names.update(self.resolvables.keys())
 
     def getresolvable(self, name):
         try:
@@ -63,12 +63,12 @@ class Context:
 
     def namesimpl(self, names):
         self.parent.namesimpl(names)
-        names.update([name, None] for name in self.resolvables.keys())
+        names.update(self.resolvables.keys())
 
     def names(self):
-        names = collections.OrderedDict()
+        names = OrderedSet()
         self.namesimpl(names)
-        return names.keys()
+        return names
 
     def getresolvable(self, name):
         try:
