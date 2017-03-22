@@ -7,9 +7,6 @@ def screenstr(text):
 def scstr(text):
     return '"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
 
-def shstr(text):
-    return "'%s'" % text.replace("'", r"'\''")
-
 def mapobjs(context, objs, expr):
     v = []
     for c in objs.resolve(context):
@@ -36,8 +33,6 @@ class SuperContext:
         ['~', Text(os.path.expanduser('~'))],
         ['screenstr', Function(lambda context, text: Text(screenstr(text.resolve(context).cat())))],
         ['scstr', Function(lambda context, text: Text(scstr(text.resolve(context).cat())))],
-        ['shstr', Function(lambda context, text: Text(shstr(text.cat())))],
-        ['env', Function(lambda context, key: Text(os.environ[key.cat()]))],
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
