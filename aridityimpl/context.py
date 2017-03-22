@@ -1,43 +1,7 @@
 from .grammar import Function, Text, List, Fork, WriteAndFlush, Resolvable
 from .util import OrderedSet
+from .functions import getfunctions
 import os, collections, sys
-
-def screenstr(context, text):
-    text = text.resolve(context).cat()
-    return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
-
-def scstr(context, text):
-    text = text.resolve(context).cat()
-    return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
-
-def pystr(context, text):
-    return Text(repr(text.resolve(context).cat()))
-
-def mapobjs(context, objs, *args):
-    if 1 == len(args):
-        expr, = args
-        return List([expr.resolve(c) for c in objs.resolve(context)])
-    else:
-        name, expr = args
-        name = name.resolve(context).cat()
-        def g():
-            for obj in objs.resolve(context):
-                c = Context(context)
-                c[name] = obj
-                yield expr.resolve(c)
-        return List(list(g()))
-
-def join(context, resolvables, *args):
-    if args:
-        separator, = args
-    else:
-        separator = Text('')
-    return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
-
-def get(context, *keys):
-    for key in keys:
-        context = context.resolved(key.cat())
-    return context
 
 class NoSuchPathException(Exception): pass
 
@@ -95,6 +59,9 @@ class Context:
             obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj
 
+    def createchild(self):
+        return type(self)(self)
+
 class SuperContext(Context):
 
     class EmptyContext:
@@ -107,18 +74,14 @@ class SuperContext(Context):
 
     def __init__(self):
         super().__init__(self.EmptyContext())
-        self['get'] = Function(get)
+        for name, f in getfunctions():
+            self[name] = Function(f)
         self['str'] = Function(lambda context, obj: obj.resolve(context).totext())
         self['~'] = Text(os.path.expanduser('~'))
-        self['screenstr'] = Function(screenstr)
-        self['scstr'] = Function(scstr)
-        self['pystr'] = Function(pystr)
         self['LF'] = Text('\n')
         self['EOL'] = Text(os.linesep)
         self['list'] = Function(lambda context, *objs: List(list(objs)))
         self['fork'] = Function(lambda context: Fork(context))
-        self['map'] = Function(mapobjs)
-        self['join'] = Function(join)
         self['stdout'] = WriteAndFlush(sys.stdout)
         self['/'] = Text(os.sep)
 
