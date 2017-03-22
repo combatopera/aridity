@@ -41,14 +41,6 @@ def get(context, *keys):
 
 class NoSuchPathException(Exception): pass
 
-class EmptyContext:
-
-    def namesimpl(self, names):
-        pass
-
-    def getresolvable(self, name):
-        raise NoSuchPathException(name)
-
 class NotStringException(Exception): pass
 
 class NotResolvableException(Exception): pass
@@ -105,8 +97,16 @@ class Context:
 
 class SuperContext(Context):
 
+    class EmptyContext:
+
+        def namesimpl(self, names):
+            pass
+
+        def getresolvable(self, name):
+            raise NoSuchPathException(name)
+
     def __init__(self):
-        super().__init__(EmptyContext())
+        super().__init__(self.EmptyContext())
         self['get'] = Function(get)
         self['str'] = Function(lambda context, obj: obj.resolve(context).totext())
         self['~'] = Text(os.path.expanduser('~'))
