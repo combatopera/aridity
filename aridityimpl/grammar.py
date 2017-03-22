@@ -87,7 +87,7 @@ class Text(Cat, Scalar):
         text, = t
         return Text(text)
 
-    def resolved(self, name):
+    def resolved(self, name): # FIXME: Sucks.
         import sys
         return getattr(sys.modules['aridityimpl.context'], 'supercontext')[name]
 
