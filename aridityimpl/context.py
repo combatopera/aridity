@@ -1,4 +1,4 @@
-from .grammar import Function, Text, Fork, WriteAndFlush, Resolvable
+from .grammar import Function, Text, Fork, Stream, Resolvable
 from .util import OrderedSet
 from .functions import getfunctions
 import os, collections, sys
@@ -79,7 +79,7 @@ class SuperContext(Context):
         self['~'] = Text(os.path.expanduser('~'))
         self['LF'] = Text('\n')
         self['EOL'] = Text(os.linesep)
-        self['stdout'] = WriteAndFlush(sys.stdout)
+        self['stdout'] = Stream(sys.stdout)
         self['/'] = Text(os.sep)
 
 supercontext = SuperContext()

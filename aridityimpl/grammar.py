@@ -176,7 +176,7 @@ class Function(Resolvable):
     def __call__(self, *args):
         return self.f(*args)
 
-class WriteAndFlush(Resolvable):
+class Stream(Resolvable):
 
     def __init__(self, f):
         self.f = f
@@ -184,7 +184,7 @@ class WriteAndFlush(Resolvable):
     def resolve(self, context):
         return self
 
-    def __call__(self, text):
+    def writeflush(self, text):
         self.f.write(text)
         self.f.flush()
 
@@ -223,13 +223,13 @@ class Entry(Struct):
         if Text('=') == self.word(1):
             context[self.word(0).cat()] = self.phrase(2)
         elif Text('redirect') == self.word(0):
-            context['stdout'] = WriteAndFlush(open(resolvepath(1), 'w'))
+            context['stdout'] = Stream(open(resolvepath(1), 'w'))
         elif Text('echo') == self.word(0):
             template = self.phrase(1).resolve(context).cat()
-            context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
+            context.resolved('stdout').writeflush(Concat(templateparser(template)).resolve(context).cat())
         elif Text('cat') == self.word(0):
             with open(resolvepath(1)) as f:
-                context.resolved('stdout')(Concat(templateparser(f.read())).resolve(context).cat())
+                context.resolved('stdout').writeflush(Concat(templateparser(f.read())).resolve(context).cat())
         elif Text('source') == self.word(0):
             with open(resolvepath(1)) as f:
                 for entry in loader(f.read()):
