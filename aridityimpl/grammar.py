@@ -47,8 +47,6 @@ class CatNotSupportedException(Exception): pass
 
 class SimpleValue(Resolvable):
 
-    serializable = True
-
     @classmethod
     def pa(cls, s, l, t):
         value, = t
@@ -131,8 +129,6 @@ class Call(Resolvable):
 
 class List(Resolvable):
 
-    serializable = True
-
     def __init__(self, objs):
         self.objs = objs
 
@@ -146,8 +142,6 @@ class List(Resolvable):
         return iter(self.objs)
 
 class Fork(Struct):
-
-    serializable = True
 
     def __init__(self, parent):
         self.objs = collections.OrderedDict()
@@ -169,8 +163,6 @@ class Fork(Struct):
         return iter(self.objs.values())
 
 class Function(Resolvable):
-
-    serializable = False
 
     def __init__(self, f):
         self.f = f
