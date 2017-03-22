@@ -7,7 +7,7 @@ from collections import OrderedDict
 class Functions:
 
     def get(context, key):
-        return context[key.resolve(context).cat()]
+        return context.getresolvable(key.resolve(context).cat())
 
     def a(context):
         return Text('A')

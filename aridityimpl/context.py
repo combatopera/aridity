@@ -43,7 +43,7 @@ class SuperContext:
     def namesimpl(self, names):
         names.update([name, None] for name in self.resolvables.keys())
 
-    def __getitem__(self, name):
+    def getresolvable(self, name):
         try:
             return self.resolvables[name]
         except KeyError:
@@ -69,11 +69,11 @@ class Context:
         self.namesimpl(names)
         return names.keys()
 
-    def __getitem__(self, name):
+    def getresolvable(self, name):
         try:
             return self.resolvables[name]
         except KeyError:
-            return self.parent[name]
+            return self.parent.getresolvable(name)
 
     def resolved(self, name):
         prefix = name + '#'
@@ -85,7 +85,7 @@ class Context:
                     nexthash = None
                 modnames[modname[:nexthash]] = None
         try:
-            resolvable = self[name]
+            resolvable = self.getresolvable(name)
         except NoSuchPathException:
             if not modnames:
                 raise
