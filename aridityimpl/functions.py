@@ -1,4 +1,4 @@
-from .grammar import Text, List
+from .grammar import Text, List, Fork
 import inspect
 
 class Functions:
@@ -39,6 +39,15 @@ class Functions:
         for key in keys:
             context = context.resolved(key.cat())
         return context
+
+    def str(context, obj):
+        return obj.resolve(context).totext()
+
+    def list(context, *objs):
+        return List(list(objs))
+
+    def fork(context):
+        return Fork(context)
 
 def getfunctions():
     return inspect.getmembers(Functions, predicate = inspect.isfunction)

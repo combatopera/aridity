@@ -1,4 +1,4 @@
-from .grammar import Function, Text, List, Fork, WriteAndFlush, Resolvable
+from .grammar import Function, Text, Fork, WriteAndFlush, Resolvable
 from .util import OrderedSet
 from .functions import getfunctions
 import os, collections, sys
@@ -76,12 +76,9 @@ class SuperContext(Context):
         super().__init__(self.EmptyContext())
         for name, f in getfunctions():
             self[name] = Function(f)
-        self['str'] = Function(lambda context, obj: obj.resolve(context).totext())
         self['~'] = Text(os.path.expanduser('~'))
         self['LF'] = Text('\n')
         self['EOL'] = Text(os.linesep)
-        self['list'] = Function(lambda context, *objs: List(list(objs)))
-        self['fork'] = Function(lambda context: Fork(context))
         self['stdout'] = WriteAndFlush(sys.stdout)
         self['/'] = Text(os.sep)
 
