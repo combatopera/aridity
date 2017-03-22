@@ -1,4 +1,5 @@
 from .grammar import Function, Text, List, Fork, WriteAndFlush
+from .util import OrderedSet
 import os, collections, sys
 
 def screenstr(context, text):
@@ -77,13 +78,13 @@ class Context:
 
     def resolved(self, name):
         prefix = name + '#'
-        modnames = collections.OrderedDict()
+        modnames = OrderedSet()
         for modname in self.names():
             if modname.startswith(prefix):
                 nexthash = modname.find('#', len(prefix))
                 if -1 == nexthash:
                     nexthash = None
-                modnames[modname[:nexthash]] = None
+                modnames.add(modname[:nexthash])
         try:
             resolvable = self.getresolvable(name)
         except NoSuchPathException:
