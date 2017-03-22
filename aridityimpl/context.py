@@ -9,11 +9,11 @@ class NotStringException(Exception): pass
 
 class NotResolvableException(Exception): pass
 
-class Context:
+class AbstractContext:
 
-    def __init__(self, parent = None):
+    def __init__(self, parent):
         self.resolvables = collections.OrderedDict()
-        self.parent = supercontext if parent is None else parent
+        self.parent = parent
 
     def __setitem__(self, name, resolvable):
         if str != type(name):
@@ -59,10 +59,7 @@ class Context:
             obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj
 
-    def createchild(self):
-        return type(self)(self)
-
-class SuperContext(Context):
+class SuperContext(AbstractContext):
 
     class EmptyContext:
 
@@ -83,3 +80,11 @@ class SuperContext(Context):
         self['/'] = Text(os.sep)
 
 supercontext = SuperContext()
+
+class Context(AbstractContext):
+
+    def __init__(self, parent = supercontext):
+        super().__init__(parent)
+
+    def createchild(self):
+        return type(self)(self)
