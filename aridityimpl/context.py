@@ -34,7 +34,7 @@ class SuperContext:
         ['LF', Text('\n')],
         ['EOL', Text(os.linesep)],
         ['list', Function(lambda context, *objs: List(list(objs)))],
-        ['fork', Function(lambda context: Fork(context, collections.OrderedDict()))],
+        ['fork', Function(lambda context: Fork(context))],
         ['map', Function(mapobjs)],
         ['join', Function(join)],
         ['stdout', WriteAndFlush(sys.stdout)],
@@ -78,10 +78,11 @@ class Context:
 
     def resolved(self, name):
         prefix = name + '#'
+        prefixlen = len(prefix)
         modnames = OrderedSet()
         for modname in self.names():
             if modname.startswith(prefix):
-                nexthash = modname.find('#', len(prefix))
+                nexthash = modname.find('#', prefixlen)
                 if -1 == nexthash:
                     nexthash = None
                 modnames.add(modname[:nexthash])
@@ -93,7 +94,7 @@ class Context:
         try:
             obj = resolvable.resolve(self)
         except NameError:
-            obj = Fork(self, collections.OrderedDict())
+            obj = Fork(self)
         for modname in modnames:
-            obj.modify(modname[len(prefix):], self.resolved(modname))
+            obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj

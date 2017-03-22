@@ -1,6 +1,6 @@
 from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
 from decimal import Decimal
-import re, itertools, os
+import re, itertools, os, collections
 
 class Struct:
 
@@ -149,9 +149,9 @@ class Fork(Struct):
 
     serializable = True
 
-    def __init__(self, parent, objs):
+    def __init__(self, parent):
+        self.objs = collections.OrderedDict()
         self.parent = parent
-        self.objs = objs
 
     def modify(self, name, obj):
         self.objs[name] = obj
