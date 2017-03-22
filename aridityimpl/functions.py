@@ -3,16 +3,16 @@ import inspect
 
 class Functions:
 
-    def screenstr(context, text):
-        text = text.resolve(context).cat()
+    def screenstr(context, resolvable):
+        text = resolvable.resolve(context).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-    def scstr(context, text):
-        text = text.resolve(context).cat()
+    def scstr(context, resolvable):
+        text = resolvable.resolve(context).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-    def pystr(context, text):
-        return Text(repr(text.resolve(context).cat()))
+    def pystr(context, resolvable):
+        return Text(repr(resolvable.resolve(context).cat()))
 
     def map(context, objs, *args):
         if 1 == len(args):
