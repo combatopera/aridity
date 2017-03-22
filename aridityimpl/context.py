@@ -16,11 +16,9 @@ def join(context, resolvables, separator):
     return Text(separator.resolve(context).cat().join(r.cat() for r in resolvables.resolve(context)))
 
 def get(context, *keys):
-    if not keys:
-        return context
-    for key in keys[:-1]:
-        context = context[key.cat()]
-    return context.resolved(keys[-1].cat())
+    for key in keys:
+        context = context.resolved(key.cat())
+    return context
 
 class NoSuchPathException(Exception): pass
 
