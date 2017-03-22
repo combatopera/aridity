@@ -222,25 +222,25 @@ class Entry(Struct):
         return Concat.unlesssingleton(phrase)
 
     def execute(self, context):
+        def resolvepath(i):
+            path = self.phrase(i).resolve(context).cat()
+            return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
         if Text('=') == self.word(1):
             context[self.word(0).cat()] = self.phrase(2)
         elif Text('redirect') == self.word(0):
-            f = open(self.phrase(1).resolve(context).cat(), 'w')
-            context['stdout'] = WriteAndFlush(f)
+            context['stdout'] = WriteAndFlush(open(resolvepath(1), 'w'))
         elif Text('echo') == self.word(0):
             template = self.phrase(1).resolve(context).cat()
             context.resolved('stdout')(Concat(templateparser(template)).resolve(context).cat())
         elif Text('cat') == self.word(0):
-            path = self.phrase(1).resolve(context).cat()
-            with open(path) as f:
+            with open(resolvepath(1)) as f:
                 context.resolved('stdout')(Concat(templateparser(f.read())).resolve(context).cat())
         elif Text('source') == self.word(0):
-            path = self.phrase(1).resolve(context).cat()
-            with open(path) as f:
+            with open(resolvepath(1)) as f:
                 for entry in loader(f.read()):
                     entry.execute(context)
         elif Text('cd') == self.word(0):
-            os.chdir(self.phrase(1).resolve(context).cat())
+            context['cwd'] = Text(resolvepath(1))
         else:
             raise UnsupportedEntryException(self)
 
