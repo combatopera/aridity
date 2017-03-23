@@ -34,7 +34,7 @@ def resolvepath(entry, context, i):
 def execute(entry, context):
     n = entry.size()
     if not n:
-        raise UnsupportedEntryException(entry)
+        return
     firstword = entry.word(0)
     if 1 < n and Text('=') == entry.word(1):
         context[firstword.cat()] = entry.phrase(2)
