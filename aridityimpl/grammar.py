@@ -25,6 +25,11 @@ class Resolvable(Struct):
     def resolve(self, context):
         raise NotImplementedError
 
+class Resolved(Resolvable):
+
+    def resolve(self, context):
+        return self
+
 class Concat(Resolvable):
 
     ignorable = False
@@ -45,7 +50,7 @@ class Concat(Resolvable):
 
 class CatNotSupportedException(Exception): pass
 
-class SimpleValue(Resolvable):
+class SimpleValue(Resolved):
 
     @classmethod
     def pa(cls, s, l, t):
@@ -54,9 +59,6 @@ class SimpleValue(Resolvable):
 
     def __init__(self, value):
         self.value = value
-
-    def resolve(self, context):
-        return self
 
     def cat(self):
         raise CatNotSupportedException(self)
@@ -130,13 +132,10 @@ class Call(Resolvable):
         result, = args
         return result
 
-class List(Resolvable):
+class List(Resolved):
 
     def __init__(self, objs):
         self.objs = objs
-
-    def resolve(self, context):
-        return self
 
     def modify(self, name, obj):
         self.objs.append(obj)
@@ -165,24 +164,18 @@ class Fork(Struct):
     def __iter__(self):
         return iter(self.objs.values())
 
-class Function(Resolvable):
+class Function(Resolved):
 
     def __init__(self, f):
         self.f = f
-
-    def resolve(self, context):
-        return self
 
     def __call__(self, *args):
         return self.f(*args)
 
-class Stream(Resolvable):
+class Stream(Resolved):
 
     def __init__(self, f):
         self.f = f
-
-    def resolve(self, context):
-        return self
 
     def writeflush(self, text):
         self.f.write(text)
