@@ -2,6 +2,7 @@ import unittest, pyparsing
 from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
 from .context import Context, NoSuchPathException
+from .directives import execute
 from collections import OrderedDict
 
 class Functions:
@@ -146,7 +147,7 @@ class TestGrammar(unittest.TestCase):
     def modifiers(self, text):
         context = Context()
         for entry in l(text):
-            entry.execute(context)
+            execute(entry, context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1#un'))
         ae([Text('uno')], list(context.resolved('v#one#1')))
@@ -162,7 +163,7 @@ class TestGrammar(unittest.TestCase):
     def fork(self, text):
         context = Context()
         for entry in l(text):
-            entry.execute(context)
+            execute(entry, context)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v#one#1'))
         ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
