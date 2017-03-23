@@ -10,12 +10,12 @@ class Directives:
     def redirect(entry, context):
         context['stdout'] = Stream(open(resolvepath(entry, context, 1), 'w'))
 
-    def echo(entry, context):
-        context.resolved('stdout').writeflush(entry.phrase(1).resolve(context).cat())
+    def write(entry, context):
+        context.resolved('stdout').flush(entry.phrase(1).resolve(context).cat())
 
     def cat(entry, context):
         with open(resolvepath(entry, context, 1)) as f:
-            context.resolved('stdout').writeflush(Concat(templateparser(f.read())).resolve(context).cat())
+            context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
     def source(entry, context):
         with open(resolvepath(entry, context, 1)) as f:

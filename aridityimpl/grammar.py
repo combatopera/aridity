@@ -164,7 +164,7 @@ class Stream(Resolved):
     def __init__(self, f):
         self.f = f
 
-    def writeflush(self, text):
+    def flush(self, text):
         self.f.write(text)
         self.f.flush()
 
