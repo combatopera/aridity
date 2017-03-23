@@ -80,6 +80,9 @@ class Scalar(SimpleValue):
 
     ignorable = False
 
+    def __hash__(self):
+        return hash(self.value)
+
 class Text(Cat, Scalar):
 
     @classmethod
