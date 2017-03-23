@@ -39,7 +39,10 @@ def execute(entry, context):
     if 1 < n and Text('=') == entry.word(1):
         context[firstword.cat()] = entry.phrase(2)
     else:
-        d = lookup.get(firstword)
+        try:
+            d = lookup.get(firstword)
+        except TypeError:
+            d = None
         if d is None:
             raise UnsupportedEntryException(entry)
         d(entry, context)
