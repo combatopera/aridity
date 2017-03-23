@@ -65,13 +65,17 @@ class Parser:
         optblank = cls.getoptblank(Blank.pa, boundarychars)
         return ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
 
-    def __init__(self, g):
+    def __init__(self, g, singleton = False):
         self.g = g.parseWithTabs()
+        self.singleton = singleton
 
     def __call__(self, text):
-        return self.g.parseString(text, parseAll = True).asList()
+        result = self.g.parseString(text, parseAll = True).asList()
+        if self.singleton:
+            result, = result
+        return result
 
 expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
 templateparser = Parser(Parser.create(Text.pa, ''))
 loader = Parser(ZeroOrMore(Parser.create(AnyScalar.pa, '\r\n').setParseAction(Entry.pa)))
-commandparser = Parser(Parser.getcommand(AnyScalar.pa, '\r\n').setParseAction(Entry.pa))
+commandparser = Parser(Parser.getcommand(AnyScalar.pa, '\r\n').setParseAction(Entry.pa), True)

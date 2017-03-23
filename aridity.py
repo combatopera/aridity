@@ -10,7 +10,7 @@ def repl(instream, outstream):
     context = Context()
     context['stdout'] = Stream(outstream)
     for line in instream:
-        command, = commandparser(line) # TODO: Support multi-line commands.
+        command = commandparser(line) # TODO: Support multi-line commands.
         execute(command, context)
 
 if '__main__' == __name__:
