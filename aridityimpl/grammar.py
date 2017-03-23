@@ -177,6 +177,9 @@ class Entry(Struct):
     def __init__(self, resolvables):
         self.resolvables = resolvables
 
+    def size(self):
+        return sum(1 for r in self.resolvables if not r.ignorable)
+
     def word(self, i):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word

@@ -11,8 +11,7 @@ class Directives:
         context['stdout'] = Stream(open(resolvepath(entry, context, 1), 'w'))
 
     def echo(entry, context):
-        template = entry.phrase(1).resolve(context).cat()
-        context.resolved('stdout').writeflush(Concat(templateparser(template)).resolve(context).cat())
+        context.resolved('stdout').writeflush(entry.phrase(1).resolve(context).cat())
 
     def cat(entry, context):
         with open(resolvepath(entry, context, 1)) as f:
@@ -33,8 +32,11 @@ def resolvepath(entry, context, i):
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
 
 def execute(entry, context):
+    n = entry.size()
+    if not n:
+        raise UnsupportedEntryException(entry)
     firstword = entry.word(0)
-    if Text('=') == entry.word(1):
+    if 1 < n and Text('=') == entry.word(1):
         context[firstword.cat()] = entry.phrase(2)
     else:
         d = lookup.get(firstword)

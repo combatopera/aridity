@@ -59,6 +59,12 @@ class Parser:
         optblank = cls.getoptblank(Blank.pa, boundarychars)
         return OneOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
 
+    @classmethod
+    def getcommand(cls, scalarpa, boundarychars):
+        optboundary = cls.getoptboundary(Boundary.pa, boundarychars)
+        optblank = cls.getoptblank(Blank.pa, boundarychars)
+        return ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
+
     def __init__(self, g):
         self.g = g.parseWithTabs()
 
@@ -68,3 +74,4 @@ class Parser:
 expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
 templateparser = Parser(Parser.create(Text.pa, ''))
 loader = Parser(ZeroOrMore(Parser.create(AnyScalar.pa, '\r\n').setParseAction(Entry.pa)))
+commandparser = Parser(Parser.getcommand(AnyScalar.pa, '\r\n').setParseAction(Entry.pa))
