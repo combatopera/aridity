@@ -1,7 +1,7 @@
 from .grammar import Text, Stream, Concat
 from .parser import templateparser, loader
 from .util import allfunctions
-import os
+import os, sys
 
 class UnsupportedEntryException(Exception): pass
 
@@ -24,6 +24,9 @@ class Directives:
 
     def cd(entry, context):
         context['cwd'] = Text(resolvepath(entry, context, 1))
+
+    def test(entry, context):
+        print(entry.phrase(1).resolve(context), file = sys.stderr)
 
 lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
