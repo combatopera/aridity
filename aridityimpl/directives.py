@@ -7,31 +7,31 @@ class UnsupportedEntryException(Exception): pass
 
 class Directives:
 
-    def redirect(entry, context):
-        context['stdout'] = Stream(open(resolvepath(entry, context, 1), 'w'))
+    def redirect(phrase, context):
+        context['stdout'] = Stream(open(resolvepath(phrase, context), 'w'))
 
-    def write(entry, context):
-        context.resolved('stdout').flush(entry.phrase(1).resolve(context).cat())
+    def write(phrase, context):
+        context.resolved('stdout').flush(phrase.resolve(context).cat())
 
-    def cat(entry, context):
-        with open(resolvepath(entry, context, 1)) as f:
+    def cat(phrase, context):
+        with open(resolvepath(phrase, context)) as f:
             context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
-    def source(entry, context):
-        with open(resolvepath(entry, context, 1)) as f:
+    def source(phrase, context):
+        with open(resolvepath(phrase, context)) as f:
             for entry in loader(f.read()):
                 execute(entry, context)
 
-    def cd(entry, context):
-        context['cwd'] = Text(resolvepath(entry, context, 1))
+    def cd(phrase, context):
+        context['cwd'] = Text(resolvepath(phrase, context))
 
-    def test(entry, context):
-        print(entry.phrase(1).resolve(context), file = sys.stderr)
+    def test(phrase, context):
+        print(phrase.resolve(context), file = sys.stderr)
 
 lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
-def resolvepath(entry, context, i):
-    path = entry.phrase(i).resolve(context).cat()
+def resolvepath(phrase, context):
+    path = phrase.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
 
 def execute(entry, context):
@@ -48,4 +48,4 @@ def execute(entry, context):
             d = None
         if d is None:
             raise UnsupportedEntryException(entry)
-        d(entry, context)
+        d(entry.phrase(1), context)
