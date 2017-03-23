@@ -1,5 +1,6 @@
 from .grammar import Text, Stream, Concat, templateparser, loader
-import os, inspect
+from .util import allfunctions
+import os
 
 class UnsupportedEntryException(Exception): pass
 
@@ -24,7 +25,7 @@ class Directives:
     def cd(entry, context):
         context['cwd'] = Text(resolvepath(entry, context, 1))
 
-lookup = {Text(name): d for name, d in inspect.getmembers(Directives, predicate = inspect.isfunction)}
+lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
 def resolvepath(entry, context, i):
     path = entry.phrase(i).resolve(context).cat()

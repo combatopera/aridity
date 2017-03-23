@@ -1,5 +1,5 @@
 from .grammar import Text, List, Fork
-import inspect
+from .util import allfunctions
 
 class Functions:
 
@@ -51,4 +51,4 @@ class Functions:
         return Fork(context)
 
 def getfunctions():
-    return inspect.getmembers(Functions, predicate = inspect.isfunction)
+    return allfunctions(Functions)

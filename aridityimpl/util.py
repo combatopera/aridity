@@ -1,4 +1,4 @@
-import collections
+import collections, inspect
 
 class OrderedSet:
 
@@ -17,3 +17,6 @@ class OrderedSet:
 
     def __bool__(self):
         return bool(self.d)
+
+def allfunctions(clazz):
+    return inspect.getmembers(clazz, predicate = inspect.isfunction)
