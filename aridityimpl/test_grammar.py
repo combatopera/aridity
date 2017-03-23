@@ -1,5 +1,6 @@
 import unittest, pyparsing
-from .grammar import expressionparser as p, loader as l, Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
+from .parser import expressionparser as p, loader as l
+from .grammar import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
 from .context import Context, NoSuchPathException
 from .directives import execute

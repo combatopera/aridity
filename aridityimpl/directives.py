@@ -1,4 +1,5 @@
-from .grammar import Text, Stream, Concat, templateparser, loader
+from .grammar import Text, Stream, Concat
+from .parser import templateparser, loader
 from .util import allfunctions
 import os
 

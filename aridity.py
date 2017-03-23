@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
-from aridityimpl.grammar import loader, Stream
+from aridityimpl.parser import loader
+from aridityimpl.grammar import Stream
 from aridityimpl.context import Context
 from aridityimpl.directives import execute
 
