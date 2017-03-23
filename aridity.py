@@ -21,7 +21,7 @@ def repl(instream, outstream, interactive = False):
             continue
         try:
             execute(command, context)
-        except (UnsupportedEntryException, NoSuchPathException):
+        except (UnsupportedEntryException, NoSuchPathException, FileNotFoundError):
             if not interactive:
                 raise
             traceback.print_exc(0)
