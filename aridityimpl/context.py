@@ -5,9 +5,9 @@ import os, collections, sys
 
 class NoSuchPathException(Exception): pass
 
-class NotStringException(Exception): pass
+class NotANameException(Exception): pass
 
-class NotResolvableException(Exception): pass
+class NotAResolvableException(Exception): pass
 
 class AbstractContext:
 
@@ -17,9 +17,9 @@ class AbstractContext:
 
     def __setitem__(self, name, resolvable):
         if str != type(name):
-            raise NotStringException(name)
+            raise NotANameException(name)
         if not isinstance(resolvable, Resolvable):
-            raise NotResolvableException(resolvable)
+            raise NotAResolvableException(resolvable)
         self.resolvables[name] = resolvable
 
     def namesimpl(self, names):
