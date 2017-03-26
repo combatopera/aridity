@@ -1,3 +1,2 @@
-language: python
-python: ['3.4']
-script: pyflakes .; nosetests
+install: git clone https://github.com/combatopera/pyven.git ../pyven
+script: ../pyven/travis_ci.py
