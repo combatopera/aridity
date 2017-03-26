@@ -1,0 +1,6 @@
+author = 'Andrzej Cichocki'
+name = 'aridity'
+years = 2017,
+projects = ()
+deps = 'pyparsing',
+pyversions = 3,
