@@ -1,5 +1,7 @@
 import collections, inspect
 
+class NoSuchPathException(Exception): pass
+
 class OrderedSet:
 
     def __init__(self):
@@ -19,4 +21,7 @@ class OrderedSet:
         return bool(self.d)
 
 def allfunctions(clazz):
-    return inspect.getmembers(clazz, predicate = inspect.isfunction)
+    for name, f in inspect.getmembers(clazz, predicate = inspect.isfunction):
+        if name.endswith('_'):
+            name = name[:-1]
+        yield name, f

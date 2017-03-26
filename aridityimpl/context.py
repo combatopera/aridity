@@ -1,9 +1,7 @@
 from .grammar import Function, Text, Fork, Stream, Resolvable
-from .util import OrderedSet
+from .util import OrderedSet, NoSuchPathException
 from .functions import getfunctions
 import os, collections, sys
-
-class NoSuchPathException(Exception): pass
 
 class NotANameException(Exception): pass
 

@@ -1,5 +1,5 @@
 from .grammar import Text, List, Fork
-from .util import allfunctions
+from .util import allfunctions, NoSuchPathException
 
 class Functions:
 
@@ -49,6 +49,14 @@ class Functions:
 
     def fork(context):
         return Fork(context)
+
+    def try_(context, *resolvables):
+        for r in resolvables[:-1]:
+            try:
+                return r.resolve(context)
+            except NoSuchPathException:
+                pass
+        return resolvables[-1].resolve(context)
 
 def getfunctions():
     return allfunctions(Functions)
