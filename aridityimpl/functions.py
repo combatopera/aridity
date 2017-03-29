@@ -35,13 +35,24 @@ class Functions:
         if 1 == len(args):
             expr, = args
             return List([expr.resolve(c) for c in objs.resolve(context)])
-        else:
+        elif 2 == len(args):
             name, expr = args
             name = name.resolve(context).cat()
             def g():
                 for obj in objs.resolve(context):
                     c = context.createchild()
                     c[name] = obj
+                    yield expr.resolve(c)
+            return List(list(g()))
+        else:
+            kname, vname, expr = args
+            kname = kname.resolve(context).cat()
+            vname = vname.resolve(context).cat()
+            def g():
+                for k, v in objs.resolve(context).objs.items():
+                    c = context.createchild()
+                    c[kname] = Text(k)
+                    c[vname] = v
                     yield expr.resolve(c)
             return List(list(g()))
 
