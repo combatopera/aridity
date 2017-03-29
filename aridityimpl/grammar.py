@@ -168,6 +168,12 @@ class Fork(Struct):
     def __iter__(self):
         return iter(self.objs.values())
 
+    def createchild(self):
+        return type(self)(self)
+
+    def __setitem__(self, name, obj):
+        self.objs[name] = obj
+
 class Function(Resolved):
 
     def __init__(self, f):
