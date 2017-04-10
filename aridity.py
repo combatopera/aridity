@@ -17,11 +17,29 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, traceback, pyparsing
+import sys, traceback, pyparsing, re
 from aridityimpl.parser import commandparser
 from aridityimpl.grammar import Stream
 from aridityimpl.context import Context, NoSuchPathException
 from aridityimpl.directives import execute, UnsupportedEntryException
+
+class Script:
+
+    u = '[$\r\n]'
+    pattern = re.compile(r"^\s+%s*|%s*\s+$|%s+" % (u, u, u))
+    del u
+
+    def __init__(self):
+        self.lines = []
+
+    def quote(self, text):
+        return self.pattern.sub(lambda m: "$lit(%s)" % m.group(), text)
+
+    def __call__(self, template, *args):
+        self.lines.append(template % tuple(self.quote(a) for a in args))
+
+    def __iter__(self):
+        return iter(self.lines)
 
 class DanglingStackException(Exception): pass
 
