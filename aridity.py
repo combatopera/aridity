@@ -58,7 +58,7 @@ class Repl:
             return
         try:
             execute(command, self.context)
-        except (UnsupportedEntryException, NoSuchPathException, FileNotFoundError):
+        except (UnsupportedEntryException, NoSuchPathException, OSError):
             if not self.interactive:
                 raise
             traceback.print_exc(0)
