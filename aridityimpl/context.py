@@ -85,7 +85,7 @@ class SuperContext(AbstractContext):
             raise NoSuchPathException(name)
 
     def __init__(self):
-        super().__init__(self.EmptyContext())
+        super(SuperContext, self).__init__(self.EmptyContext())
         for name, f in getfunctions():
             self[name] = Function(f)
         self['~'] = Text(os.path.expanduser('~'))
@@ -99,7 +99,7 @@ supercontext = SuperContext()
 class Context(AbstractContext):
 
     def __init__(self, parent = supercontext):
-        super().__init__(parent)
+        super(Context, self).__init__(parent)
 
     def createchild(self):
         return type(self)(self)
