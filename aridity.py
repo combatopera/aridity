@@ -52,7 +52,7 @@ class Repl:
     def __call__(self, line):
         try:
             command = commandparser(''.join(self.stack + [line]))
-            self.stack.clear()
+            del self.stack[:]
         except pyparsing.ParseException:
             self.stack.append(line)
             return
