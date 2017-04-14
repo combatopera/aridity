@@ -41,7 +41,5 @@ class OrderedSet:
         return bool(self.d)
 
 def allfunctions(clazz):
-    for name, f in inspect.getmembers(clazz, predicate = inspect.isfunction):
-        if name.endswith('_'):
-            name = name[:-1]
-        yield name, f
+    for name, f in inspect.getmembers(clazz, predicate = lambda f: inspect.ismethod(f) or inspect.isfunction(f)):
+        yield name[:-1] if name.endswith('_') else name, clazz.__dict__[name]
