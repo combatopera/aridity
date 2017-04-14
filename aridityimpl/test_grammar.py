@@ -22,6 +22,7 @@ from decimal import Decimal
 from .context import Context, NoSuchPathException
 from .directives import execute
 from collections import OrderedDict
+from .util import allfunctions
 
 class Functions:
 
@@ -96,8 +97,9 @@ class TestGrammar(unittest.TestCase):
 
     def test_resolve(self):
         c = Context()
-        for name in 'a', 'ac', 'act', 'id':
-            c[name] = Function(getattr(Functions, name))
+        for name, f in allfunctions(Functions):
+            if name in ('a', 'ac', 'act', 'id'):
+                c[name] = Function(f)
         c['minus124'] = Number(-124)
         c['minus124txt'] = Text('minus124')
         c['gett'], = p('$get(get)')
@@ -129,8 +131,9 @@ class TestGrammar(unittest.TestCase):
         actual = p('$act(x $pass[ y\t])')
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
         c = Context()
-        for name in 'act',:
-            c[name] = Function(getattr(Functions, name))
+        for name, f in allfunctions(Functions):
+            if name in ('act',):
+                c[name] = Function(f)
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
         ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
