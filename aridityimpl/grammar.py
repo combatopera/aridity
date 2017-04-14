@@ -78,6 +78,9 @@ class SimpleValue(Resolved):
     def cat(self):
         raise CatNotSupportedException(self)
 
+    def unravel(self):
+        return self.value
+
 class Cat:
 
     def cat(self):
@@ -147,6 +150,9 @@ class List(Resolved):
     def __iter__(self):
         return iter(self.objs)
 
+    def unravel(self):
+        return list(x.unravel() for x in self)
+
 class Fork(Struct):
 
     def __init__(self, parent):
@@ -173,6 +179,10 @@ class Fork(Struct):
 
     def __setitem__(self, name, obj):
         self.objs[name] = obj
+
+    def unravel(self):
+        # XXX: Add ancestor items?
+        return collections.OrderedDict([k, v.unravel()] for k, v in self.objs.items())
 
 class Function(Resolved):
 
