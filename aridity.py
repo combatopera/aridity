@@ -38,10 +38,9 @@ class Repl:
         except TypeError:
             return obj
 
-    def __init__(self, outstream, interactive = False):
-        self.context = Context()
-        self.context['stdout'] = Stream(outstream)
+    def __init__(self, context, interactive = False):
         self.stack = []
+        self.context = context
         self.interactive = interactive
 
     def __enter__(self):
@@ -69,7 +68,9 @@ class Repl:
             raise DanglingStackException(self.stack)
 
 def main():
-    with Repl(sys.stdout, True) as repl:
+    context = Context()
+    context['stdout'] = Stream(sys.stdout)
+    with Repl(context, True) as repl:
         for line in sys.stdin:
             repl(line)
 
