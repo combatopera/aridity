@@ -43,7 +43,8 @@ class Directives:
         context['cwd'] = Text(resolvepath(phrase, context))
 
     def test(phrase, context):
-        print(phrase.resolve(context), file = sys.stderr)
+        sys.stderr.write(phrase.resolve(context))
+        sys.stderr.write(linesep)
 
 lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
