@@ -44,7 +44,7 @@ class Directives:
 
     def test(phrase, context):
         sys.stderr.write(phrase.resolve(context))
-        sys.stderr.write(linesep)
+        sys.stderr.write(os.linesep)
 
 lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
