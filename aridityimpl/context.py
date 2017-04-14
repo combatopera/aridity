@@ -24,7 +24,7 @@ class NotANameException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
-class AbstractContext:
+class AbstractContext(object):
 
     def __init__(self, parent):
         self.resolvables = collections.OrderedDict()
