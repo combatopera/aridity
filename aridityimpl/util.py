@@ -37,6 +37,9 @@ class OrderedSet:
     def __bool__(self):
         return bool(self.d)
 
+    def __nonzero__(self):
+        return bool(self.d)
+
 def allfunctions(clazz):
     for name, f in inspect.getmembers(clazz, predicate = inspect.isfunction):
         if name.endswith('_'):

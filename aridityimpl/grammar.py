@@ -17,7 +17,7 @@
 
 import itertools, collections
 
-class Struct:
+class Struct(object):
 
     def __eq__(self, that):
         if type(self) != type(that):
