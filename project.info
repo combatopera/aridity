@@ -1,6 +1,6 @@
-author = 'Andrzej Cichocki'
-name = 'aridity'
-years = 2017,
-projects = ()
-deps = 'pyparsing',
-pyversions = 3, 2
+author = Andrzej Cichocki
+name = aridity
+years#2017 = 2017
+deps#pyparsing = pyparsing
+pyversions#3 = 3
+pyversions#2 = 2
