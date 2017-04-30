@@ -23,6 +23,7 @@ from .context import Context, NoSuchPathException
 from .directives import execute
 from collections import OrderedDict
 from .util import allfunctions
+from .repl import Repl
 
 class Functions:
 
@@ -197,3 +198,12 @@ class TestGrammar(unittest.TestCase):
         c = Context()
         with self.assertRaises(NoSuchPathException):
             c.resolved('hmm')
+
+    def test_listsareresolved(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('l = $list(x $get(y))')
+            repl('y = $get(yy)')
+            repl('yy = z')
+        l = context.resolved('l').unravel()
+        self.assertEqual(['x', 'z'], l)
