@@ -72,8 +72,8 @@ class Functions:
     def str(context, resolvable):
         return resolvable.resolve(context).totext()
 
-    def list(context, *objs):
-        return List(list(objs))
+    def list(context, *resolvables):
+        return List([r.resolve(context) for r in resolvables])
 
     def fork(context):
         return Fork(context)
