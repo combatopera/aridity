@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, pyparsing
+import unittest, pyparsing, tempfile
 from .parser import expressionparser as p, loader as l
 from .grammar import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
@@ -207,3 +207,29 @@ class TestGrammar(unittest.TestCase):
             repl('yy = z')
         l = context.resolved('l').unravel()
         self.assertEqual(['x', 'z'], l)
+
+    def test_emptytemplate(self):
+        pass # TODO: Implement me.
+
+    def test_hmm(self):
+        with tempfile.NamedTemporaryFile() as f, tempfile.NamedTemporaryFile() as g:
+            f.write('''command = $list($pass($join$map($get(env) k v $get(k)=$get(v)$pass( ))$get(executable)))
+programs#sc#executable = sclang
+programs#sc#stdin = nop$get(EOL)
+programs#sc#label = SuperDirt
+env = $fork()
+label = synth
+''')
+            f.flush()
+            g.write('''$join$map(
+    $get(programs)
+    $pass[screen $join($map($get(command) w $screenstr$get(w)) $pass( ))
+title $get(label)
+$try($pass[stuff $screenstr$get(stdin)
+] $pass[])])''')
+            g.flush()
+            context = Context()
+            with Repl(context) as repl:
+                repl = repl.printf
+                repl("source %s", f.name)
+                repl("cat %s", g.name)
