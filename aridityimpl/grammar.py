@@ -153,7 +153,7 @@ class List(Resolved):
     def unravel(self):
         return list(x.unravel() for x in self)
 
-class Fork(Struct):
+class Fork(Resolved):
 
     def __init__(self, parent):
         self.objs = collections.OrderedDict()
