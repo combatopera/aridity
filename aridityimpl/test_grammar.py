@@ -215,7 +215,6 @@ class TestGrammar(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as f, tempfile.NamedTemporaryFile() as g:
             f.write('''command = $get(executable)
 programs#sc#executable = sclang
-env = $fork()
 ''')
             f.flush()
             g.write('$join$map($get(programs) $join$map($get(command) w $get(w)))')
