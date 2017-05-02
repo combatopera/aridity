@@ -165,11 +165,14 @@ class Fork(Struct):
     def __getitem__(self, name):
         return self.objs[name]
 
-    def resolved(self, name):
+    def getresolvable(self, name):
         try:
             return self.objs[name]
         except KeyError:
-            return self.parent.resolved(name)
+            return self.parent.getresolvable(name)
+
+    def resolved(self, name):
+        return self.getresolvable(name).resolve(self)
 
     def __iter__(self):
         return iter(self.objs.values())
