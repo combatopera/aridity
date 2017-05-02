@@ -212,15 +212,12 @@ class TestGrammar(unittest.TestCase):
         pass # TODO: Implement me.
 
     def test_hmm(self):
-        with tempfile.NamedTemporaryFile() as f, tempfile.NamedTemporaryFile() as g:
-            f.write('''command = $get(executable)
-programs#sc#executable = sclang
-''')
-            f.flush()
+        with tempfile.NamedTemporaryFile() as g:
             g.write('$join$map($get(programs) $join$map($get(command) w $get(w)))')
             g.flush()
             context = Context()
             with Repl(context) as repl:
                 repl = repl.printf
-                repl("source %s", f.name)
+                repl('command = $get(executable)')
+                repl('programs#sc#executable = sclang')
                 repl("cat %s", g.name)
