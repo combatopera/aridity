@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, pyparsing, tempfile
+import unittest, pyparsing
 from .parser import expressionparser as p, loader as l
 from .grammar import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
@@ -212,12 +212,9 @@ class TestGrammar(unittest.TestCase):
         pass # TODO: Implement me.
 
     def test_hmm(self):
-        with tempfile.NamedTemporaryFile() as g:
-            g.write('$join$map($get(programs) $join$map($get(command) w $get(w)))')
-            g.flush()
-            context = Context()
-            with Repl(context) as repl:
-                repl = repl.printf
-                repl('command = $get(executable)')
-                repl('programs#sc#executable = sclang')
-                repl("cat %s", g.name)
+        context = Context()
+        with Repl(context) as repl:
+            repl('command = $get(executable)')
+            repl('programs#sc#executable = sclang')
+            repl('text = $join$map($get(programs) $join$map($get(command) w $get(w)))')
+        context.resolved('text')
