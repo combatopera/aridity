@@ -221,12 +221,7 @@ env = $fork()
 label = synth
 ''')
             f.flush()
-            g.write('''$join$map(
-    $get(programs)
-    $pass[screen $join($map($get(command) w $screenstr$get(w)) $pass( ))
-title $get(label)
-$try($pass[stuff $screenstr$get(stdin)
-] $pass[])])''')
+            g.write('$join$map($get(programs) $join$map($get(command) w $get(w)))')
             g.flush()
             context = Context()
             with Repl(context) as repl:
