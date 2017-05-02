@@ -218,5 +218,5 @@ class TestGrammar(unittest.TestCase):
             repl('items#x#value = woo')
             repl('text1 = $map($get(items) $get(value))')
             repl('text2 = $map($get(items) $get(proxy))')
-        context.resolved('text1')
-        context.resolved('text2')
+        for k in 'text1', 'text2':
+            self.assertEqual(['woo'], context.resolved(k).unravel())
