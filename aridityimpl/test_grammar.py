@@ -211,10 +211,12 @@ class TestGrammar(unittest.TestCase):
     def test_emptytemplate(self):
         pass # TODO: Implement me.
 
-    def test_hmm(self):
+    def test_proxy(self):
         context = Context()
         with Repl(context) as repl:
-            repl('command = $get(executable)')
-            repl('programs#sc#executable = sclang')
-            repl('text = $join$map($get(programs) $join$map($get(command) w $get(w)))')
-        context.resolved('text')
+            repl('proxy = $get(value)')
+            repl('items#x#value = woo')
+            repl('text1 = $map($get(items) $get(value))')
+            repl('text2 = $map($get(items) $get(proxy))')
+        context.resolved('text1')
+        context.resolved('text2')
