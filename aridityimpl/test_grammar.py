@@ -213,7 +213,7 @@ class TestGrammar(unittest.TestCase):
 
     def test_hmm(self):
         with tempfile.NamedTemporaryFile() as f, tempfile.NamedTemporaryFile() as g:
-            f.write('''command = $list($pass($join$map($get(env) k v $get(k)=$get(v)$pass( ))$get(executable)))
+            f.write('''command = $get(executable)
 programs#sc#executable = sclang
 env = $fork()
 ''')
