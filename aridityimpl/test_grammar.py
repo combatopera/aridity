@@ -220,3 +220,10 @@ class TestGrammar(unittest.TestCase):
             repl('text2 = $map($get(items) $get(proxy))')
         for k in 'text1', 'text2':
             self.assertEqual(['woo'], context.resolved(k).unravel())
+
+    def test_listargspaces(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('d = x  y')
+            repl('x = $list(a b c=$get(d))')
+        self.assertEqual(['a', 'b', 'c=x  y'], context.resolved('x').unravel())
