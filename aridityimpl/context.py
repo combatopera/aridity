@@ -20,7 +20,7 @@ from .util import OrderedSet, NoSuchPathException
 from .functions import getfunctions
 import os, collections, sys
 
-class NotANameException(Exception): pass
+class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
@@ -30,12 +30,12 @@ class AbstractContext(object):
         self.resolvables = collections.OrderedDict()
         self.parent = parent
 
-    def __setitem__(self, name, resolvable):
-        if str != type(name):
-            raise NotANameException(name)
+    def __setitem__(self, path, resolvable):
+        if not (tuple == type(path) and set(type(name) for name in path) <= set([str])):
+            raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        self.resolvables[name] = resolvable
+        self.resolvables[path] = resolvable
 
     def namesimpl(self, names):
         self.parent.namesimpl(names)
@@ -87,12 +87,12 @@ class SuperContext(AbstractContext):
     def __init__(self):
         super(SuperContext, self).__init__(self.EmptyContext())
         for name, f in getfunctions():
-            self[name] = Function(f)
-        self['~'] = Text(os.path.expanduser('~'))
-        self['LF'] = Text('\n')
-        self['EOL'] = Text(os.linesep)
-        self['stdout'] = Stream(sys.stdout)
-        self['/'] = Text(os.sep)
+            self[name,] = Function(f)
+        self['~',] = Text(os.path.expanduser('~'))
+        self['LF',] = Text('\n')
+        self['EOL',] = Text(os.linesep)
+        self['stdout',] = Stream(sys.stdout)
+        self['/',] = Text(os.sep)
 
 supercontext = SuperContext()
 

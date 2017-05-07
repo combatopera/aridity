@@ -56,14 +56,15 @@ def execute(entry, context):
     n = entry.size()
     if not n:
         return
-    firstword = entry.word(0)
-    if 1 < n and Text('=') == entry.word(1):
-        context[firstword.cat()] = entry.phrase(2)
-    else:
-        try:
-            d = lookup.get(firstword)
-        except TypeError:
-            d = None
-        if d is None:
-            raise UnsupportedEntryException(entry)
-        d(entry.phrase(1), context)
+    for i in xrange(n):
+        if Text('=') == entry.word(i):
+            context[tuple(entry.word(k).cat() for k in xrange(i))] = entry.phrase(i + 1)
+            return
+    word = entry.word(0)
+    try:
+        d = lookup.get(word)
+    except TypeError:
+        d = None
+    if d is None:
+        raise UnsupportedEntryException(entry)
+    d(entry.phrase(1), context)
