@@ -101,9 +101,9 @@ class TestGrammar(unittest.TestCase):
         for name, f in allfunctions(Functions):
             if name in ('a', 'ac', 'act', 'id'):
                 c[name,] = Function(f)
-        c['minus124'] = Number(-124)
-        c['minus124txt'] = Text('minus124')
-        c['gett'], = p('$get(get)')
+        c['minus124',] = Number(-124)
+        c['minus124txt',] = Text('minus124')
+        c['gett',], = p('$get(get)')
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
