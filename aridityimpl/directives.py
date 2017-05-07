@@ -56,9 +56,9 @@ def execute(entry, context):
     n = entry.size()
     if not n:
         return
-    for i in xrange(n):
+    for i in range(n):
         if Text('=') == entry.word(i):
-            context[tuple(entry.word(k).totext().cat() for k in xrange(i))] = entry.phrase(i + 1)
+            context[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
             return
     word = entry.word(0)
     try:
