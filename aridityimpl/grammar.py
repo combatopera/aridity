@@ -160,7 +160,7 @@ class Fork(Resolved):
         self.parent = parent
 
     def modify(self, name, obj):
-        self.objs[name] = obj
+        self.objs[name,] = obj
 
     def __getitem__(self, name):
         return self.objs[name]
