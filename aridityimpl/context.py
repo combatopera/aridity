@@ -56,12 +56,12 @@ class AbstractContext(object):
         prefix = name + '#'
         prefixlen = len(prefix)
         modpaths = OrderedSet()
-        for modname in self.paths():
-            if modname.startswith(prefix):
-                nexthash = modname.find('#', prefixlen)
+        for modpath in self.paths():
+            if modpath.startswith(prefix):
+                nexthash = modpath.find('#', prefixlen)
                 if -1 == nexthash:
                     nexthash = None
-                modpaths.add(modname[:nexthash])
+                modpaths.add(modpath[:nexthash])
         try:
             resolvable = self.getresolvable(name)
             found = True
@@ -70,8 +70,8 @@ class AbstractContext(object):
                 raise
             found = False
         obj = resolvable.resolve(self) if found else Fork(self)
-        for modname in modpaths:
-            obj.modify(modname[prefixlen:], self.resolved(modname))
+        for modpath in modpaths:
+            obj.modify(modpath[prefixlen:], self.resolved(modpath))
         return obj
 
 class SuperContext(AbstractContext):
