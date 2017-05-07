@@ -171,8 +171,8 @@ class Fork(Resolved):
         except KeyError:
             return self.parent.getresolvable(name)
 
-    def resolved(self, name):
-        return self.getresolvable(name).resolve(self)
+    def resolved(self, *path):
+        return self.getresolvable(path).resolve(self)
 
     def __iter__(self):
         return iter(self.objs.values())

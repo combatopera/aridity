@@ -67,7 +67,7 @@ class AbstractContext(object):
             found = False
         obj = resolvable.resolve(self) if found else Fork(self)
         for modpath in modpaths:
-            obj.modify(modpath[n], self.resolved(modpath))
+            obj.modify(modpath[n], self.resolved(*modpath))
         return obj
 
 class SuperContext(AbstractContext):
