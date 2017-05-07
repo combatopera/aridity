@@ -160,16 +160,14 @@ class Fork(Resolved):
         self.parent = parent
 
     def modify(self, name, obj):
-        self.objs[name,] = obj
+        self.objs[name] = obj
 
-    def __getitem__(self, name):
-        return self.objs[name]
-
-    def getresolvable(self, name):
+    def getresolvable(self, path):
+        name, = path
         try:
             return self.objs[name]
         except KeyError:
-            return self.parent.getresolvable(name)
+            return self.parent.getresolvable(path)
 
     def resolved(self, *path):
         return self.getresolvable(path).resolve(self)
@@ -179,9 +177,6 @@ class Fork(Resolved):
 
     def createchild(self):
         return type(self)(self)
-
-    def __setitem__(self, name, obj):
-        self.objs[name] = obj
 
     def unravel(self):
         # XXX: Add ancestor items?
