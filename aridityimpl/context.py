@@ -53,15 +53,11 @@ class AbstractContext(object):
             return self.parent.getresolvable(path)
 
     def resolved(self, path):
-        prefix = path + '#'
-        prefixlen = len(prefix)
+        n = len(path)
         modpaths = OrderedSet()
         for modpath in self.paths():
-            if modpath.startswith(prefix):
-                nexthash = modpath.find('#', prefixlen)
-                if -1 == nexthash:
-                    nexthash = None
-                modpaths.add(modpath[:nexthash])
+            if modpath != path and modpath[:n] == path:
+                modpaths.add(modpath[:n + 1])
         try:
             resolvable = self.getresolvable(path)
             found = True
@@ -71,7 +67,7 @@ class AbstractContext(object):
             found = False
         obj = resolvable.resolve(self) if found else Fork(self)
         for modpath in modpaths:
-            obj.modify(modpath[prefixlen:], self.resolved(modpath))
+            obj.modify(modpath[n], self.resolved(modpath))
         return obj
 
 class SuperContext(AbstractContext):
