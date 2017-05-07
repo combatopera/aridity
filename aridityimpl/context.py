@@ -52,7 +52,7 @@ class AbstractContext(object):
         except KeyError:
             return self.parent.getresolvable(path)
 
-    def resolved(self, path):
+    def resolved(self, *path):
         n = len(path)
         modpaths = OrderedSet()
         for modpath in self.paths():
