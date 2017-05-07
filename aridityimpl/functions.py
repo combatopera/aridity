@@ -41,7 +41,7 @@ class Functions:
             def g():
                 for obj in objs.resolve(context):
                     c = context.createchild()
-                    c[name] = obj
+                    c[name,] = obj
                     yield expr.resolve(c)
             return List(list(g()))
         else:
@@ -51,8 +51,8 @@ class Functions:
             def g():
                 for k, v in objs.resolve(context).objs.items():
                     c = context.createchild()
-                    c[kname] = Text(k)
-                    c[vname] = v
+                    c[kname,] = Text(k)
+                    c[vname,] = v
                     yield expr.resolve(c)
             return List(list(g()))
 
