@@ -161,37 +161,37 @@ class TestGrammar(unittest.TestCase):
         self.assertEqual(Text('a-bb-ccc'), call.resolve(Context()))
 
     def test_modifiers(self):
-        self.modifiers('v = $list()\nv#one = $list()\nv#one#1 = $list()\nv#one#1#un = uno')
+        self.modifiers('v = $list()\nv one = $list()\nv one 1 = $list()\nv one 1 un = uno')
 
     def test_modifiers2(self):
-        self.modifiers('v#one#1#un = uno')
+        self.modifiers('v one 1 un = uno')
 
     def modifiers(self, text):
         context = Context()
         for entry in l(text):
             execute(entry, context)
         ae = self.assertEqual
-        ae(Text('uno'), context.resolved('v#one#1#un'))
-        ae([Text('uno')], list(context.resolved('v#one#1')))
-        ae([[Text('uno')]], [list(x) for x in context.resolved('v#one')])
+        ae(Text('uno'), context.resolved('v', 'one', '1', 'un'))
+        ae([Text('uno')], list(context.resolved('v', 'one', '1')))
+        ae([[Text('uno')]], [list(x) for x in context.resolved('v', 'one')])
         ae([[[Text('uno')]]], [[list(y) for y in x] for x in context.resolved('v')])
 
     def test_fork(self):
-        self.fork('hmm = woo\nv = $list()\nv#one = $fork()\nv#one#1 = uno\nv#two = $fork()\n\r\r\nv#two#hmm = yay')
+        self.fork('hmm = woo\nv = $list()\nv one = $fork()\nv one 1 = uno\nv two = $fork()\n\r\r\nv two hmm = yay')
 
     def test_fork2(self):
-        self.fork('hmm = woo\nv#one#1 = uno\n\r\r\nv#two#hmm = yay')
+        self.fork('hmm = woo\nv one 1 = uno\n\r\r\nv two hmm = yay')
 
     def fork(self, text):
         context = Context()
         for entry in l(text):
             execute(entry, context)
         ae = self.assertEqual
-        ae(Text('uno'), context.resolved('v#one#1'))
-        ae(OrderedDict([('1', Text('uno'))]), context.resolved('v#one').objs)
-        ae(OrderedDict([('hmm', Text('yay'))]), context.resolved('v#two').objs)
-        ae(Text('woo'), context.resolved('v#one').resolved('hmm'))
-        ae(Text('yay'), context.resolved('v#two').resolved('hmm'))
+        ae(Text('uno'), context.resolved('v', 'one', '1'))
+        ae(OrderedDict([('1', Text('uno'))]), context.resolved('v', 'one').objs)
+        ae(OrderedDict([('hmm', Text('yay'))]), context.resolved('v', 'two').objs)
+        ae(Text('woo'), context.resolved('v', 'one').resolved('hmm'))
+        ae(Text('yay'), context.resolved('v', 'two').resolved('hmm'))
         ae([OrderedDict([('1', Text('uno'))]), OrderedDict([('hmm', Text('yay'))])], [f.objs for f in context.resolved('v')])
 
     def test_absent(self):
@@ -215,7 +215,7 @@ class TestGrammar(unittest.TestCase):
         context = Context()
         with Repl(context) as repl:
             repl('proxy = $get(value)')
-            repl('items#x#value = woo')
+            repl('items x value = woo')
             repl('text1 = $map($get(items) $get(value))')
             repl('text2 = $map($get(items) $get(proxy))')
         for k in 'text1', 'text2':
