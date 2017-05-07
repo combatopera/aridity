@@ -37,14 +37,14 @@ class AbstractContext(object):
             raise NotAResolvableException(resolvable)
         self.resolvables[path] = resolvable
 
-    def namesimpl(self, names):
-        self.parent.namesimpl(names)
-        names.update(self.resolvables.keys())
+    def pathsimpl(self, paths):
+        self.parent.pathsimpl(paths)
+        paths.update(self.resolvables.keys())
 
-    def names(self):
-        names = OrderedSet()
-        self.namesimpl(names)
-        return names
+    def paths(self):
+        paths = OrderedSet()
+        self.pathsimpl(paths)
+        return paths
 
     def getresolvable(self, name):
         try:
@@ -55,22 +55,22 @@ class AbstractContext(object):
     def resolved(self, name):
         prefix = name + '#'
         prefixlen = len(prefix)
-        modnames = OrderedSet()
-        for modname in self.names():
+        modpaths = OrderedSet()
+        for modname in self.paths():
             if modname.startswith(prefix):
                 nexthash = modname.find('#', prefixlen)
                 if -1 == nexthash:
                     nexthash = None
-                modnames.add(modname[:nexthash])
+                modpaths.add(modname[:nexthash])
         try:
             resolvable = self.getresolvable(name)
             found = True
         except NoSuchPathException:
-            if not modnames:
+            if not modpaths:
                 raise
             found = False
         obj = resolvable.resolve(self) if found else Fork(self)
-        for modname in modnames:
+        for modname in modpaths:
             obj.modify(modname[prefixlen:], self.resolved(modname))
         return obj
 
@@ -78,7 +78,7 @@ class SuperContext(AbstractContext):
 
     class EmptyContext:
 
-        def namesimpl(self, names):
+        def pathsimpl(self, paths):
             pass
 
         def getresolvable(self, name):
