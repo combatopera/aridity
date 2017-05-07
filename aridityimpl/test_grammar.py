@@ -100,7 +100,7 @@ class TestGrammar(unittest.TestCase):
         c = Context()
         for name, f in allfunctions(Functions):
             if name in ('a', 'ac', 'act', 'id'):
-                c[name] = Function(f)
+                c[name,] = Function(f)
         c['minus124'] = Number(-124)
         c['minus124txt'] = Text('minus124')
         c['gett'], = p('$get(get)')
@@ -134,7 +134,7 @@ class TestGrammar(unittest.TestCase):
         c = Context()
         for name, f in allfunctions(Functions):
             if name in ('act',):
-                c[name] = Function(f)
+                c[name,] = Function(f)
         ae(Text('act.x. y\t'), Concat(actual).resolve(c))
         ae([Text('10')], p('$pass[10]'))
         ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
