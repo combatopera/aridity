@@ -25,7 +25,7 @@ class UnsupportedEntryException(Exception): pass
 class Directives:
 
     def redirect(phrase, context):
-        context['stdout'] = Stream(open(resolvepath(phrase, context), 'w'))
+        context['stdout',] = Stream(open(resolvepath(phrase, context), 'w'))
 
     def write(phrase, context):
         context.resolved('stdout').flush(phrase.resolve(context).cat())
@@ -40,7 +40,7 @@ class Directives:
                 execute(entry, context)
 
     def cd(phrase, context):
-        context['cwd'] = Text(resolvepath(phrase, context))
+        context['cwd',] = Text(resolvepath(phrase, context))
 
     def test(phrase, context):
         sys.stderr.write(phrase.resolve(context))
