@@ -159,6 +159,10 @@ class Fork(Resolved):
         self.objs = collections.OrderedDict()
         self.parent = parent
 
+    def __setitem__(self, path, obj):
+        name, = path
+        self.objs[name] = obj
+
     def modify(self, name, obj):
         self.objs[name] = obj
 
