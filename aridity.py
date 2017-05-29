@@ -24,7 +24,7 @@ from aridityimpl.repl import Repl
 
 def main():
     context = Context()
-    context['stdout'] = Stream(sys.stdout)
+    context['stdout',] = Stream(sys.stdout)
     with Repl(context, True) as repl:
         for line in sys.stdin:
             repl(line)
