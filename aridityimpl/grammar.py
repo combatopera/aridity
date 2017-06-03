@@ -111,10 +111,16 @@ class Text(Cat, Scalar):
     def totext(self):
         return self
 
+    def tobash(self):
+        return self.value
+
 class Number(Scalar):
 
     def totext(self):
         return Text(str(self.value)) # XXX: Ideally this would unparse?
+
+    def tobash(self):
+        return str(self.value)
 
 class Boolean(Scalar):
 
@@ -185,6 +191,12 @@ class Fork(Resolved):
     def unravel(self):
         # XXX: Add ancestor items?
         return collections.OrderedDict([k, v.unravel()] for k, v in self.objs.items())
+
+    def tobash(self, toplevel = False):
+        if toplevel:
+            return ''.join("%s=%s\n" % (name, obj.tobash()) for name, obj in self.objs.items())
+        else:
+            return "(%s)" % ' '.join(x.tobash() for x in self)
 
 class Function(Resolved):
 

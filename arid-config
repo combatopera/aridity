@@ -32,8 +32,7 @@ def configpath(configname):
 def main():
     context = Context()
     context.source(configpath(sys.argv[1]))
-    for item in context.resolved(*sys.argv[2:]).unravel().items():
-        print("%s=%s" % item) # FIXME: Proper encoding for bash eval.
+    sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
 
 if '__main__' == __name__:
     main()
