@@ -20,7 +20,6 @@ from .parser import expressionparser as p, loader as l
 from .grammar import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
 from .context import Context, NoSuchPathException
-from .directives import execute
 from collections import OrderedDict
 from .util import allfunctions
 from .repl import Repl
@@ -169,7 +168,7 @@ class TestGrammar(unittest.TestCase):
     def modifiers(self, text):
         context = Context()
         for entry in l(text):
-            execute(entry, context)
+            context.execute(entry)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v', 'one', '1', 'un'))
         ae([Text('uno')], list(context.resolved('v', 'one', '1')))
@@ -185,7 +184,7 @@ class TestGrammar(unittest.TestCase):
     def fork(self, text):
         context = Context()
         for entry in l(text):
-            execute(entry, context)
+            context.execute(entry)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v', 'one', '1'))
         ae(OrderedDict([('1', Text('uno'))]), context.resolved('v', 'one').objs)

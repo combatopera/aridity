@@ -16,11 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .grammar import Text, Stream, Concat
-from .parser import templateparser, loader
-from .util import allfunctions
+from .parser import templateparser
 import os, sys
-
-class UnsupportedEntryException(Exception): pass
 
 class Directives:
 
@@ -35,9 +32,7 @@ class Directives:
             context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
     def source(phrase, context):
-        with open(resolvepath(phrase, context)) as f:
-            for entry in loader(f.read()):
-                execute(entry, context)
+        context.source(resolvepath(phrase, context))
 
     def cd(phrase, context):
         context['cwd',] = Text(resolvepath(phrase, context))
@@ -46,25 +41,6 @@ class Directives:
         sys.stderr.write(phrase.resolve(context))
         sys.stderr.write(os.linesep)
 
-lookup = {Text(name): d for name, d in allfunctions(Directives)}
-
 def resolvepath(phrase, context):
     path = phrase.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
-
-def execute(entry, context):
-    n = entry.size()
-    if not n:
-        return
-    for i in range(n):
-        if Text('=') == entry.word(i):
-            context[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
-            return
-    word = entry.word(0)
-    try:
-        d = lookup.get(word)
-    except TypeError:
-        d = None
-    if d is None:
-        raise UnsupportedEntryException(entry)
-    d(entry.phrase(1), context)

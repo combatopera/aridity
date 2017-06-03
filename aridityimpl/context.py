@@ -16,9 +16,15 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .grammar import Function, Text, Fork, Stream, Resolvable
-from .util import OrderedSet, NoSuchPathException
+from .util import OrderedSet, NoSuchPathException, allfunctions
 from .functions import getfunctions
+from .parser import loader
+from .directives import Directives
 import os, collections, sys
+
+lookup = {Text(name): d for name, d in allfunctions(Directives)}
+
+class UnsupportedEntryException(Exception): pass
 
 class NotAPathException(Exception): pass
 
@@ -69,6 +75,28 @@ class AbstractContext(object):
         for modpath in modpaths:
             obj.modify(modpath[n], self.resolved(*modpath))
         return obj
+
+    def source(self, path):
+        with open(path) as f:
+            for entry in loader(f.read()):
+                self.execute(entry)
+
+    def execute(self, entry):
+        n = entry.size()
+        if not n:
+            return
+        for i in range(n):
+            if Text('=') == entry.word(i):
+                self[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
+                return
+        word = entry.word(0)
+        try:
+            d = lookup.get(word)
+        except TypeError:
+            d = None
+        if d is None:
+            raise UnsupportedEntryException(entry)
+        d(entry.phrase(1), self)
 
 class SuperContext(AbstractContext):
 

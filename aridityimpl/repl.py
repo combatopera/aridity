@@ -17,8 +17,7 @@
 
 import traceback, pyparsing, re
 from aridityimpl.parser import commandparser
-from aridityimpl.context import NoSuchPathException
-from aridityimpl.directives import execute, UnsupportedEntryException
+from aridityimpl.context import NoSuchPathException, UnsupportedEntryException
 
 class DanglingStackException(Exception): pass
 
@@ -54,7 +53,7 @@ class Repl:
             self.stack.append(line)
             return
         try:
-            execute(command, self.context)
+            self.context.execute(command)
         except (UnsupportedEntryException, NoSuchPathException, OSError):
             if not self.interactive:
                 raise
