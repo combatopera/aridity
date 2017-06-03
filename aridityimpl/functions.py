@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import Text, List, Fork
+from .grammar import Text, List, Fork, Number
 from .util import allfunctions, NoSuchPathException
 
 class Functions:
@@ -85,6 +85,12 @@ class Functions:
             except NoSuchPathException:
                 pass
         return resolvables[-1].resolve(context)
+
+    def mul(context, *resolvables):
+        x = 1
+        for r in resolvables:
+            x *= r.resolve(context).value
+        return Number(x)
 
 def getfunctions():
     return allfunctions(Functions)
