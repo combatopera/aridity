@@ -17,6 +17,7 @@
 
 from .model import Text, Stream, Concat
 from .grammar import templateparser
+from .util import allfunctions
 import os, sys
 
 class Directives:
@@ -44,3 +45,5 @@ class Directives:
 def resolvepath(phrase, context):
     path = phrase.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
+
+lookup = {Text(name): d for name, d in allfunctions(Directives)}
