@@ -16,13 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Text, List, Fork, Number
-from .util import allfunctions, NoSuchPathException
-
-def realname(name):
-    def apply(f):
-        f.realname = name
-        return f
-    return apply
+from .util import allfunctions, NoSuchPathException, realname
 
 class Functions:
 
