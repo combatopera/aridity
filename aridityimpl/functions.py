@@ -70,10 +70,10 @@ class Functions:
             separator = ''
         return Text(separator.join(r.cat() for r in resolvables.resolve(context)))
 
-    def get(context, *resolvables):
-        for r in resolvables:
-            context = context.resolved(r.resolve(context).cat())
-        return context
+    def get(*args): return getimpl(*args)
+
+    @realname('')
+    def get_(*args): return getimpl(*args)
 
     def str(context, resolvable):
         return resolvable.resolve(context).totext()
@@ -98,6 +98,11 @@ class Functions:
         for r in resolvables:
             x *= r.resolve(context).value
         return Number(x)
+
+def getimpl(context, *resolvables):
+    for r in resolvables:
+        context = context.resolved(r.resolve(context).cat())
+    return context
 
 def getfunctions():
     return allfunctions(Functions)

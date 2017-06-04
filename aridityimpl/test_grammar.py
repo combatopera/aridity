@@ -226,3 +226,10 @@ class TestGrammar(unittest.TestCase):
             repl('d = x  y')
             repl('x = $list(a b c=$get(d))')
         self.assertEqual(['a', 'b', 'c=x  y'], context.resolved('x').unravel())
+
+    def test_get2(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('woo = yay')
+            repl('yay2 = $(woo)')
+        self.assertEqual('yay', context.resolved('yay2').unravel())

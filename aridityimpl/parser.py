@@ -62,6 +62,7 @@ class Parser:
                     return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
+                yield getbrackets(Blank.pa, AnyScalar.pa).setParseAction(Call.emptyidpa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         return action
 
