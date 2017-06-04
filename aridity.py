@@ -18,9 +18,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from aridityimpl.grammar import Stream
-from aridityimpl.context import Context
-from aridityimpl.repl import Repl
+from aridimpl.grammar import Stream
+from aridimpl.context import Context
+from aridimpl.repl import Repl
 
 def main():
     context = Context()
