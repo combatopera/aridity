@@ -18,7 +18,7 @@
 from .model import Function, Text, Fork, Stream, Resolvable
 from .util import OrderedSet, NoSuchPathException, allfunctions
 from .functions import getfunctions
-from .parser import loader
+from .grammar import loader
 from .directives import Directives
 import os, collections, sys
 

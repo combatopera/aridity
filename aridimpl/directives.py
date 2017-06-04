@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Text, Stream, Concat
-from .parser import templateparser
+from .grammar import templateparser
 import os, sys
 
 class Directives:
