@@ -99,6 +99,15 @@ class TestGrammar(unittest.TestCase):
                 with self.assertRaises(pyparsing.ParseException):
                     p(text)
 
+    def test_pass(self):
+        ae = self.assertEqual
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass( x  y\t)'))
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass[ x  y\t]'))
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $pass[ y\t])'))
+        ae([Text('10')], p('$pass[10]'))
+        ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
+        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
+
     def test_loader(self):
         ae = self.assertEqual
         ae([], l(''))
@@ -133,15 +142,6 @@ class TestGrammar(unittest.TestCase):
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
         ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
-
-    def test_pass(self):
-        ae = self.assertEqual
-        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass( x  y\t)'))
-        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass[ x  y\t]'))
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $pass[ y\t])'))
-        ae([Text('10')], p('$pass[10]'))
-        ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
-        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
 
     def test_pass2(self):
         ae = self.assertEqual
