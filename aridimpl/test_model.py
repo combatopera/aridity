@@ -61,7 +61,7 @@ class TestModel(unittest.TestCase):
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
         ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
 
-    def test_pass2(self):
+    def test_passresolve(self):
         ae = self.assertEqual
         c = Context()
         for name, f in allfunctions(Functions):
