@@ -116,7 +116,16 @@ class SuperContext(AbstractContext):
         self['LF',] = Text('\n')
         self['EOL',] = Text(os.linesep)
         self['stdout',] = Stream(sys.stdout)
-        self['/',] = Text(os.sep)
+        self['/',] = Slash()
+
+class Slash(Text, Function):
+
+    def __init__(self):
+        Text.__init__(self, os.sep)
+        Function.__init__(self, slashfunction)
+
+def slashfunction(context, *resolvables):
+    return Text(os.path.join(*(r.resolve(context).cat() for r in resolvables)))
 
 supercontext = SuperContext()
 
