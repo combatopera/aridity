@@ -40,7 +40,7 @@ class Functions:
 
 class TestGrammar(unittest.TestCase):
 
-    def test_parser(self):
+    def test_expressionparser(self):
         ae = self.assertEqual
         ae([Text('x')], p('x'))
         ae([Text('yy')], p('yy'))
@@ -82,6 +82,13 @@ class TestGrammar(unittest.TestCase):
         ae([Concat([Text('100'), Call('a', [])])], p('100$a()'))
         ae([Call('aaa', [Call('bbb', [Text('ccc)ddd')])])], p('$aaa($bbb[ccc)ddd])'))
 
+    def test_lit(self):
+        ae = self.assertEqual
+        ae([Text('$doesNotExist(]')], p('$lit($doesNotExist(])'))
+        ae([Text('$doesNotExist[)')], p('$lit[$doesNotExist[)]'))
+        ae([Text(' \t')], p('$lit[ \t]'))
+        ae([Text('10')], p('$lit[10]'))
+
     def test_loader(self):
         ae = self.assertEqual
         ae([], l(''))
@@ -116,13 +123,6 @@ class TestGrammar(unittest.TestCase):
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
         ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
-
-    def test_lit(self):
-        ae = self.assertEqual
-        ae([Text('$doesNotExist(]')], p('$lit($doesNotExist(])'))
-        ae([Text('$doesNotExist[)')], p('$lit[$doesNotExist[)]'))
-        ae([Text(' \t')], p('$lit[ \t]'))
-        ae([Text('10')], p('$lit[10]'))
 
     def test_pass(self):
         ae = self.assertEqual
