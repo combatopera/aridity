@@ -102,7 +102,7 @@ class TestGrammar(unittest.TestCase):
                 c[name,] = Function(f)
         c['minus124',] = Number(-124)
         c['minus124txt',] = Text('minus124')
-        c['gett',], = p('$get(get)')
+        c['gett',], = p('$($pass())') # FIXME: Using lit does not work.
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
