@@ -18,6 +18,12 @@
 from .grammar import Text, List, Fork, Number
 from .util import allfunctions, NoSuchPathException
 
+def realname(name):
+    def apply(f):
+        f.realname = name
+        return f
+    return apply
+
 class Functions:
 
     def screenstr(context, resolvable):
@@ -78,6 +84,7 @@ class Functions:
     def fork(context):
         return Fork(context)
 
+    @realname('try')
     def try_(context, *resolvables):
         for r in resolvables[:-1]:
             try:

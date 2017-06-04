@@ -42,4 +42,8 @@ class OrderedSet:
 
 def allfunctions(clazz):
     for name, f in inspect.getmembers(clazz, predicate = lambda f: inspect.ismethod(f) or inspect.isfunction(f)):
-        yield name[:-1] if name.endswith('_') else name, clazz.__dict__[name]
+        try:
+            realname = f.realname
+        except AttributeError:
+            realname = name
+        yield realname, clazz.__dict__[name]
