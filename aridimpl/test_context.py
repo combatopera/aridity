@@ -92,7 +92,7 @@ class TestContext(unittest.TestCase):
             repl('x = $list(a b c=$get(d))')
         self.assertEqual(['a', 'b', 'c=x  y'], context.resolved('x').unravel())
 
-    def test_get2(self):
+    def test_shortget(self):
         context = Context()
         with Repl(context) as repl:
             repl('woo = yay')
