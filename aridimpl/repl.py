@@ -16,8 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 import traceback, pyparsing, re
-from aridimpl.grammar import commandparser
-from aridimpl.context import NoSuchPathException, UnsupportedEntryException
+from .grammar import commandparser
+from .context import NoSuchPathException, UnsupportedEntryException
 
 class DanglingStackException(Exception): pass
 
