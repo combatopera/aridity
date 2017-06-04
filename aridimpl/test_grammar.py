@@ -138,16 +138,18 @@ class TestGrammar(unittest.TestCase):
         ae = self.assertEqual
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass( x  y\t)'))
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass[ x  y\t]'))
-        actual = p('$act(x $pass[ y\t])')
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], actual)
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $pass[ y\t])'))
+        ae([Text('10')], p('$pass[10]'))
+        ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
+        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
+
+    def test_pass2(self):
+        ae = self.assertEqual
         c = Context()
         for name, f in allfunctions(Functions):
             if name in ('act',):
                 c[name,] = Function(f)
-        ae(Text('act.x. y\t'), Concat(actual).resolve(c))
-        ae([Text('10')], p('$pass[10]'))
-        ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
-        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
+        ae(Text('act.x. y\t'), Concat(p('$act(x $pass[ y\t])')).resolve(c))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c))
         ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c))
 
