@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import Function, Text, Fork, Stream, Resolvable
+from .model import Function, Text, Fork, Stream, Resolvable
 from .util import OrderedSet, NoSuchPathException, allfunctions
 from .functions import getfunctions
 from .parser import loader

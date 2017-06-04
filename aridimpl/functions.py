@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import Text, List, Fork, Number
+from .model import Text, List, Fork, Number
 from .util import allfunctions, NoSuchPathException
 
 def realname(name):

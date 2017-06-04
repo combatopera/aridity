@@ -17,7 +17,7 @@
 
 from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
 from decimal import Decimal
-from .grammar import Text, Boolean, Number, Blank, Call, Concat, Boundary, Entry
+from .model import Text, Boolean, Number, Blank, Call, Concat, Boundary, Entry
 import re
 
 class AnyScalar:

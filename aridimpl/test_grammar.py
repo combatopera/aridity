@@ -17,7 +17,7 @@
 
 import unittest, pyparsing
 from .parser import expressionparser as p, loader as l
-from .grammar import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
+from .model import Text, Call, Blank, Concat, Number, Boolean, Function, Entry, List, Boundary
 from decimal import Decimal
 from .context import Context, NoSuchPathException
 from collections import OrderedDict

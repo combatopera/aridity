@@ -18,7 +18,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from aridimpl.grammar import Stream
+from aridimpl.model import Stream
 from aridimpl.context import Context
 from aridimpl.repl import Repl
 
