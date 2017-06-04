@@ -89,6 +89,16 @@ class TestGrammar(unittest.TestCase):
         ae([Text(' \t')], p('$lit[ \t]'))
         ae([Text('10')], p('$lit[10]'))
 
+    def test_whitespace(self):
+        ae = self.assertEqual
+        ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
+        ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $pass( x ) '))
+        for name in 'lit', 'pass':
+            for text in (' $ %s( x ) ' % name,
+                         ' $%s ( x ) ' % name):
+                with self.assertRaises(pyparsing.ParseException):
+                    p(text)
+
     def test_loader(self):
         ae = self.assertEqual
         ae([], l(''))
@@ -140,16 +150,6 @@ class TestGrammar(unittest.TestCase):
         ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
         ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c))
         ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c))
-
-    def test_whitespace(self):
-        ae = self.assertEqual
-        ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
-        ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $pass( x ) '))
-        for name in 'lit', 'pass':
-            for text in (' $ %s( x ) ' % name,
-                         ' $%s ( x ) ' % name):
-                with self.assertRaises(pyparsing.ParseException):
-                    p(text)
 
     def test_map(self): # TODO: Also test 2-arg form.
         call, = p('$map($list(a b 0) x $str($get(x))2)')
