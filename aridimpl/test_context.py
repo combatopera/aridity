@@ -24,6 +24,22 @@ from .repl import Repl
 
 class TestContext(unittest.TestCase):
 
+    def test_precedence(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x = y')
+            repl('x2 = y = z')
+            repl('blank =')
+            repl('= blank')
+            repl('write = yo')
+            repl('write yo')
+        ae = self.assertEqual
+        ae('y', c.resolved('x').unravel())
+        ae('y = z', c.resolved('x2').unravel())
+        ae('', c.resolved('blank').unravel())
+        ae('blank', c.resolvables[()].unravel())
+        ae('yo', c.resolved('write').unravel())
+
     def test_modifiers(self):
         self.modifiers('v = $list()\nv one = $list()\nv one 1 = $list()\nv one 1 un = uno')
 

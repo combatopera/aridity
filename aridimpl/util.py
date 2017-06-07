@@ -40,6 +40,12 @@ class OrderedSet:
     def __nonzero__(self):
         return bool(self.d)
 
+def realname(name):
+    def apply(f):
+        f.realname = name
+        return f
+    return apply
+
 def allfunctions(clazz):
     for name, f in inspect.getmembers(clazz, predicate = lambda f: inspect.ismethod(f) or inspect.isfunction(f)):
         try:

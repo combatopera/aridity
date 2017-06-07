@@ -16,13 +16,11 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Function, Text, Fork, Stream, Resolvable
-from .util import OrderedSet, NoSuchPathException, allfunctions
+from .util import OrderedSet, NoSuchPathException
 from .functions import getfunctions
 from .grammar import loader
-from .directives import Directives
+from .directives import lookup
 import os, collections, sys
-
-lookup = {Text(name): d for name, d in allfunctions(Directives)}
 
 class UnsupportedEntryException(Exception): pass
 
