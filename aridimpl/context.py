@@ -30,7 +30,7 @@ class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
-class AbstractContext(object):
+class AbstractContext(object): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
         self.resolvables = collections.OrderedDict()

@@ -42,7 +42,7 @@ class Repl:
     def __enter__(self):
         return self
 
-    def printf(self, template, *args):
+    def printf(self, template, *args): # TODO: Replace with methods corresponding to directives.
         self(template % tuple(self.quote(a) for a in args))
 
     def __call__(self, line):
@@ -54,7 +54,7 @@ class Repl:
             return
         try:
             self.context.execute(command)
-        except (UnsupportedEntryException, NoSuchPathException, OSError):
+        except (UnsupportedEntryException, NoSuchPathException, OSError): # XXX: Or just any exception?
             if not self.interactive:
                 raise
             traceback.print_exc(0)
