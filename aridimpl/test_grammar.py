@@ -66,16 +66,16 @@ class TestGrammar(unittest.TestCase):
 
     def test_lit(self):
         ae = self.assertEqual
-        ae([Text('$doesNotExist(]')], p('$lit($doesNotExist(])'))
-        ae([Text('$doesNotExist[)')], p('$lit[$doesNotExist[)]'))
-        ae([Text(' \t')], p('$lit[ \t]'))
-        ae([Text('10')], p('$lit[10]'))
+        ae([Text('$doesNotExist(]')], p('''$'($doesNotExist(])'''))
+        ae([Text('$doesNotExist[)')], p('''$'[$doesNotExist[)]'''))
+        ae([Text(' \t')], p('''$'[ \t]'''))
+        ae([Text('10')], p('''$'[10]'''))
 
     def test_whitespace(self):
         ae = self.assertEqual
-        ae([Blank(' '), Text(' x '), Blank(' ')], p(' $lit( x ) '))
+        ae([Blank(' '), Text(' x '), Blank(' ')], p(''' $'( x ) '''))
         ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $pass( x ) '))
-        for name in 'lit', 'pass':
+        for name in "'", 'pass':
             for text in (' $ %s( x ) ' % name,
                          ' $%s ( x ) ' % name):
                 with self.assertRaises(pyparsing.ParseException):
