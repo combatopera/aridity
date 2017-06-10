@@ -53,11 +53,11 @@ class TestModel(unittest.TestCase):
         ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
         ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
         ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
-        ae(Number(-124), Call('get', [Text('minus124')]).resolve(c))
+        ae(Number(-124), Call('', [Text('minus124')]).resolve(c))
         ae(Number(-124), Call('gett', [Text('minus124')]).resolve(c))
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
-        ae(Number(-124), Call('get', [Call('get', [Text('minus124txt')])]).resolve(c))
+        ae(Number(-124), Call('', [Call('', [Text('minus124txt')])]).resolve(c))
 
     def test_passresolve(self):
         ae = self.assertEqual
@@ -70,7 +70,7 @@ class TestModel(unittest.TestCase):
         ae(Text(' 100'), Concat(p('$.( 100)')).resolve(c))
 
     def test_map(self): # TODO: Also test 2-arg form.
-        call, = p('$map($list(a b 0) x $str($get(x))2)')
+        call, = p('$map($list(a b 0) x $str($(x))2)')
         self.assertEqual(List([Text('a2'), Text('b2'), Text('02')]), call.resolve(Context()))
 
     def test_join(self):

@@ -82,8 +82,8 @@ class TestContext(unittest.TestCase):
     def test_listsareresolved(self):
         context = Context()
         with Repl(context) as repl:
-            repl('l = $list(x $get(y))')
-            repl('y = $get(yy)')
+            repl('l = $list(x $(y))')
+            repl('y = $(yy)')
             repl('yy = z')
         l = context.resolved('l').unravel()
         self.assertEqual(['x', 'z'], l)
@@ -94,10 +94,10 @@ class TestContext(unittest.TestCase):
     def test_proxy(self):
         context = Context()
         with Repl(context) as repl:
-            repl('proxy = $get(value)')
+            repl('proxy = $(value)')
             repl('items x value = woo')
-            repl('text1 = $map($get(items) $get(value))')
-            repl('text2 = $map($get(items) $get(proxy))')
+            repl('text1 = $map($(items) $(value))')
+            repl('text2 = $map($(items) $(proxy))')
         for k in 'text1', 'text2':
             self.assertEqual(['woo'], context.resolved(k).unravel())
 
@@ -105,7 +105,7 @@ class TestContext(unittest.TestCase):
         context = Context()
         with Repl(context) as repl:
             repl('d = x  y')
-            repl('x = $list(a b c=$get(d))')
+            repl('x = $list(a b c=$(d))')
         self.assertEqual(['a', 'b', 'c=x  y'], context.resolved('x').unravel())
 
     def test_shortget(self):
