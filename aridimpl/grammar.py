@@ -60,7 +60,7 @@ class Parser:
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
                     return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)
-                yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
+                yield Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         return action
