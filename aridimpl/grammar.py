@@ -36,7 +36,8 @@ class AnyScalar:
 
 class Parser:
 
-    idregex = '(?:[A-Za-z_/](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?|)'
+    bracketpairs = '()', '[]'
+    idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
     identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
     @staticmethod
@@ -55,7 +56,7 @@ class Parser:
     def getaction(cls):
         action = Forward()
         def clauses():
-            for o, c in '()', '[]':
+            for o, c in cls.bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
