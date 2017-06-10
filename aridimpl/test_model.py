@@ -70,7 +70,7 @@ class TestModel(unittest.TestCase):
         ae(Text(' 100'), Concat(p('$.( 100)')).resolve(c))
 
     def test_map(self): # TODO: Also test 2-arg form.
-        call, = p('$map($list(a b 0) x $str($(x))2)')
+        call, = p('$map($list(a b 0) x $(x)2)')
         self.assertEqual(List([Text('a2'), Text('b2'), Text('02')]), call.resolve(Context()))
 
     def test_join(self):
