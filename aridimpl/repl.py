@@ -30,7 +30,7 @@ class Repl:
     @classmethod
     def quote(cls, obj):
         try:
-            return cls.pattern.sub(lambda m: "$lit(%s)" % m.group(), obj)
+            return cls.pattern.sub(lambda m: "$'(%s)" % m.group(), obj)
         except TypeError:
             return obj
 
