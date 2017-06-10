@@ -36,7 +36,7 @@ class AnyScalar:
 
 class Parser:
 
-    idregex = '[A-Za-z_/](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?'
+    idregex = '(?:[A-Za-z_/](?:[A-Za-z_0-9.#]*[A-Za-z_0-9])?|)'
     identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
     @staticmethod
@@ -62,7 +62,6 @@ class Parser:
                     return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)
                 yield Suppress('pass') + getbrackets(Text.pa, Text.pa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
-                yield getbrackets(Blank.pa, AnyScalar.pa).setParseAction(Call.emptyidpa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         return action
 

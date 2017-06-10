@@ -134,10 +134,6 @@ class Call(Resolvable):
     def pa(cls, s, l, t):
         return cls(t[0], t[1:])
 
-    @classmethod
-    def emptyidpa(cls, s, l, t):
-        return cls('', t[:])
-
     def __init__(self, name, args):
         self.name = name
         self.args = args
