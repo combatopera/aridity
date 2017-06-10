@@ -117,10 +117,13 @@ class Text(Cat, Scalar):
 class Number(Scalar):
 
     def totext(self):
-        return Text(str(self.value)) # XXX: Ideally this would unparse?
+        return Text(self.cat())
 
     def tobash(self):
         return str(self.value)
+
+    def cat(self):
+        return str(self.value) # FIXME: Should unparse.
 
 class Boolean(Scalar):
 
