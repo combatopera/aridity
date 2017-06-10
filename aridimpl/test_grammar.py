@@ -74,8 +74,8 @@ class TestGrammar(unittest.TestCase):
     def test_whitespace(self):
         ae = self.assertEqual
         ae([Blank(' '), Text(' x '), Blank(' ')], p(''' $'( x ) '''))
-        ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $pass( x ) '))
-        for name in "'", 'pass':
+        ae([Blank(' '), Concat([Text(' '), Text('x'), Text(' ')]), Blank(' ')], p(' $.( x ) '))
+        for name in "'", '.':
             for text in (' $ %s( x ) ' % name,
                          ' $%s ( x ) ' % name):
                 with self.assertRaises(pyparsing.ParseException):
@@ -83,12 +83,12 @@ class TestGrammar(unittest.TestCase):
 
     def test_pass(self):
         ae = self.assertEqual
-        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass( x  y\t)'))
-        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$pass[ x  y\t]'))
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $pass[ y\t])'))
-        ae([Text('10')], p('$pass[10]'))
-        ae([Text('x('), Blank(' '), Text(')')], p('$pass(x() )'))
-        ae([Concat([Text('x()'), Text(' ')])], p('$pass[x() ]'))
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.( x  y\t)'))
+        ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.[ x  y\t]'))
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $.[ y\t])'))
+        ae([Text('10')], p('$.[10]'))
+        ae([Text('x('), Blank(' '), Text(')')], p('$.(x() )'))
+        ae([Concat([Text('x()'), Text(' ')])], p('$.[x() ]'))
 
     def test_loader(self):
         ae = self.assertEqual

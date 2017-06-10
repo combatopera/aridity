@@ -44,7 +44,7 @@ class TestModel(unittest.TestCase):
                 c[name,] = Function(f)
         c['minus124',] = Number(-124)
         c['minus124txt',] = Text('minus124')
-        c['gett',], = p('$($pass())') # FIXME: Using lit does not work.
+        c['gett',], = p('$($.())') # FIXME: Using lit does not work.
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
@@ -65,9 +65,9 @@ class TestModel(unittest.TestCase):
         for name, f in allfunctions(Functions):
             if name in ('act',):
                 c[name,] = Function(f)
-        ae(Text('act.x. y\t'), Concat(p('$act(x $pass[ y\t])')).resolve(c))
-        ae(Text('act.x. '), Concat(p('$act(x $pass( ))')).resolve(c))
-        ae(Text(' 100'), Concat(p('$pass( 100)')).resolve(c))
+        ae(Text('act.x. y\t'), Concat(p('$act(x $.[ y\t])')).resolve(c))
+        ae(Text('act.x. '), Concat(p('$act(x $.( ))')).resolve(c))
+        ae(Text(' 100'), Concat(p('$.( 100)')).resolve(c))
 
     def test_map(self): # TODO: Also test 2-arg form.
         call, = p('$map($list(a b 0) x $str($get(x))2)')
