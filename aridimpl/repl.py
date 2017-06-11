@@ -45,6 +45,7 @@ class Repl:
         self.stack = []
         self.indent = ''
         self.prefix = None
+        self.prefixes = {'': []}
         self.context = context
         self.interactive = interactive
 
@@ -68,11 +69,10 @@ class Repl:
         if self.prefix is not None:
             if len(indent) <= len(self.indent):
                 raise MalformedEntryException(command)
-            self.context['prefix', indent] = self.prefix.resolve() # XXX: Too eager?
+            self.prefixes[indent] = self.prefix.resolve().objs # XXX: Too eager?
             self.prefix = None
         self.indent = indent
-        prefix = self.context.resolved('prefix', indent)
-        command = Entry(prefix.objs + command.resolvables)
+        command = Entry(self.prefixes[indent] + command.resolvables)
         try:
             self.context.execute(command)
         except UnsupportedEntryException:
