@@ -71,6 +71,11 @@ class Repl:
                 raise MalformedEntryException(command)
             self.prefixes[indent] = self.prefix.resolve().objs # XXX: Too eager?
             self.prefix = None
+        if indent not in self.prefixes:
+            raise NoSuchIndentException(command)
+        for i in list(self.prefixes):
+            if len(indent) < len(i):
+                del self.prefixes[i]
         self.indent = indent
         command = Entry(self.prefixes[indent] + command.resolvables)
         try:
