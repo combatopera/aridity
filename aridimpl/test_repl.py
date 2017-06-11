@@ -17,7 +17,7 @@
 
 import unittest
 from .context import Context
-from .repl import Repl, NoSuchIndentException, DanglingPrefixException
+from .repl import Repl, NoSuchIndentException, DanglingPrefixException, MalformedEntryException
 
 class TestRepl(unittest.TestCase):
 
@@ -63,3 +63,21 @@ class TestRepl(unittest.TestCase):
             repl('  space)')
             repl(' woo = yay')
         self.assertEqual({'woo': 'yay'}, context.resolved('name\n  space').unravel())
+
+    def test_badindent(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('ns')
+            repl('  ns2')
+            with self.assertRaises(MalformedEntryException):
+                repl('  woo = yay')
+            repl('   woo = yay')
+
+    def test_badindent2(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('ns')
+            repl('\tns2')
+            with self.assertRaises(MalformedEntryException):
+                repl('  woo = yay')
+            repl('\t woo = yay')
