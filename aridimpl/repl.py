@@ -18,12 +18,15 @@
 import traceback, pyparsing, re
 from .grammar import commandparser
 from .context import NoSuchPathException, UnsupportedEntryException
+from .model import List, Entry
 
 class DanglingStackException(Exception): pass
 
 class NoSuchIndentException(Exception): pass
 
 class DanglingPrefixException(Exception): pass
+
+class MalformedEntryException(Exception): pass
 
 class Repl:
 
@@ -40,6 +43,8 @@ class Repl:
 
     def __init__(self, context, interactive = False):
         self.stack = []
+        self.indent = ''
+        self.prefix = None
         self.context = context
         self.interactive = interactive
 
@@ -56,13 +61,30 @@ class Repl:
         except pyparsing.ParseException:
             self.stack.append(line)
             return
+        indent = command.indent()
+        common = min(len(self.indent), len(indent))
+        if indent[:common] != self.indent[:common]:
+            raise MalformedEntryException(command)
+        if self.prefix is not None:
+            if len(indent) <= len(self.indent):
+                raise MalformedEntryException(command)
+            self.context['prefix', indent] = List(self.prefix.words()) # XXX: Is words() necessary?
+            self.prefix = None
+        self.indent = indent
+        prefix = self.context.resolved('prefix', indent)
+        command = Entry(prefix.objs + command.resolvables)
         try:
             self.context.execute(command)
-        except (UnsupportedEntryException, NoSuchPathException, OSError): # XXX: Or just any exception?
+        except UnsupportedEntryException:
+            self.prefix = command
+        except (NoSuchPathException, OSError): # XXX: Or just any exception?
             if not self.interactive:
                 raise
             traceback.print_exc(0)
 
-    def __exit__(self, *args):
-        if self.stack:
-            raise DanglingStackException(self.stack)
+    def __exit__(self, exc_type, *args):
+        if exc_type is None:
+            if self.stack:
+                raise DanglingStackException(self.stack)
+            if self.prefix is not None:
+                raise DanglingPrefixException(self.prefix)

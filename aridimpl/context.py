@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Fork, Stream, Resolvable
+from .model import Function, Text, Fork, Stream, Resolvable, List
 from .util import OrderedSet, NoSuchPathException
 from .functions import getfunctions
 from .grammar import loader
@@ -115,6 +115,7 @@ class SuperContext(AbstractContext):
         self['EOL',] = Text(os.linesep)
         self['stdout',] = Stream(sys.stdout)
         self['/',] = Slash()
+        self['prefix', ''] = List([])
 
 class Slash(Text, Function):
 

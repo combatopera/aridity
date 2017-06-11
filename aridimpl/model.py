@@ -230,6 +230,9 @@ class Entry(Struct):
     def size(self):
         return sum(1 for r in self.resolvables if not r.ignorable)
 
+    def words(self):
+        return [r for r in self.resolvables if not r.ignorable]
+
     def word(self, i):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word
@@ -246,3 +249,11 @@ class Entry(Struct):
         for end in 0, -1:
             trim(end)
         return Concat.unlesssingleton(phrase)
+
+    def indent(self):
+        indent = []
+        for r in self.resolvables:
+            if not r.ignorable: # TODO: Also break on boundary.
+                break
+            indent.append(r)
+        return Concat.unlesssingleton(indent).resolve(None).cat()
