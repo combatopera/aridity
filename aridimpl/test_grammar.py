@@ -48,9 +48,7 @@ class TestGrammar(unittest.TestCase):
             ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
         ae([Text('woo')], p('woo'))
         ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
-        ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(
- yay
-)\thoupla  '''))
+        ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(\n yay\n)\thoupla  '''))
         ae([Number(1)], p('1'))
         ae([Number(-5)], p('-5'))
         ae([Call('id', [Number(Decimal('.1'))])], p('$id(.1)'))
@@ -70,6 +68,7 @@ class TestGrammar(unittest.TestCase):
         ae([Text('$doesNotExist[)')], p('''$'[$doesNotExist[)]'''))
         ae([Text(' \t')], p('''$'[ \t]'''))
         ae([Text('10')], p('''$'[10]'''))
+        ae([Text('true')], p('''$'(true)'''))
 
     def test_whitespace(self):
         ae = self.assertEqual
@@ -87,7 +86,7 @@ class TestGrammar(unittest.TestCase):
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.[ x  y\t]'))
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $.[ y\t])'))
         ae([Text('10')], p('$.[10]'))
-        ae([Text('x('), Blank(' '), Text(')')], p('$.(x() )'))
+        ae([Text('x('), Blank(' '), Text(')')], p('$.(x() )')) # Gotcha!
         ae([Concat([Text('x()'), Text(' ')])], p('$.[x() ]'))
 
     def test_loader(self):
