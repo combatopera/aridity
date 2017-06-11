@@ -21,6 +21,10 @@ from .context import NoSuchPathException, UnsupportedEntryException
 
 class DanglingStackException(Exception): pass
 
+class NoSuchIndentException(Exception): pass
+
+class DanglingPrefixException(Exception): pass
+
 class Repl:
 
     u = '[$\r\n]'
