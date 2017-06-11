@@ -69,6 +69,10 @@ class Functions:
     @realname('')
     def get_(*args): return getimpl(*args)
 
+    @realname(',') # XXX: Oh yeah?
+    def aslist(context, resolvable):
+        return context.resolved(resolvable.resolve(context).cat(), aslist = True)
+
     def str(context, resolvable):
         return resolvable.resolve(context).totext()
 

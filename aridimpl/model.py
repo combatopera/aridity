@@ -42,8 +42,8 @@ class Resolvable(Struct):
 
 class Resolved(Resolvable):
 
-    def resolve(self, context):
-        return self
+    def resolve(self, context, aslist = False):
+        return List([self]) if aslist else self
 
 class Concat(Resolvable):
 
@@ -60,8 +60,11 @@ class Concat(Resolvable):
     def __init__(self, parts):
         self.parts = parts
 
-    def resolve(self, context):
-        return Text(''.join(part.resolve(context).cat() for part in self.parts))
+    def resolve(self, context, aslist = False):
+        if aslist:
+            return List([part.resolve(context) for part in self.parts if not part.ignorable])
+        else:
+            return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
 class CatNotSupportedException(Exception): pass
 
@@ -182,8 +185,8 @@ class Fork(Resolved):
         except KeyError:
             return self.parent.getresolvable(path)
 
-    def resolved(self, *path):
-        return self.getresolvable(path).resolve(self)
+    def resolved(self, *path, **kwargs):
+        return self.getresolvable(path).resolve(self, **kwargs)
 
     def __iter__(self):
         return iter(self.objs.values())

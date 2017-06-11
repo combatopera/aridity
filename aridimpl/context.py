@@ -54,7 +54,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         except KeyError:
             return self.parent.getresolvable(path)
 
-    def resolved(self, *path):
+    def resolved(self, *path, **kwargs):
         n = len(path)
         modpaths = OrderedSet()
         for modpath in self.paths():
@@ -67,7 +67,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             if not modpaths:
                 raise
             found = False
-        obj = resolvable.resolve(self) if found else Fork(self)
+        obj = resolvable.resolve(self, **kwargs) if found else Fork(self)
         for modpath in modpaths:
             obj.modify(modpath[n], self.resolved(*modpath))
         return obj

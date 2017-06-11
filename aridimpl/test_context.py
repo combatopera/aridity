@@ -114,3 +114,20 @@ class TestContext(unittest.TestCase):
             repl('woo = yay')
             repl('yay2 = $(woo)')
         self.assertEqual('yay', context.resolved('yay2').unravel())
+
+    def test_barelist(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('a = ')
+            repl('b = yay')
+            repl('c = yay houpla')
+            repl('c, = $,(c)')
+            repl('d = yay 100')
+            repl('d, = $,(d)')
+        ae = self.assertEqual
+        ae([], context.resolved('a', aslist = True).unravel())
+        ae(['yay'], context.resolved('b', aslist = True).unravel())
+        ae(['yay', 'houpla'], context.resolved('c', aslist = True).unravel())
+        ae(['yay', 'houpla'], context.resolved('c,').unravel())
+        ae(['yay', 100], context.resolved('d', aslist = True).unravel())
+        ae(['yay', 100], context.resolved('d,').unravel())
