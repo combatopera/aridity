@@ -70,8 +70,8 @@ class Functions:
     def get_(*args): return getimpl(*args)
 
     @realname(',') # XXX: Oh yeah?
-    def aslist(context, resolvable):
-        return context.resolved(resolvable.resolve(context).cat(), aslist = True)
+    def aslist(context, *resolvables):
+        return context.resolved(*(r.resolve(context).cat() for r in resolvables), aslist = True)
 
     def str(context, resolvable):
         return resolvable.resolve(context).totext()

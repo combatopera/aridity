@@ -124,6 +124,8 @@ class TestContext(unittest.TestCase):
             repl('c, = $,(c)')
             repl('d = yay 100')
             repl('d, = $,(d)')
+            repl('x y = true false')
+            repl('tf = $,(x y)')
         ae = self.assertEqual
         ae([], context.resolved('a', aslist = True).unravel())
         ae(['yay'], context.resolved('b', aslist = True).unravel())
@@ -131,6 +133,8 @@ class TestContext(unittest.TestCase):
         ae(['yay', 'houpla'], context.resolved('c,').unravel())
         ae(['yay', 100], context.resolved('d', aslist = True).unravel())
         ae(['yay', 100], context.resolved('d,').unravel())
+        ae([True, False], context.resolved('x', 'y', aslist = True).unravel())
+        ae([True, False], context.resolved('tf').unravel())
 
     def test_donotresolvewholeforktogetonething(self):
         context = Context()
