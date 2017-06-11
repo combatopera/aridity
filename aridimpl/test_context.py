@@ -131,3 +131,11 @@ class TestContext(unittest.TestCase):
         ae(['yay', 'houpla'], context.resolved('c,').unravel())
         ae(['yay', 100], context.resolved('d', aslist = True).unravel())
         ae(['yay', 100], context.resolved('d,').unravel())
+
+    def test_donotresolvewholeforktogetonething(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('namespace')
+            repl('  thing = $(namespace other)')
+            repl('  other = data')
+        self.assertEqual('data', context.resolved('namespace', 'thing').unravel())

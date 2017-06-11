@@ -98,9 +98,7 @@ class Functions:
         return Number(x)
 
 def getimpl(context, *resolvables):
-    for r in resolvables:
-        context = context.resolved(r.resolve(context).cat())
-    return context
+    return context.resolved(*(r.resolve(context).cat() for r in resolvables))
 
 def getfunctions():
     return allfunctions(Functions)
