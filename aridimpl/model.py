@@ -230,8 +230,8 @@ class Entry(Struct):
     def size(self):
         return sum(1 for r in self.resolvables if not r.ignorable)
 
-    def words(self):
-        return [r for r in self.resolvables if not r.ignorable]
+    def resolve(self):
+        return List([r.resolve(None) for r in self.resolvables])
 
     def word(self, i):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)

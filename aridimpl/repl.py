@@ -18,7 +18,7 @@
 import traceback, pyparsing, re
 from .grammar import commandparser
 from .context import NoSuchPathException, UnsupportedEntryException
-from .model import List, Entry
+from .model import Entry
 
 class DanglingStackException(Exception): pass
 
@@ -68,7 +68,7 @@ class Repl:
         if self.prefix is not None:
             if len(indent) <= len(self.indent):
                 raise MalformedEntryException(command)
-            self.context['prefix', indent] = List(self.prefix.words()) # XXX: Is words() necessary?
+            self.context['prefix', indent] = self.prefix.resolve() # XXX: Too eager?
             self.prefix = None
         self.indent = indent
         prefix = self.context.resolved('prefix', indent)
