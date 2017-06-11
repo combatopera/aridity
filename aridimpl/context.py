@@ -16,13 +16,11 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Function, Text, Fork, Stream, Resolvable
-from .util import OrderedSet, NoSuchPathException
+from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException
 from .functions import getfunctions
-from .grammar import loader
 from .directives import lookup
+from .repl import Repl
 import os, collections, sys
-
-class UnsupportedEntryException(Exception): pass
 
 class NotAPathException(Exception): pass
 
@@ -75,9 +73,10 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         return obj
 
     def source(self, path):
-        with open(path) as f:
-            for entry in loader(f.read()):
-                self.execute(entry)
+        with Repl(self) as repl:
+            with open(path) as f:
+                for line in f:
+                    repl(line)
 
     def execute(self, entry):
         n = entry.size()

@@ -17,7 +17,7 @@
 
 import traceback, pyparsing, re
 from .grammar import commandparser
-from .context import NoSuchPathException, UnsupportedEntryException
+from .util import NoSuchPathException, UnsupportedEntryException
 from .model import Entry
 
 class DanglingStackException(Exception): pass

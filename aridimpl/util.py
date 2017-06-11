@@ -19,6 +19,8 @@ import collections, inspect
 
 class NoSuchPathException(Exception): pass
 
+class UnsupportedEntryException(Exception): pass
+
 class OrderedSet:
 
     def __init__(self):
