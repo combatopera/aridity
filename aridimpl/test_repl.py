@@ -55,3 +55,11 @@ class TestRepl(unittest.TestCase):
         with self.assertRaises(DanglingPrefixException):
             with Repl(context) as repl:
                 repl('prefix')
+
+    def test_multilineprefix(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('name$.(\n')
+            repl('  space)')
+            repl(' woo = yay')
+        self.assertEqual({'woo': 'yay'}, context.resolved('name\n  space').unravel())
