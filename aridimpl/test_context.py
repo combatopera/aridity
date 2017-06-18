@@ -156,5 +156,5 @@ class TestContext(unittest.TestCase):
         ae('itemYay', items['item']['woo'])
         ae('y', items['item2']['x'])
         ae('yay2', items['*']['woo2'])
-        #ae('yay', items['item2']['woo'])
-        #ae('yay', items['*']['woo'])
+        ae('yay', items['item2']['woo'])
+        ae('yay', items['*']['woo'])

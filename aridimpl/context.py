@@ -30,11 +30,10 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
 
     def __init__(self, parent):
         self.resolvables = OrderedDict()
-        self.prototypes = OrderedDict()
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
-        if not (tuple == type(path) and set(type(name) for name in path) <= set([str])):
+        if not (tuple == type(path) and set(type(name) for name in path) <= set([str, type(None)])):
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
@@ -59,8 +58,15 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         n = len(path)
         modpaths = OrderedSet()
         for modpath in self.paths():
-            if modpath != path and modpath[:n] == path:
-                modpaths.add(modpath[:n + 1])
+            try: star = modpath.index(None)
+            except: star = -1
+            if -1 == star:
+                if modpath != path and modpath[:n] == path:
+                    modpaths.add(modpath[:n + 1])
+            elif star < n:
+                path2 = tuple((x if i != star else None) for i, x in enumerate(path))
+                if modpath != path2 and modpath[:n] == path2:
+                    modpaths.add(modpath[:n + 1])
         try:
             resolvable = self.getresolvable(path)
             found = True
@@ -102,7 +108,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 # TODO LATER: Support multiple stars in entry.
                 t1 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))
                 t2 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i + 1, j))
-                self.prototypes[t1, t2] = entry.phrase(j + 1)
+                self[t1 + (None,) + t2] = entry.phrase(j + 1)
                 return
         word = entry.word(0)
         try:
