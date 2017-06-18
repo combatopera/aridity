@@ -130,7 +130,8 @@ class Number(Scalar):
 
 class Boolean(Scalar):
 
-    pass
+    def tobash(self, toplevel):
+        return 'true' if self.value else 'false'
 
 class Call(Resolvable):
 
