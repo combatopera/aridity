@@ -61,7 +61,7 @@ class Parser:
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
                     return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)
-                yield Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
                 yield (cls.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         action << Suppress('$').leaveWhitespace() + Or(clauses()).leaveWhitespace()
         return action
@@ -69,7 +69,7 @@ class Parser:
     @classmethod
     def getarg(cls, action, scalarpa, boundarychars):
         opttext = Optional(cls.gettext(Text.pa, boundarychars))
-        return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.pa)
+        return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.smartpa)
 
     @classmethod
     def create(cls, scalarpa, boundarychars):

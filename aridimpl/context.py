@@ -30,6 +30,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
 
     def __init__(self, parent):
         self.resolvables = OrderedDict()
+        self.prototypes = OrderedDict()
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
@@ -85,11 +86,23 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         # TODO: Blow up if multiple directives found.
         for i in range(n):
             if Text('=') == entry.word(i):
-                self[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
+                self[tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))] = entry.phrase(i + 1)
                 return
             if Text('+=') == entry.word(i):
                 r = itertools.chain(range(i), [i + 1])
-                self[tuple(entry.word(k).totext().cat() for k in r)] = entry.phrase(i + 1)
+                self[tuple(entry.word(k).resolve(self).totext().cat() for k in r)] = entry.phrase(i + 1)
+                return
+            if Text('*') == entry.word(i):
+                for j in range(i + 1, n):
+                    if Text('=') == entry.word(j):
+                        break
+                else:
+                    # XXX: Also support += and other directives?
+                    raise Exception('Expected equals in same entry after star.')
+                # TODO LATER: Support multiple stars in entry.
+                t1 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))
+                t2 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i + 1, j))
+                self.prototypes[t1, t2] = entry.phrase(j + 1)
                 return
         word = entry.word(0)
         try:

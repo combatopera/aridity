@@ -51,7 +51,11 @@ class Concat(Resolvable):
     ignorable = False
 
     @classmethod
-    def pa(cls, s, l, t):
+    def strictpa(cls, s, l, t):
+        return cls(t.asList())
+
+    @classmethod
+    def smartpa(cls, s, l, t):
         return cls.unlesssingleton(t.asList())
 
     @classmethod

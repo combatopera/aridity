@@ -143,3 +143,18 @@ class TestContext(unittest.TestCase):
             repl('  thing = $(namespace other)')
             repl('  other = data')
         self.assertEqual('data', context.resolved('namespace', 'thing').unravel())
+
+    def test_star(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('hmm * woo = yay')
+            repl('hmm item woo = itemYay')
+            repl('hmm item2 x = y')
+            repl("hmm $.(*) woo2 = yay2")
+        items = context.resolved('hmm').unravel()
+        ae = self.assertEqual
+        ae('itemYay', items['item']['woo'])
+        ae('y', items['item2']['x'])
+        ae('yay2', items['*']['woo2'])
+        #ae('yay', items['item2']['woo'])
+        #ae('yay', items['*']['woo'])
