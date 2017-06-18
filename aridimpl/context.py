@@ -82,6 +82,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         n = entry.size()
         if not n:
             return
+        # TODO: Blow up if multiple directives found.
         for i in range(n):
             if Text('=') == entry.word(i):
                 self[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
