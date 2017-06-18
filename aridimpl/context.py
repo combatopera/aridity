@@ -20,7 +20,7 @@ from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException
 from .functions import getfunctions
 from .directives import lookup
 from .repl import Repl
-import os, collections, sys
+import os, collections, sys, itertools
 
 class NotAPathException(Exception): pass
 
@@ -85,6 +85,10 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         for i in range(n):
             if Text('=') == entry.word(i):
                 self[tuple(entry.word(k).totext().cat() for k in range(i))] = entry.phrase(i + 1)
+                return
+            if Text('+=') == entry.word(i):
+                r = itertools.chain(range(i), [i + 1])
+                self[tuple(entry.word(k).totext().cat() for k in r)] = entry.phrase(i + 1)
                 return
         word = entry.word(0)
         try:
