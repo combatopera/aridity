@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import itertools, collections
+import itertools
+from .util import OrderedDict
 
 class Struct(object):
 
@@ -169,7 +170,7 @@ class List(Resolved):
 class Fork(Resolved):
 
     def __init__(self, parent):
-        self.objs = collections.OrderedDict()
+        self.objs = OrderedDict()
         self.parent = parent
 
     def __setitem__(self, path, obj):
@@ -190,14 +191,14 @@ class Fork(Resolved):
         return self.getresolvable(path).resolve(self, **kwargs)
 
     def __iter__(self):
-        return iter(self.objs.values())
+        return iter(self.objs)
 
     def createchild(self):
         return type(self)(self)
 
     def unravel(self):
         # XXX: Add ancestor items?
-        return collections.OrderedDict([k, v.unravel()] for k, v in self.objs.items())
+        return OrderedDict([k, v.unravel()] for k, v in self.objs.items())
 
     def tobash(self, toplevel = False):
         if toplevel:

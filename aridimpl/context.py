@@ -16,11 +16,11 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Function, Text, Fork, Stream, Resolvable
-from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException
+from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
 from .repl import Repl
-import os, collections, sys, itertools
+import os, sys, itertools
 
 class NotAPathException(Exception): pass
 
@@ -29,7 +29,7 @@ class NotAResolvableException(Exception): pass
 class AbstractContext(object): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
-        self.resolvables = collections.OrderedDict()
+        self.resolvables = OrderedDict()
         self.parent = parent
 
     def __setitem__(self, path, resolvable):

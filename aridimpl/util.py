@@ -21,10 +21,18 @@ class NoSuchPathException(Exception): pass
 
 class UnsupportedEntryException(Exception): pass
 
-class OrderedSet:
+class OrderedDictWrapper:
 
-    def __init__(self):
-        self.d = collections.OrderedDict()
+    def __init__(self, *args):
+        self.d = collections.OrderedDict(*args)
+
+    def __bool__(self):
+        return bool(self.d)
+
+    def __nonzero__(self):
+        return bool(self.d)
+
+class OrderedSet(OrderedDictWrapper):
 
     def add(self, x):
         self.d[x] = None
@@ -36,11 +44,25 @@ class OrderedSet:
     def __iter__(self):
         return iter(self.d.keys())
 
-    def __bool__(self):
-        return bool(self.d)
+class OrderedDict(OrderedDictWrapper):
 
-    def __nonzero__(self):
-        return bool(self.d)
+    def __setitem__(self, k, v):
+        self.d[k] = v
+
+    def __getitem__(self, k):
+        return self.d[k]
+
+    def keys(self):
+        return self.d.keys()
+
+    def items(self):
+        return self.d.items()
+
+    def __iter__(self):
+        return iter(self.d.values())
+
+    def __eq__(self, that):
+        return self.d == that
 
 def realname(name):
     def apply(f):

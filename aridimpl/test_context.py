@@ -19,7 +19,7 @@ import unittest
 from .grammar import loader as l
 from .model import Text
 from .context import Context, NoSuchPathException
-from collections import OrderedDict
+from .util import OrderedDict
 from .repl import Repl
 
 class TestContext(unittest.TestCase):
