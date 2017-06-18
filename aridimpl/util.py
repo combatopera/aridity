@@ -64,6 +64,9 @@ class OrderedDict(OrderedDictWrapper):
     def __eq__(self, that):
         return self.d == that
 
+    def __repr__(self):
+        return repr(self.d)
+
 def realname(name):
     def apply(f):
         f.realname = name
