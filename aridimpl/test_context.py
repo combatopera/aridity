@@ -158,3 +158,13 @@ class TestContext(unittest.TestCase):
         ae('yay2', items['*']['woo2'])
         ae('yay', items['item2']['woo'])
         ae('yay', items['*']['woo'])
+
+    def test_relmod(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('ns * stuff = $(woo) there')
+            repl('ns item woo = yay')
+        ae = self.assertEqual
+        ae({'stuff': 'yay there', 'woo': 'yay'}, context.resolved('ns', 'item').unravel())
+        ae({'item': {'stuff': 'yay there', 'woo': 'yay'}}, context.resolved('ns').unravel())
+        ae('yay there', context.resolved('ns', 'item', 'stuff').unravel())

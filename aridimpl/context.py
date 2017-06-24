@@ -72,11 +72,14 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             found = True
         except NoSuchPathException:
             if not modpaths:
+                if len(path) > 1:
+                    return self.resolved(*path[:-1]).resolved(path[-1], **kwargs)
                 raise
             found = False
         obj = resolvable.resolve(self, **kwargs) if found else Fork(self)
+        modcontext = ModContext(self, path)
         for modpath in modpaths:
-            obj.modify(modpath[n], self.resolved(*modpath))
+            obj.modify(modpath[n], modcontext.resolved(*modpath))
         return obj
 
     def source(self, path):
@@ -118,6 +121,15 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         if d is None:
             raise UnsupportedEntryException(entry)
         d(entry.phrase(1), self)
+
+class ModContext(AbstractContext):
+
+    def __init__(self, parent, contextpath):
+        super(ModContext, self).__init__(parent)
+        k = len(contextpath)
+        for path in parent.paths():
+            if len(path) == k + 1 and contextpath == path[:k]:
+                self[path[k:]] = parent.getresolvable(path)
 
 class SuperContext(AbstractContext):
 
