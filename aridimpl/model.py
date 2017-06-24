@@ -185,11 +185,12 @@ class Fork(Resolved):
         self.objs[name] = obj
 
     def getresolvable(self, path):
-        name, = path
-        try:
-            return self.objs[name]
-        except KeyError:
-            return self.parent.getresolvable(path)
+        if 1 == len(path):
+            try:
+                return self.objs[path[0]]
+            except KeyError:
+                pass
+        return self.parent.getresolvable(path)
 
     def resolved(self, *path, **kwargs):
         return self.getresolvable(path).resolve(self, **kwargs)
