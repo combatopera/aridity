@@ -44,6 +44,9 @@ class OrderedSet(OrderedDictWrapper):
     def __iter__(self):
         return iter(self.d.keys())
 
+    def __repr__(self):
+        return repr(self.d.keys())
+
 class OrderedDict(OrderedDictWrapper):
 
     def __setitem__(self, k, v):
