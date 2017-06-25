@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright 2017 Andrzej Cichocki
 
 # This file is part of aridity.
@@ -31,6 +29,3 @@ def main():
     context = Context()
     context.source(configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
-
-if '__main__' == __name__:
-    main()
