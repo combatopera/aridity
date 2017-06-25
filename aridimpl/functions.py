@@ -76,6 +76,9 @@ class Functions:
     def str(context, resolvable):
         return resolvable.resolve(context).totext()
 
+    def java(context, resolvable):
+        return resolvable.resolve(context).tojava()
+
     def list(context, *resolvables):
         return List([r.resolve(context) for r in resolvables])
 

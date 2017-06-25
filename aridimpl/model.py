@@ -211,6 +211,9 @@ class Fork(Resolved):
         else:
             return "(%s)" % ' '.join(x.tobash() for x in self)
 
+    def tojava(self):
+        return Text(''.join("%s %s\n" % (k, v.unravel()) for k, v in self.objs.items())) # TODO: Escaping.
+
 class Function(Resolved):
 
     def __init__(self, f):
