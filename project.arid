@@ -5,3 +5,4 @@ deps += pyparsing
 pyversions
     += 3
     += 2
+executable = true
