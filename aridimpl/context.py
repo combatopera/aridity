@@ -77,9 +77,13 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 raise
             found = False
         obj = resolvable.resolve(self, **kwargs) if found else Fork(self)
-        modcontext = ModContext(self, path)
+        try:
+            modify = obj.modify
+        except AttributeError:
+            return obj
+        modcontext = ModContext.create(self, path)
         for modpath in modpaths:
-            obj.modify(modpath[n], modcontext.resolved(*modpath))
+            modify(modpath[n], modcontext.resolved(*modpath))
         return obj
 
     def source(self, path):
@@ -135,11 +139,17 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
 
 class ModContext(AbstractContext):
 
+    @classmethod
+    def create(cls, context, path):
+        for name in path:
+            context = cls(context, (name,))
+        return context
+
     def __init__(self, parent, contextpath):
         super(ModContext, self).__init__(parent)
         k = len(contextpath)
         for path in parent.paths():
-            if len(path) == k + 1 and contextpath == path[:k]:
+            if len(path) > k and contextpath == path[:k]:
                 self[path[k:]] = parent.getresolvable(path)
 
 class SuperContext(AbstractContext):
