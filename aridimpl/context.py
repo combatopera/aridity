@@ -56,8 +56,10 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
 
     def resolved(self, *path, **kwargs):
         n = len(path)
+        if len(path) > 1:
+            return ModContext.create(self, path[:-1]).resolved(path[-1], **kwargs)
         modpaths = OrderedSet()
-        for modpath in self.paths():
+        for modpath in self.resolvables.keys():
             try: star = modpath.index(None)
             except: star = -1
             if -1 == star:
@@ -72,8 +74,6 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             found = True
         except NoSuchPathException:
             if not modpaths:
-                if len(path) > 1:
-                    return self.resolved(*path[:-1]).resolved(path[-1], **kwargs)
                 raise
             found = False
         obj = resolvable.resolve(self, **kwargs) if found else Fork(self)
@@ -148,7 +148,7 @@ class ModContext(AbstractContext):
     def __init__(self, parent, name):
         super(ModContext, self).__init__(parent)
         for path in parent.paths():
-            if len(path) > 1 and name == path[0]:
+            if len(path) > 1 and (name == path[0] or path[0] is None):
                 self[path[1:]] = parent.getresolvable(path)
 
 class SuperContext(AbstractContext):

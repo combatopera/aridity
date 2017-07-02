@@ -168,3 +168,23 @@ class TestContext(unittest.TestCase):
         ae({'stuff': 'yay there', 'woo': 'yay'}, context.resolved('ns', 'item').unravel())
         ae({'item': {'stuff': 'yay there', 'woo': 'yay'}}, context.resolved('ns').unravel())
         ae('yay there', context.resolved('ns', 'item', 'stuff').unravel())
+
+    def test_relmod2(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('ns my.key = value')
+            repl('ns item woo = $(my.key)')
+        ae = self.assertEqual
+        ae({'item': {'woo': 'value'}, 'my.key': 'value'}, context.resolved('ns').unravel())
+        ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
+        ae('value', context.resolved('ns', 'item', 'woo').unravel())
+
+    def test_relmod3(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('ns my key = value')
+            repl('ns item woo = $(my key)')
+        ae = self.assertEqual
+        ae({'item': {'woo': 'value'}, 'my': {'key': 'value'}}, context.resolved('ns').unravel())
+        ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
+        ae('value', context.resolved('ns', 'item', 'woo').unravel())
