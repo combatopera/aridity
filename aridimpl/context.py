@@ -147,9 +147,11 @@ class ModContext(AbstractContext):
 
     def __init__(self, parent, name):
         super(ModContext, self).__init__(parent)
-        for path in parent.paths():
-            if len(path) > 1 and (name == path[0] or path[0] is None):
-                self[path[1:]] = parent.getresolvable(path)
+        paths = parent.paths()
+        for word in None, name:
+            for path in paths:
+                if len(path) > 1 and word == path[0]:
+                    self[path[1:]] = parent.getresolvable(path)
 
 class SuperContext(AbstractContext):
 

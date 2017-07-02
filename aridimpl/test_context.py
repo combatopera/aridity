@@ -188,3 +188,18 @@ class TestContext(unittest.TestCase):
         ae({'item': {'woo': 'value'}, 'my': {'key': 'value'}}, context.resolved('ns').unravel())
         ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
         ae('value', context.resolved('ns', 'item', 'woo').unravel())
+
+    def test_relmod4(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('woo port = 102')
+            repl('yay * port = 100')
+            repl('yay 0 x = 0')
+            repl('yay 1 x = 1')
+            repl('yay 2 x = 2')
+            repl('yay 1 port = 101')
+            repl('yay 2 port = $(woo port)')
+        ae = self.assertEqual
+        ae({'0': {'x': 0, 'port': 100}, '1': {'x': 1, 'port': 101}, '2': {'x': 2, 'port': 102}}, context.resolved('yay').unravel())
+        ae({'x': 2, 'port': 102}, context.resolved('yay', '2').unravel())
+        ae(102, context.resolved('yay', '2', 'port').unravel())
