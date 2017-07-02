@@ -133,7 +133,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             while True:
                 try: d = c.resolvables
                 except AttributeError: break
-                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %s" % (eol, ' '.join(path), r) for path, r in d.items()))
+                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %s" % (eol, ' '.join(str(w) for w in path), r) for path, r in d.items()))
                 c = c.parent
         return eol.join(g())
 
