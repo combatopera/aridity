@@ -122,6 +122,17 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             raise UnsupportedEntryException(entry)
         d(entry.phrase(1), self)
 
+    def __str__(self):
+        eol = '\n'
+        def g():
+            c = self
+            while True:
+                try: d = c.resolvables
+                except AttributeError: break
+                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %s" % (eol, ' '.join(path), r) for path, r in d.items()))
+                c = c.parent
+        return eol.join(g())
+
 class ModContext(AbstractContext):
 
     def __init__(self, parent, contextpath):
