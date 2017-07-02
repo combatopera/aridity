@@ -142,15 +142,14 @@ class ModContext(AbstractContext):
     @classmethod
     def create(cls, context, path):
         for name in path:
-            context = cls(context, (name,))
+            context = cls(context, name)
         return context
 
-    def __init__(self, parent, contextpath):
+    def __init__(self, parent, name):
         super(ModContext, self).__init__(parent)
-        k = len(contextpath)
         for path in parent.paths():
-            if len(path) > k and contextpath == path[:k]:
-                self[path[k:]] = parent.getresolvable(path)
+            if len(path) > 1 and name == path[0]:
+                self[path[1:]] = parent.getresolvable(path)
 
 class SuperContext(AbstractContext):
 
