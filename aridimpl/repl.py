@@ -41,11 +41,11 @@ class Repl:
         except TypeError:
             return obj
 
-    def __init__(self, context, interactive = False):
+    def __init__(self, context, interactive = False, rootprefix = []):
         self.stack = []
         self.indent = ''
         self.prefix = None
-        self.prefixes = {'': []}
+        self.prefixes = {'': rootprefix}
         self.context = context
         self.interactive = interactive
 

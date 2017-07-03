@@ -33,7 +33,7 @@ class Directives:
             context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
     def source(phrase, context):
-        context.source(resolvepath(phrase, context))
+        context.source([], resolvepath(phrase, context))
 
     def cd(phrase, context):
         context['cwd',] = Text(resolvepath(phrase, context))

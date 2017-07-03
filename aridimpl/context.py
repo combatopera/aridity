@@ -18,7 +18,7 @@
 from .model import Function, Text, Fork, Stream, Resolvable
 from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
-from .directives import lookup
+from .directives import lookup, resolvepath
 from .repl import Repl
 import os, sys, itertools
 
@@ -86,8 +86,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             modify(modpath[n], modcontext.resolved(*modpath))
         return obj
 
-    def source(self, path):
-        with Repl(self) as repl:
+    def source(self, prefix, path):
+        with Repl(self, rootprefix = prefix) as repl:
             with open(path) as f:
                 for line in f:
                     repl(line)
@@ -116,6 +116,9 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 t1 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))
                 t2 = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i + 1, j))
                 self[t1 + (None,) + t2] = entry.phrase(j + 1)
+                return
+            if Text('.') == entry.word(i):
+                self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
                 return
         word = entry.word(0)
         try:

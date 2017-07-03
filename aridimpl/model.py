@@ -250,18 +250,26 @@ class Entry(Struct):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word
 
-    def phrase(self, i):
-        phrase = list(self.resolvables)
+    def subentry(self, i, j):
+        v = list(self.resolvables)
         def trim(end):
-            while phrase and phrase[end].ignorable:
-                del phrase[end]
+            while v and v[end].ignorable:
+                del v[end]
+        n = self.size()
+        while j < n:
+            trim(-1)
+            del v[-1]
+            j += 1
         while i:
             trim(0)
-            del phrase[0]
+            del v[0]
             i -= 1
         for end in 0, -1:
             trim(end)
-        return Concat.unlesssingleton(phrase)
+        return v
+
+    def phrase(self, i):
+        return Concat.unlesssingleton(self.subentry(i, self.size()))
 
     def indent(self):
         indent = []
