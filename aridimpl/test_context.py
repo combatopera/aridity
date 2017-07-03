@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import unittest, tempfile
 from .grammar import loader as l
 from .model import Text
 from .context import Context, NoSuchPathException
@@ -203,3 +203,15 @@ class TestContext(unittest.TestCase):
         ae({'0': {'x': 0, 'port': 100}, '1': {'x': 1, 'port': 101}, '2': {'x': 2, 'port': 102}}, context.resolved('yay').unravel())
         ae({'x': 2, 'port': 102}, context.resolved('yay', '2').unravel())
         ae(102, context.resolved('yay', '2', 'port').unravel())
+
+    def test_nestedinclude(self):
+        context = Context()
+        with tempfile.NamedTemporaryFile() as f:
+            f.write('woo = yay')
+            f.flush()
+            with Repl(context) as repl:
+                repl.printf("ns . %s", f.name)
+        ae = self.assertEqual
+        ae({'ns': {'woo': 'yay'}}, context.resolved().unravel())
+        ae({'woo': 'yay'}, context.resolved('ns').unravel())
+        ae('yay', context.resolved('ns', 'woo').unravel())
