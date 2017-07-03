@@ -157,6 +157,9 @@ class Call(Resolvable):
         result, = args
         return result
 
+    def cat(self):
+        return "$%s(%s)" % (self.name, ''.join(a.cat() for a in self.args))
+
 class List(Resolved):
 
     def __init__(self, objs):

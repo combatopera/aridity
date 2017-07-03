@@ -215,3 +215,12 @@ class TestContext(unittest.TestCase):
         ae({'ns': {'woo': 'yay'}}, context.resolved().unravel())
         ae({'woo': 'yay'}, context.resolved('ns').unravel())
         ae('yay', context.resolved('ns', 'woo').unravel())
+
+    def test_anonymouslistelements(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('woo += yay')
+            repl('woo += $(houpla  )')
+            repl('houpla = x')
+        ae = self.assertEqual
+        ae({'yay': 'yay', '$(houpla  )': 'x'}, context.resolved('woo').unravel())
