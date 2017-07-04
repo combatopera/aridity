@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, CharsNotIn, NoMatch
+from pyparsing import Forward, OneOrMore, Optional, Or, Regex, Suppress, ZeroOrMore, NoMatch
 from decimal import Decimal
 from .model import Text, Boolean, Number, Blank, Call, Concat, Boundary, Entry
 import re
@@ -57,7 +57,7 @@ class Parser:
         action = Forward()
         def clauses():
             for o, c in cls.bracketpairs:
-                yield (Suppress(Regex("lit|'")) + Suppress(o) + Optional(CharsNotIn(c)) + Suppress(c)).setParseAction(Text.pa)
+                yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 def getbrackets(blankpa, scalarpa):
                     optblank = cls.getoptblank(blankpa, '')
                     return Suppress(o) + ZeroOrMore(optblank + cls.getarg(action, scalarpa, c)) + optblank + Suppress(c)

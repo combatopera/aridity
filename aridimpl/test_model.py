@@ -44,7 +44,7 @@ class TestModel(unittest.TestCase):
                 c[name,] = Function(f)
         c['minus124',] = Number(-124)
         c['minus124txt',] = Text('minus124')
-        c['gett',], = p('$($.())') # FIXME: Using lit does not work.
+        c['gett',], = p('$($.())')
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
@@ -58,6 +58,10 @@ class TestModel(unittest.TestCase):
         ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
         ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
         ae(Number(-124), Call('', [Call('', [Text('minus124txt')])]).resolve(c))
+
+    def test_emptyliteral(self):
+        self.assertEqual([Text('')], p("$'()"))
+        self.assertEqual([Call('', [Text('')])], p("$($'())"))
 
     def test_passresolve(self):
         ae = self.assertEqual
