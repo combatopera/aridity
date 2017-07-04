@@ -57,7 +57,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
     def resolved(self, *path, **kwargs):
         n = len(path)
         if len(path) > 1:
-            return ModContext.create(self, path[:-1]).resolved(path[-1], **kwargs)
+            return contextchain(self, path[:-1]).resolved(path[-1], **kwargs)
         modpaths = OrderedSet()
         for modpath in self.resolvables.keys():
             try: star = modpath.index(None)
@@ -81,7 +81,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             modify = obj.modify
         except AttributeError:
             return obj
-        modcontext = ModContext.create(self, path)
+        modcontext = contextchain(self, path)
         for modpath in modpaths:
             modify(modpath[n], modcontext.resolved(*modpath))
         return obj
@@ -140,21 +140,15 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 c = c.parent
         return eol.join(g())
 
-class ModContext(AbstractContext):
-
-    @classmethod
-    def create(cls, context, path):
-        for name in path:
-            context = cls(context, name)
-        return context
-
-    def __init__(self, parent, name):
-        super(ModContext, self).__init__(parent)
-        paths = parent.paths()
+def contextchain(context, path):
+    for name in path:
+        paths = context.paths()
+        context = Context(context)
         for word in None, name:
             for path in paths:
                 if len(path) > 1 and word == path[0]:
-                    self[path[1:]] = parent.getresolvable(path)
+                    context[path[1:]] = context.parent.getresolvable(path)
+    return context
 
 class SuperContext(AbstractContext):
 
