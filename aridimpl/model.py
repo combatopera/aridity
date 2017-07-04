@@ -71,6 +71,7 @@ class Concat(Resolvable):
         else:
             return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
+# TODO: Always throw when concatenation within a path component is attempted.
 class CatNotSupportedException(Exception): pass
 
 class SimpleValue(Resolved):
