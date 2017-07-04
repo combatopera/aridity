@@ -94,6 +94,6 @@ class Parser:
         return result
 
 expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
-templateparser = Parser(Parser.create(Text.pa, ''))
+templateparser = Parser(Parser.create(Text.pa, '') | Regex('^$').setParseAction(Text.pa))
 loader = Parser(ZeroOrMore(Parser.create(AnyScalar.pa, '\r\n').setParseAction(Entry.pa)))
 commandparser = Parser(Parser.getcommand(AnyScalar.pa, '\r\n').setParseAction(Entry.pa), True)

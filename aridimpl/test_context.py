@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, tempfile
+import unittest, tempfile, collections
 from .grammar import loader as l
-from .model import Text
+from .model import Text, Stream
 from .context import Context, NoSuchPathException
 from .util import OrderedDict
 from .repl import Repl
@@ -89,7 +89,12 @@ class TestContext(unittest.TestCase):
         self.assertEqual(['x', 'z'], l)
 
     def test_emptytemplate(self):
-        pass # TODO: Implement me.
+        context = Context()
+        chunks = []
+        context['stdout',] = Stream(collections.namedtuple('Chunks', 'write flush')(chunks.append, lambda: None))
+        with tempfile.NamedTemporaryFile() as f, Repl(context) as repl:
+            repl.printf("cat %s", f.name)
+        self.assertEqual([''], chunks)
 
     def test_proxy(self):
         context = Context()
