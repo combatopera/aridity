@@ -58,7 +58,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
     def resolved(self, *path, **kwargs):
         n = len(path)
         if len(path) > 1:
-            return subcontext(self, path[:-1]).resolved(path[-1], **kwargs)
+            return self.subcontext(path[:-1]).resolved(path[-1], **kwargs)
         modpaths = OrderedSet()
         for modpath in self.resolvables.keys():
             try: star = modpath.index(None)
@@ -82,7 +82,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             modify = obj.modify
         except AttributeError:
             return obj
-        modcontext = subcontext(self, path)
+        modcontext = self.subcontext(path)
         for modpath in modpaths:
             modify(modpath[n], modcontext.resolved(*modpath))
         return obj
@@ -122,7 +122,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
                 return
             if Text('cat') == entry.word(i):
-                context = subcontext(self, [w.resolve(self).totext().cat() for w in entry.subentry(0, i)])
+                context = self.subcontext([w.resolve(self).totext().cat() for w in entry.subentry(0, i)])
                 with open(resolvepath(entry.phrase(i + 1), context)) as f:
                     context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
                 return
@@ -146,15 +146,15 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 c = c.parent
         return eol.join(g())
 
-def subcontext(context, path):
-    for name in path:
-        paths = context.paths()
-        context = Context(context)
-        for word in None, name:
-            for path in paths:
-                if len(path) > 1 and word == path[0]:
-                    context[path[1:]] = context.parent.getresolvable(path)
-    return context
+    def subcontext(self, path):
+        for name in path:
+            paths = self.paths()
+            self = Context(self)
+            for word in None, name:
+                for path in paths:
+                    if len(path) > 1 and word == path[0]:
+                        self[path[1:]] = self.parent.getresolvable(path)
+        return self
 
 class SuperContext(AbstractContext):
 
