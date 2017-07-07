@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Fork, Stream, Resolvable
+from .model import Function, Text, Fork, Stream, Resolvable, Concat
 from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup, resolvepath
 from .repl import Repl
+from .grammar import templateparser
 import os, sys
 
 class NotAPathException(Exception): pass
@@ -119,6 +120,11 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 return
             if Text('.') == entry.word(i):
                 self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
+                return
+            if Text('cat') == entry.word(i):
+                context = subcontext(self, entry.subentry(0, i))
+                with open(resolvepath(entry.phrase(i + 1), context)) as f:
+                    context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
                 return
         word = entry.word(0)
         try:

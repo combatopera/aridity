@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Text, Stream, Concat
-from .grammar import templateparser
+from .model import Text, Stream
 from .util import allfunctions
 import os, sys
 
@@ -27,10 +26,6 @@ class Directives:
 
     def write(phrase, context):
         context.resolved('stdout').flush(phrase.resolve(context).cat())
-
-    def cat(phrase, context):
-        with open(resolvepath(phrase, context)) as f:
-            context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
     def source(phrase, context):
         context.source([], resolvepath(phrase, context))
