@@ -122,7 +122,7 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
                 return
             if Text('cat') == entry.word(i):
-                context = self.subcontext([w.resolve(self).totext().cat() for w in entry.subentry(0, i)])
+                context = self.subcontext([entry.word(k).resolve(self).totext().cat() for k in range(i)])
                 with open(resolvepath(entry.phrase(i + 1), context)) as f:
                     context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
                 return
