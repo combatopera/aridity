@@ -104,10 +104,12 @@ class Cat:
 class Blank(Cat, SimpleValue):
 
     ignorable = True
+    boundary = False
 
 class Boundary(SimpleValue):
 
     ignorable = True
+    boundary = True
 
 class Scalar(SimpleValue):
 
@@ -291,7 +293,7 @@ class Entry(Struct):
     def indent(self):
         indent = []
         for r in self.resolvables:
-            if not r.ignorable: # TODO: Also break on boundary.
+            if not r.ignorable or r.boundary:
                 break
             indent.append(r)
         return Concat.unlesssingleton(indent).resolve(None).cat()
