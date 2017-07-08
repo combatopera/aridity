@@ -132,7 +132,7 @@ class Text(Cat, Scalar):
 class Number(Scalar):
 
     def totext(self):
-        return Text(self.cat())
+        return Text(self.unparse())
 
     def tobash(self):
         return str(self.value)
