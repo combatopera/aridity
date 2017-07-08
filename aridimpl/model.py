@@ -52,7 +52,7 @@ class Concat(Resolvable):
 
     @classmethod
     def strictpa(cls, s, l, t):
-        return cls(t.asList())
+        return cls(t[1:-1])
 
     @classmethod
     def smartpa(cls, s, l, t):
@@ -156,11 +156,12 @@ class Call(Resolvable):
 
     @classmethod
     def pa(cls, s, l, t):
-        return cls(t[0], t[1:])
+        return cls(t[0], t[2:-1], t[1]+t[-1])
 
-    def __init__(self, name, args):
+    def __init__(self, name, args, brackets = None):
         self.name = name
         self.args = args
+        self.brackets = brackets
 
     def resolve(self, context, aslist = False):
         args = [a for a in self.args if not a.ignorable]
@@ -170,8 +171,7 @@ class Call(Resolvable):
         return List([result]) if aslist else result
 
     def unparse(self):
-        # FIXME: Probably not reliable.
-        return "$%s(%s)" % (self.name, ''.join(a.unparse() for a in self.args))
+        return "$%s%s%s%s" % (self.name, self.brackets[0], ''.join(a.unparse() for a in self.args), self.brackets[1])
 
     def cat(self):
         return self.unparse()

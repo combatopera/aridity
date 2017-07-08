@@ -61,7 +61,7 @@ class TestModel(unittest.TestCase):
 
     def test_emptyliteral(self):
         self.assertEqual([Text('')], p("$'()"))
-        self.assertEqual([Call('', [Text('')])], p("$($'())"))
+        self.assertEqual([Call('', [Text('')], '()')], p("$($'())"))
 
     def test_passresolve(self):
         ae = self.assertEqual

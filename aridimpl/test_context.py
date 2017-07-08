@@ -234,6 +234,7 @@ class TestContext(unittest.TestCase):
         context = Context()
         with Repl(context) as repl:
             repl('woo += yay 1')
-            repl('woo += yay  2')
+            repl('woo += yay  $[two]')
+            repl('two = 2')
         ae = self.assertEqual
-        ae({'yay 1': 'yay 1', 'yay  2': 'yay  2'}, context.resolved('woo').unravel())
+        ae({'yay 1': 'yay 1', 'yay  $[two]': 'yay  2'}, context.resolved('woo').unravel())

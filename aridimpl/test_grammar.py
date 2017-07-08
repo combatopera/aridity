@@ -29,38 +29,33 @@ class TestGrammar(unittest.TestCase):
         ae([Text('x'), Blank('  '), Text('y')], p('x  y'))
         ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Blank('\t')], p('\tx  y\t'))
         ae([Blank('\t'), Text('x'), Blank('  '), Text('y'), Boundary('\r')], p('\tx  y\r'))
-        for text in ('$a()',
-                     '$a[]'):
-            ae([Call('a', [])], p(text))
-        for text in ('$ac(x)',
-                     '$ac[x]'):
-            ae([Call('ac', [Text('x')])], p(text))
-        for text in ('$act(x yy)',
-                     '$act[x yy]'):
-            ae([Call('act', [Text('x'), Blank(' '), Text('yy')])], p(text))
-        for text in ('$act(\rx  yy\t)',
-                     '$act[\rx  yy\t]'):
-            ae([Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')])], p(text))
-        for text in ('$act(\rx$b()z  yy\t)',
-                     '$act(\rx$b[]z  yy\t)',
-                     '$act[\rx$b[]z  yy\t]',
-                     '$act[\rx$b()z  yy\t]'):
-            ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', []), Text('z')]), Blank('  '), Text('yy'), Blank('\t')])], p(text))
+        ae([Call('a', [], '()')], p('$a()'))
+        ae([Call('a', [], '[]')], p('$a[]'))
+        ae([Call('ac', [Text('x')], '()')], p('$ac(x)'))
+        ae([Call('ac', [Text('x')], '[]')], p('$ac[x]'))
+        ae([Call('act', [Text('x'), Blank(' '), Text('yy')], '()')], p('$act(x yy)'))
+        ae([Call('act', [Text('x'), Blank(' '), Text('yy')], '[]')], p('$act[x yy]'))
+        ae([Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')], '()')], p('$act(\rx  yy\t)'))
+        ae([Call('act', [Blank('\r'), Text('x'), Blank('  '), Text('yy'), Blank('\t')], '[]')], p('$act[\rx  yy\t]'))
+        ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', [], '()'), Text('z')]), Blank('  '), Text('yy'), Blank('\t')], '()')], p('$act(\rx$b()z  yy\t)'))
+        ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', [], '[]'), Text('z')]), Blank('  '), Text('yy'), Blank('\t')], '()')], p('$act(\rx$b[]z  yy\t)'))
+        ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', [], '[]'), Text('z')]), Blank('  '), Text('yy'), Blank('\t')], '[]')], p('$act[\rx$b[]z  yy\t]'))
+        ae([Call('act', [Blank('\r'), Concat([Text('x'), Call('b', [], '()'), Text('z')]), Blank('  '), Text('yy'), Blank('\t')], '[]')], p('$act[\rx$b()z  yy\t]'))
         ae([Text('woo')], p('woo'))
-        ae([Concat([Text('woo'), Call('get', [Text('yay')]), Text('houpla')])], p('woo$get(yay)houpla'))
-        ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')]), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(\n yay\n)\thoupla  '''))
+        ae([Concat([Text('woo'), Call('get', [Text('yay')], '()'), Text('houpla')])], p('woo$get(yay)houpla'))
+        ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')], '()'), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(\n yay\n)\thoupla  '''))
         ae([Number(1)], p('1'))
         ae([Number(-5)], p('-5'))
-        ae([Call('id', [Number(Decimal('.1'))])], p('$id(.1)'))
-        ae([Call('id', [Number(Decimal('-5.4'))])], p('$id(-5.4)'))
-        ae([Call('id', [Text('.1woo')])], p('$id(.1woo)'))
+        ae([Call('id', [Number(Decimal('.1'))], '()')], p('$id(.1)'))
+        ae([Call('id', [Number(Decimal('-5.4'))], '()')], p('$id(-5.4)'))
+        ae([Call('id', [Text('.1woo')], '()')], p('$id(.1woo)'))
         ae([Text('100woo')], p('100woo'))
         ae([Boolean(False)], p('false'))
-        ae([Call('id', [Boolean(True)])], p('$id(true)'))
-        ae([Call('id', [Text('falseyay')])], p('$id(falseyay)'))
+        ae([Call('id', [Boolean(True)], '()')], p('$id(true)'))
+        ae([Call('id', [Text('falseyay')], '()')], p('$id(falseyay)'))
         ae([Text('truewoo')], p('truewoo'))
-        ae([Concat([Text('100'), Call('a', [])])], p('100$a()'))
-        ae([Call('aaa', [Call('bbb', [Text('ccc)ddd')])])], p('$aaa($bbb[ccc)ddd])'))
+        ae([Concat([Text('100'), Call('a', [], '()')])], p('100$a()'))
+        ae([Call('aaa', [Call('bbb', [Text('ccc)ddd')], '[]')], '()')], p('$aaa($bbb[ccc)ddd])'))
 
     def test_lit(self):
         ae = self.assertEqual
@@ -84,7 +79,7 @@ class TestGrammar(unittest.TestCase):
         ae = self.assertEqual
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.( x  y\t)'))
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.[ x  y\t]'))
-        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])])], p('$act(x $.[ y\t])'))
+        ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])], '()')], p('$act(x $.[ y\t])'))
         ae([Concat([Text('10')])], p('$.[10]'))
         ae([Concat([Text('x(')]), Blank(' '), Text(')')], p('$.(x() )')) # Gotcha!
         ae([Concat([Text('x()'), Text(' ')])], p('$.[x() ]'))
@@ -100,4 +95,4 @@ class TestGrammar(unittest.TestCase):
             ae([Entry([Text('x=y'), Boundary(eol)]), Entry([Text('x2=y2')])], l('x=y%sx2=y2' % eol))
         ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Boolean(True)])], l('x = true'))
         ae([Entry([Text('x'), Blank(' '), Text('=true'), Blank(' ')])], l('x =true '))
-        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Call('a', [Blank('\n'), Text('b'), Blank('\r')])])], l('x = $a(\nb\r)'))
+        ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Call('a', [Blank('\n'), Text('b'), Blank('\r')], '()')])], l('x = $a(\nb\r)'))
