@@ -88,10 +88,18 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         return obj
 
     def source(self, prefix, path):
-        with Repl(self, rootprefix = prefix) as repl:
-            with open(path) as f:
-                for line in f:
-                    repl(line)
+        oldhere = self.resolvables.get(('here',))
+        self.resolvables['here',] = Text(os.path.dirname(path))
+        try:
+            with Repl(self, rootprefix = prefix) as repl:
+                with open(path) as f:
+                    for line in f:
+                        repl(line)
+        finally:
+            if oldhere is None:
+                del self.resolvables['here',]
+            else:
+                self.resolvables['here',] = oldhere
 
     def execute(self, entry):
         n = entry.size()
@@ -101,6 +109,9 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         for i in range(n):
             if Text('=') == entry.word(i):
                 self[tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))] = entry.phrase(i + 1)
+                return
+            if Text(':=') == entry.word(i):
+                self[tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))] = entry.phrase(i + 1).resolve(self)
                 return
             if Text('+=') == entry.word(i):
                 path = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))

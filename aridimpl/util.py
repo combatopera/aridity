@@ -55,6 +55,12 @@ class OrderedDict(OrderedDictWrapper):
     def __getitem__(self, k):
         return self.d[k]
 
+    def __delitem__(self, k):
+        del self.d[k]
+
+    def get(self, k):
+        return self.d.get(k)
+
     def keys(self):
         return self.d.keys()
 
