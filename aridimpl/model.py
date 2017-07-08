@@ -151,12 +151,12 @@ class Call(Resolvable):
         self.name = name
         self.args = args
 
-    def resolve(self, context):
+    def resolve(self, context, aslist = False):
         args = [a for a in self.args if not a.ignorable]
         for name in reversed(self.name.split('$')):
             args = [context.resolved(name)(*[context] + args)]
         result, = args
-        return result
+        return List([result]) if aslist else result
 
     def cat(self):
         return "$%s(%s)" % (self.name, ''.join(a.cat() for a in self.args))
