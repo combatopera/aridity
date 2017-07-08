@@ -98,12 +98,12 @@ class Cat:
     def cat(self):
         return self.value
 
+    def unparse(self):
+        return self.value
+
 class Blank(Cat, SimpleValue):
 
     ignorable = True
-
-    def unparse(self):
-        return self.value
 
 class Boundary(SimpleValue):
 
@@ -127,9 +127,6 @@ class Text(Cat, Scalar):
         return self
 
     def tobash(self):
-        return self.value
-
-    def unparse(self):
         return self.value
 
 class Number(Scalar):
