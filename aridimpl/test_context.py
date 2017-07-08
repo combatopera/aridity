@@ -229,3 +229,11 @@ class TestContext(unittest.TestCase):
             repl('houpla = x')
         ae = self.assertEqual
         ae({'yay': 'yay', '$(houpla  )': 'x'}, context.resolved('woo').unravel())
+
+    def test_anonymouslistelements2(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('woo += yay 1')
+            repl('woo += yay  2')
+        ae = self.assertEqual
+        ae({'yay 1': 'yay 1', 'yay  2': 'yay  2'}, context.resolved('woo').unravel())

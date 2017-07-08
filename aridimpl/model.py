@@ -71,6 +71,9 @@ class Concat(Resolvable):
         else:
             return Text(''.join(part.resolve(context).cat() for part in self.parts))
 
+    def unparse(self):
+        return ''.join(part.unparse() for part in self.parts)
+
 # TODO: Always throw when concatenation within a path component is attempted.
 class CatNotSupportedException(Exception): pass
 
@@ -99,6 +102,9 @@ class Blank(Cat, SimpleValue):
 
     ignorable = True
 
+    def unparse(self):
+        return self.value
+
 class Boundary(SimpleValue):
 
     ignorable = True
@@ -123,6 +129,9 @@ class Text(Cat, Scalar):
     def tobash(self):
         return self.value
 
+    def unparse(self):
+        return self.value
+
 class Number(Scalar):
 
     def totext(self):
@@ -131,8 +140,11 @@ class Number(Scalar):
     def tobash(self):
         return str(self.value)
 
-    def cat(self):
+    def unparse(self):
         return str(self.value) # FIXME: Should unparse.
+
+    def cat(self):
+        return self.unparse()
 
 class Boolean(Scalar):
 
@@ -158,8 +170,12 @@ class Call(Resolvable):
         result, = args
         return List([result]) if aslist else result
 
+    def unparse(self):
+        # FIXME: Probably not reliable.
+        return "$%s(%s)" % (self.name, ''.join(a.unparse() for a in self.args))
+
     def cat(self):
-        return "$%s(%s)" % (self.name, ''.join(a.cat() for a in self.args))
+        return self.unparse()
 
 class List(Resolved):
 

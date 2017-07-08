@@ -115,7 +115,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 return
             if Text('+=') == entry.word(i):
                 path = tuple(entry.word(k).resolve(self).totext().cat() for k in range(i))
-                self[path + (entry.word(i + 1).cat(),)] = entry.phrase(i + 1)
+                phrase = entry.phrase(i + 1)
+                self[path + (phrase.unparse(),)] = phrase
                 return
             if Text('*') == entry.word(i):
                 for j in range(i + 1, n):
