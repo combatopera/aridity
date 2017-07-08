@@ -16,29 +16,44 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Text, Stream
-from .util import allfunctions
 import os, sys
 
-class Directives:
+lookup = {}
 
-    def redirect(phrase, context):
+def directive(cls):
+    lookup[Text(cls.name)] = cls()
+
+@directive
+class Redirect:
+    name = 'redirect'
+    def __call__(self, phrase, context):
         context['stdout',] = Stream(open(resolvepath(phrase, context), 'w'))
 
-    def write(phrase, context):
+@directive
+class Write:
+    name = 'write'
+    def __call__(self, phrase, context):
         context.resolved('stdout').flush(phrase.resolve(context).cat())
 
-    def source(phrase, context):
+@directive
+class Source:
+    name = 'source'
+    def __call__(self, phrase, context):
         context.source([], resolvepath(phrase, context))
 
-    def cd(phrase, context):
+@directive
+class CD:
+    name = 'cd'
+    def __call__(self, phrase, context):
         context['cwd',] = Text(resolvepath(phrase, context))
 
-    def test(phrase, context):
+@directive
+class Test:
+    name = 'test'
+    def __call__(self, phrase, context):
         sys.stderr.write(phrase.resolve(context))
         sys.stderr.write(os.linesep)
 
 def resolvepath(phrase, context):
     path = phrase.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
-
-lookup = {Text(name): d for name, d in allfunctions(Directives)}
