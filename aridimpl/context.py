@@ -108,14 +108,14 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         # TODO: Blow up if multiple directives found.
         for i in range(n):
             if Text('=') == entry.word(i):
-                self[entry.path(0, i, self)] = entry.phrase(i + 1)
+                self[entry.subentry(0, i).topath(self)] = entry.phrase(i + 1)
                 return
             if Text(':=') == entry.word(i):
-                self[entry.path(0, i, self)] = entry.phrase(i + 1).resolve(self)
+                self[entry.subentry(0, i).topath(self)] = entry.phrase(i + 1).resolve(self)
                 return
             if Text('+=') == entry.word(i):
                 phrase = entry.phrase(i + 1)
-                self[entry.path(0, i, self) + (phrase.unparse(),)] = phrase
+                self[entry.subentry(0, i).topath(self) + (phrase.unparse(),)] = phrase
                 return
             if Text('*') == entry.word(i):
                 for j in range(i + 1, n):
@@ -125,13 +125,13 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                     # XXX: Also support += and other directives?
                     raise Exception('Expected equals in same entry after star.')
                 # TODO LATER: Support multiple stars in entry.
-                self[entry.path(0, i, self) + (None,) + entry.path(i + 1, j, self)] = entry.phrase(j + 1)
+                self[entry.subentry(0, i).topath(self) + (None,) + entry.subentry(i + 1, j).topath(self)] = entry.phrase(j + 1)
                 return
             if Text('.') == entry.word(i):
                 self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
                 return
             if Text('cat') == entry.word(i):
-                context = self.subcontext(entry.path(0, i, self))
+                context = self.subcontext(entry.subentry(0, i).topath(self))
                 with open(resolvepath(entry.phrase(i + 1), context)) as f:
                     context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
                 return
