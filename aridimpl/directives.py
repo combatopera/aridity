@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Text, Stream
+from .model import Text, Stream, Concat
+from .grammar import templateparser
 import os, sys
 
 lookup = {}
 
 def directive(cls):
-    lookup[Text(cls.name)] = cls()
+    obj = cls()
+    lookup[Text(cls.name)] = obj
+    return obj
 
 @directive
 class Redirect:
@@ -37,7 +40,7 @@ class Write:
 
 @directive
 class Source:
-    name = 'source'
+    name = '.'
     def __call__(self, prefix, phrase, context):
         context.source(prefix, resolvepath(phrase, context))
 
@@ -53,6 +56,32 @@ class Test:
     def __call__(self, prefix, phrase, context):
         sys.stderr.write(phrase.resolve(context))
         sys.stderr.write(os.linesep)
+
+@directive
+class Equals:
+    name = '='
+    def __call__(self, prefix, phrase, context):
+        context[prefix.topath(context)] = phrase
+
+@directive
+class ColonEquals:
+    name = ':='
+    def __call__(self, prefix, phrase, context):
+        Equals(prefix, phrase.resolve(context), context)
+
+@directive
+class PlusEquals:
+    name = '+='
+    def __call__(self, prefix, phrase, context):
+        context[prefix.topath(context) + (phrase.unparse(),)] = phrase
+
+@directive
+class Cat:
+    name = '<'
+    def __call__(self, prefix, phrase, context):
+        context = context.subcontext(prefix.topath(context))
+        with open(resolvepath(phrase, context)) as f:
+            context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
 def resolvepath(phrase, context):
     path = phrase.resolve(context).cat()
