@@ -28,10 +28,10 @@ class TestContext(unittest.TestCase):
         c = Context()
         with Repl(c) as repl:
             repl('x = y')
-            repl('x2 = y = z')
+            repl('x2 = y $.(=) z') # FIXME: Quote should work too.
             repl('blank =')
             repl('= blank')
-            repl('write = yo')
+            repl('$.(write) = yo')
             repl('write yo')
         ae = self.assertEqual
         ae('y', c.resolved('x').unravel())
@@ -93,7 +93,7 @@ class TestContext(unittest.TestCase):
         chunks = []
         context['stdout',] = Stream(collections.namedtuple('Chunks', 'write flush')(chunks.append, lambda: None))
         with tempfile.NamedTemporaryFile() as f, Repl(context) as repl:
-            repl.printf("cat %s", f.name)
+            repl.printf("< %s", f.name)
         self.assertEqual([''], chunks)
 
     def test_proxy(self):

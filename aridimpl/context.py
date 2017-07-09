@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Fork, Stream, Resolvable, Concat
+from .model import Function, Text, Fork, Stream, Resolvable
 from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
-from .directives import lookup, resolvepath
+from .directives import lookup
 from .repl import Repl
-from .grammar import templateparser
 import os, sys
 
 class NotAPathException(Exception): pass
@@ -102,37 +101,20 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 self.resolvables['here',] = oldhere
 
     def execute(self, entry):
-        n = entry.size()
-        if not n:
+        words = entry.words()
+        if not words:
             return
-        # TODO: Blow up if multiple directives found.
-        for i in range(n):
-            if Text('=') == entry.word(i):
-                self[entry.subentry(0, i).topath(self)] = entry.phrase(i + 1)
-                return
-            if Text(':=') == entry.word(i):
-                self[entry.subentry(0, i).topath(self)] = entry.phrase(i + 1).resolve(self)
-                return
-            if Text('+=') == entry.word(i):
-                phrase = entry.phrase(i + 1)
-                self[entry.subentry(0, i).topath(self) + (phrase.unparse(),)] = phrase
-                return
-            if Text('.') == entry.word(i):
-                self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
-                return
-            if Text('cat') == entry.word(i):
-                context = self.subcontext(entry.subentry(0, i).topath(self))
-                with open(resolvepath(entry.phrase(i + 1), context)) as f:
-                    context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
-                return
-        word = entry.word(0)
-        try:
-            d = lookup.get(word)
-        except TypeError:
-            d = None
-        if d is None:
+        directives = []
+        for i, word in enumerate(words):
+            try:
+                d = lookup.get(word)
+            except TypeError:
+                d = None
+            if d is not None:
+                directives.append((d, i))
+        if 1 != len(directives):
             raise UnsupportedEntryException(entry)
-        i = 0
+        d, i = directives[0]
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
     def __str__(self):

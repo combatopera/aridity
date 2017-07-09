@@ -271,6 +271,9 @@ class Entry(Struct):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word
 
+    def words(self):
+        return [r for r in self.resolvables if not r.ignorable]
+
     def topath(self, context):
         return tuple((None if self.wildcard == r else r.resolve(context).totext().cat()) for r in self.resolvables if not r.ignorable)
 
