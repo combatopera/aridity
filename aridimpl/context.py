@@ -142,7 +142,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             d = None
         if d is None:
             raise UnsupportedEntryException(entry)
-        d(entry.phrase(1), self)
+        i = 0
+        d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
     def __str__(self):
         eol = '\n'

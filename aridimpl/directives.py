@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Text, Stream, Entry
+from .model import Text, Stream
 import os, sys
 
 lookup = {}
@@ -26,31 +26,31 @@ def directive(cls):
 @directive
 class Redirect:
     name = 'redirect'
-    def __call__(self, phrase, context):
+    def __call__(self, prefix, phrase, context):
         context['stdout',] = Stream(open(resolvepath(phrase, context), 'w'))
 
 @directive
 class Write:
     name = 'write'
-    def __call__(self, phrase, context):
+    def __call__(self, prefix, phrase, context):
         context.resolved('stdout').flush(phrase.resolve(context).cat())
 
 @directive
 class Source:
     name = 'source'
-    def __call__(self, phrase, context):
-        context.source(Entry([]), resolvepath(phrase, context))
+    def __call__(self, prefix, phrase, context):
+        context.source(prefix, resolvepath(phrase, context))
 
 @directive
 class CD:
     name = 'cd'
-    def __call__(self, phrase, context):
+    def __call__(self, prefix, phrase, context):
         context['cwd',] = Text(resolvepath(phrase, context))
 
 @directive
 class Test:
     name = 'test'
-    def __call__(self, phrase, context):
+    def __call__(self, prefix, phrase, context):
         sys.stderr.write(phrase.resolve(context))
         sys.stderr.write(os.linesep)
 
