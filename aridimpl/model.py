@@ -269,6 +269,10 @@ class Entry(Struct):
         word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word
 
+    def path(self, i, j, context):
+        words = itertools.islice((r for r in self.resolvables if not r.ignorable), i, j)
+        return tuple(word.resolve(context).totext().cat() for word in words)
+
     def subentry(self, i, j):
         v = list(self.resolvables)
         def trim(end):
