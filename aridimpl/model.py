@@ -252,6 +252,8 @@ class Stream(Resolved):
 
 class Entry(Struct):
 
+    wildcard = Text('*')
+
     @classmethod
     def pa(cls, s, l, t):
         return cls(t.asList())
@@ -270,7 +272,7 @@ class Entry(Struct):
         return word
 
     def topath(self, context):
-        return tuple(r.resolve(context).totext().cat() for r in self.resolvables if not r.ignorable)
+        return tuple((None if self.wildcard == r else r.resolve(context).totext().cat()) for r in self.resolvables if not r.ignorable)
 
     def subentry(self, i, j):
         v = list(self.resolvables)

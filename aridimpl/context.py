@@ -117,16 +117,6 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 phrase = entry.phrase(i + 1)
                 self[entry.subentry(0, i).topath(self) + (phrase.unparse(),)] = phrase
                 return
-            if Text('*') == entry.word(i):
-                for j in range(i + 1, n):
-                    if Text('=') == entry.word(j):
-                        break
-                else:
-                    # XXX: Also support += and other directives?
-                    raise Exception('Expected equals in same entry after star.')
-                # TODO LATER: Support multiple stars in entry.
-                self[entry.subentry(0, i).topath(self) + (None,) + entry.subentry(i + 1, j).topath(self)] = entry.phrase(j + 1)
-                return
             if Text('.') == entry.word(i):
                 self.source(entry.subentry(0, i), resolvepath(entry.phrase(i + 1), self))
                 return
