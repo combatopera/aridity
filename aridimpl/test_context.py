@@ -238,3 +238,12 @@ class TestContext(unittest.TestCase):
             repl('two = 2')
         ae = self.assertEqual
         ae({'yay 1': 'yay 1', 'yay  $[two]': 'yay  2'}, context.resolved('woo').unravel())
+
+    def test_thisusedtowork(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('x paths += woo')
+            repl('x paths += yay')
+            repl('y paths = $(x paths)')
+        ae = self.assertEqual
+        ae(['woo', 'yay'], context.resolved('y', 'paths').unravel())
