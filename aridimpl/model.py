@@ -289,10 +289,10 @@ class Entry(Struct):
             i -= 1
         for end in 0, -1:
             trim(end)
-        return v
+        return Entry(v)
 
     def phrase(self, i):
-        return Concat.unlesssingleton(self.subentry(i, self.size()))
+        return Concat.unlesssingleton(self.subentry(i, self.size()).resolvables)
 
     def indent(self):
         indent = []

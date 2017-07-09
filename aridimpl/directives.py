@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Text, Stream
+from .model import Text, Stream, Entry
 import os, sys
 
 lookup = {}
@@ -39,7 +39,7 @@ class Write:
 class Source:
     name = 'source'
     def __call__(self, phrase, context):
-        context.source([], resolvepath(phrase, context))
+        context.source(Entry([]), resolvepath(phrase, context))
 
 @directive
 class CD:

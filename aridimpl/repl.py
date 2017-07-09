@@ -41,7 +41,7 @@ class Repl:
         except TypeError:
             return obj
 
-    def __init__(self, context, interactive = False, rootprefix = []):
+    def __init__(self, context, interactive = False, rootprefix = Entry([])):
         self.stack = []
         self.indent = ''
         self.prefix = None
@@ -69,7 +69,7 @@ class Repl:
         if self.prefix is not None:
             if len(indent) <= len(self.indent):
                 raise MalformedEntryException(command)
-            self.prefixes[indent] = self.prefix.resolve().objs # XXX: Too eager?
+            self.prefixes[indent] = self.prefix
             self.prefix = None
         if indent not in self.prefixes:
             raise NoSuchIndentException(command)
@@ -77,7 +77,7 @@ class Repl:
             if len(indent) < len(i):
                 del self.prefixes[i]
         self.indent = indent
-        command = Entry(self.prefixes[indent] + command.resolvables)
+        command = Entry(self.prefixes[indent].resolvables + command.resolvables)
         try:
             self.context.execute(command)
         except UnsupportedEntryException:

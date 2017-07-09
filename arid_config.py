@@ -17,6 +17,7 @@
 
 import sys, os
 from aridimpl.context import Context
+from aridimpl.model import Entry
 
 def configpath(configname):
     for parent in os.environ['PATH'].split(os.pathsep):
@@ -27,5 +28,5 @@ def configpath(configname):
 
 def main():
     context = Context()
-    context.source([], configpath(sys.argv[1]))
+    context.source(Entry([]), configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
