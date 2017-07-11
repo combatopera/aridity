@@ -27,6 +27,12 @@ def directive(cls):
     return obj
 
 @directive
+class Colon:
+    name = ':'
+    def __call__(self, prefix, phrase, context):
+        pass # Do nothing.
+
+@directive
 class Redirect:
     name = 'redirect'
     def __call__(self, prefix, phrase, context):

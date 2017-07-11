@@ -17,7 +17,7 @@
 
 import traceback, pyparsing, re
 from .grammar import commandparser
-from .model import Entry
+from .model import Entry, Text
 
 class DanglingStackException(Exception): pass
 
@@ -41,7 +41,7 @@ class Repl:
     def __init__(self, context, interactive = False, rootprefix = Entry([])):
         self.stack = []
         self.indent = ''
-        self.command = None
+        self.command = Entry([Text(':')])
         self.partials = {'': rootprefix}
         self.context = context
         self.interactive = interactive
@@ -64,8 +64,7 @@ class Repl:
         if indent[:common] != self.indent[:common]:
             raise MalformedEntryException(command)
         if len(indent) <= len(self.indent):
-            if self.command is not None:
-                self.fire()
+            self.fire()
         else:
             self.partials[indent] = self.command
         if indent not in self.partials:
@@ -88,5 +87,4 @@ class Repl:
         if exc_type is None:
             if self.stack:
                 raise DanglingStackException(self.stack)
-            if self.command is not None:
-                self.fire()
+            self.fire()
