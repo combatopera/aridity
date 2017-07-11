@@ -17,14 +17,11 @@
 
 import traceback, pyparsing, re
 from .grammar import commandparser
-from .util import NoSuchPathException, UnsupportedEntryException
 from .model import Entry
 
 class DanglingStackException(Exception): pass
 
 class NoSuchIndentException(Exception): pass
-
-class DanglingPrefixException(Exception): pass
 
 class MalformedEntryException(Exception): pass
 
@@ -44,8 +41,8 @@ class Repl:
     def __init__(self, context, interactive = False, rootprefix = Entry([])):
         self.stack = []
         self.indent = ''
-        self.prefix = None
-        self.prefixes = {'': rootprefix}
+        self.command = None
+        self.partials = {'': rootprefix}
         self.context = context
         self.interactive = interactive
 
@@ -66,22 +63,22 @@ class Repl:
         common = min(len(self.indent), len(indent))
         if indent[:common] != self.indent[:common]:
             raise MalformedEntryException(command)
-        if self.prefix is not None:
-            if len(indent) <= len(self.indent):
-                raise MalformedEntryException(command)
-            self.prefixes[indent] = self.prefix
-            self.prefix = None
-        if indent not in self.prefixes:
+        if len(indent) <= len(self.indent):
+            if self.command is not None:
+                self.fire()
+        else:
+            self.partials[indent] = self.command
+        if indent not in self.partials:
             raise NoSuchIndentException(command)
-        for i in list(self.prefixes):
+        for i in list(self.partials):
             if len(indent) < len(i):
-                del self.prefixes[i]
+                del self.partials[i]
+        self.command = Entry(self.partials[indent].resolvables + command.resolvables)
         self.indent = indent
-        command = Entry(self.prefixes[indent].resolvables + command.resolvables)
+
+    def fire(self):
         try:
-            self.context.execute(command)
-        except UnsupportedEntryException:
-            self.prefix = command
+            self.context.execute(self.command)
         except:
             if not self.interactive:
                 raise
@@ -91,5 +88,5 @@ class Repl:
         if exc_type is None:
             if self.stack:
                 raise DanglingStackException(self.stack)
-            if self.prefix is not None:
-                raise DanglingPrefixException(self.prefix)
+            if self.command is not None:
+                self.fire()

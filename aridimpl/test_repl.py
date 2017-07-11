@@ -17,7 +17,8 @@
 
 import unittest
 from .context import Context
-from .repl import Repl, NoSuchIndentException, DanglingPrefixException, MalformedEntryException
+from .repl import Repl, NoSuchIndentException, MalformedEntryException
+from .util import UnsupportedEntryException
 
 class TestRepl(unittest.TestCase):
 
@@ -52,7 +53,7 @@ class TestRepl(unittest.TestCase):
 
     def test_unusedprefix(self):
         context = Context()
-        with self.assertRaises(DanglingPrefixException):
+        with self.assertRaises(UnsupportedEntryException):
             with Repl(context) as repl:
                 repl('prefix')
 
@@ -69,7 +70,7 @@ class TestRepl(unittest.TestCase):
         with Repl(context) as repl:
             repl('ns')
             repl('  ns2')
-            with self.assertRaises(MalformedEntryException):
+            with self.assertRaises(UnsupportedEntryException):
                 repl('  woo = yay')
             repl('   woo = yay')
 
