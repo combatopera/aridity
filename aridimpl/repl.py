@@ -54,25 +54,25 @@ class Repl:
 
     def __call__(self, line):
         try:
-            command = commandparser(''.join(self.stack + [line]))
+            suffix = commandparser(''.join(self.stack + [line]))
             del self.stack[:]
         except pyparsing.ParseException:
             self.stack.append(line)
             return
-        indent = command.indent()
+        indent = suffix.indent()
         common = min(len(self.indent), len(indent))
         if indent[:common] != self.indent[:common]:
-            raise MalformedEntryException(command)
+            raise MalformedEntryException(suffix)
         if len(indent) <= len(self.indent):
             self.fire()
             if indent not in self.partials:
-                raise NoSuchIndentException(command)
+                raise NoSuchIndentException(suffix)
         else:
             self.partials[indent] = self.command
         for i in list(self.partials):
             if len(indent) < len(i):
                 del self.partials[i]
-        self.command = Entry(self.partials[indent].resolvables + command.resolvables)
+        self.command = Entry(self.partials[indent].resolvables + suffix.resolvables)
         self.indent = indent
 
     def fire(self):
