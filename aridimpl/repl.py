@@ -82,7 +82,7 @@ class Repl:
             self.context.execute(command)
         except UnsupportedEntryException:
             self.prefix = command
-        except (NoSuchPathException, OSError): # XXX: Or just any exception?
+        except:
             if not self.interactive:
                 raise
             traceback.print_exc(0)
