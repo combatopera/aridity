@@ -101,11 +101,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
                 self.resolvables['here',] = oldhere
 
     def execute(self, entry):
-        words = entry.words()
-        if not words:
-            return
         directives = []
-        for i, word in enumerate(words):
+        for i, word in enumerate(entry.words()):
             try:
                 d = lookup.get(word)
             except TypeError:
