@@ -65,10 +65,10 @@ class Repl:
             raise MalformedEntryException(command)
         if len(indent) <= len(self.indent):
             self.fire()
+            if indent not in self.partials:
+                raise NoSuchIndentException(command)
         else:
             self.partials[indent] = self.command
-        if indent not in self.partials:
-            raise NoSuchIndentException(command)
         for i in list(self.partials):
             if len(indent) < len(i):
                 del self.partials[i]
