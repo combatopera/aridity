@@ -19,7 +19,6 @@ import unittest, tempfile, collections
 from .grammar import loader as l
 from .model import Text, Stream
 from .context import Context, NoSuchPathException
-from .util import OrderedDict
 from .repl import Repl
 
 class TestContext(unittest.TestCase):
@@ -51,10 +50,10 @@ class TestContext(unittest.TestCase):
         for entry in l(text):
             context.execute(entry)
         ae = self.assertEqual
-        ae(Text('uno'), context.resolved('v', 'one', '1', 'un'))
-        ae([Text('uno')], list(context.resolved('v', 'one', '1')))
-        ae([[Text('uno')]], [list(x) for x in context.resolved('v', 'one')])
-        ae([[[Text('uno')]]], [[list(y) for y in x] for x in context.resolved('v')])
+        ae('uno', context.resolved('v', 'one', '1', 'un').unravel())
+        ae({'un': 'uno'}, context.resolved('v', 'one', '1').unravel())
+        ae({'1': {'un': 'uno'}}, context.resolved('v', 'one').unravel())
+        ae({'one': {'1': {'un': 'uno'}}}, context.resolved('v').unravel())
 
     def test_fork(self):
         self.fork('hmm = woo\nv = $list()\nv one = $fork()\nv one 1 = uno\nv two = $fork()\n\r\r\nv two hmm = yay')
@@ -68,11 +67,11 @@ class TestContext(unittest.TestCase):
             context.execute(entry)
         ae = self.assertEqual
         ae(Text('uno'), context.resolved('v', 'one', '1'))
-        ae(OrderedDict([('1', Text('uno'))]), context.resolved('v', 'one').objs)
-        ae(OrderedDict([('hmm', Text('yay'))]), context.resolved('v', 'two').objs)
+        ae({'1': 'uno'}, context.resolved('v', 'one').unravel())
+        ae({'hmm': 'yay'}, context.resolved('v', 'two').unravel())
         ae(Text('woo'), context.resolved('v', 'one').resolved('hmm'))
         ae(Text('yay'), context.resolved('v', 'two').resolved('hmm'))
-        ae([OrderedDict([('1', Text('uno'))]), OrderedDict([('hmm', Text('yay'))])], [f.objs for f in context.resolved('v')])
+        ae({'one': {'1': 'uno'}, 'two': {'hmm': 'yay'}}, context.resolved('v').unravel())
 
     def test_absent(self):
         c = Context()
