@@ -144,6 +144,12 @@ class Context(AbstractContext):
         for name, r in self.resolvables.items():
             if name is not None:
                 c.resolvables[name] = r
+        defaults = self.resolvables.get(None)
+        if defaults is not None:
+            for item in c.resolvables:
+                for dn, dr in defaults.resolvables.items():
+                    if dn not in item.resolvables.keys():
+                        item.resolvables[dn] = dr
         return c
 
     def createchild(self, **kwargs):
