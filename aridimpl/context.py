@@ -42,6 +42,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             if that is None:
                 that = Context(self)
                 self.resolvables[name,] = that
+            else:
+                that = that.resolve(self)
             self = that
         self.resolvables[path[-1:]] = resolvable
 
