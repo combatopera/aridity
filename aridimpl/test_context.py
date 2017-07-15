@@ -40,20 +40,25 @@ class TestContext(unittest.TestCase):
         ae('yo', c.resolved('write').unravel())
 
     def test_modifiers(self):
-        self.modifiers('v := $list()\nv one := $list()\nv one 1 := $list()\nv one 1 un = uno')
+        context = self.modifiers('v := $list()\nv one := $list()\nv one 1 := $list()\nv one 1 un = uno')
+        ae = self.assertEqual
+        ae(['uno'], context.resolved('v', 'one', '1').unravel())
+        ae([['uno']], context.resolved('v', 'one').unravel())
+        ae([[['uno']]], context.resolved('v').unravel())
 
     def test_modifiers2(self):
-        self.modifiers('v one 1 un = uno')
+        context = self.modifiers('v one 1 un = uno')
+        ae = self.assertEqual
+        ae({'un': 'uno'}, context.resolved('v', 'one', '1').unravel())
+        ae({'1': {'un': 'uno'}}, context.resolved('v', 'one').unravel())
+        ae({'one': {'1': {'un': 'uno'}}}, context.resolved('v').unravel())
 
     def modifiers(self, text):
         context = Context()
         for entry in l(text):
             context.execute(entry)
-        ae = self.assertEqual
-        ae('uno', context.resolved('v', 'one', '1', 'un').unravel())
-        ae({'un': 'uno'}, context.resolved('v', 'one', '1').unravel())
-        ae({'1': {'un': 'uno'}}, context.resolved('v', 'one').unravel())
-        ae({'one': {'1': {'un': 'uno'}}}, context.resolved('v').unravel())
+        self.assertEqual('uno', context.resolved('v', 'one', '1', 'un').unravel())
+        return context
 
     def test_fork(self):
         c = self.fork('hmm = woo\nv := $list()\nv one := $fork()\nv one 1 = uno\nv two := $fork()\n\r\r\nv two hmm = yay')
