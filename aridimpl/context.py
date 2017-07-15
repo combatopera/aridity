@@ -49,10 +49,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return self
 
     def getresolvable(self, name):
-        try:
-            return self.resolvables[name]
-        except KeyError:
-            return self.parent.getresolvable(name)
+        r = self.resolvables.get(name)
+        return self.parent.getresolvable(name) if r is None else r
 
     def resolved(self, *path, **kwargs):
         for name, kwargs in zip(path, [{}] * (len(path) - 1) + [kwargs]):
