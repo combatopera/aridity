@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Fork, Stream, Resolvable
+from .model import Function, Text, Stream, Resolvable
 from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -37,7 +37,13 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        self.resolvables[path] = resolvable
+        for name in path[:-1]:
+            that = self.resolvables.get((name,))
+            if that is None:
+                that = Context(self)
+                self.resolvables[name,] = that
+            self = that
+        self.resolvables[path[-1:]] = resolvable
 
     def pathsimpl(self, paths):
         self.parent.pathsimpl(paths)
@@ -55,36 +61,19 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             return self.parent.getresolvable(path)
 
     def resolved(self, *path, **kwargs):
-        n = len(path)
         if len(path) > 1:
-            return self.subcontext(path[:-1]).resolved(path[-1], **kwargs)
-        modpaths = OrderedSet()
-        for modpath in self.resolvables.keys():
-            try: star = modpath.index(None)
-            except: star = -1
-            if -1 == star:
-                if modpath != path and modpath[:n] == path:
-                    modpaths.add(modpath[:n + 1])
-            elif star < n:
-                path2 = tuple((x if i != star else None) for i, x in enumerate(path))
-                if modpath != path2 and modpath[:n] == path2:
-                    modpaths.add(modpath[:n + 1])
-        try:
-            resolvable = self.getresolvable(path)
-            found = True
-        except NoSuchPathException:
-            if not modpaths:
-                raise
-            found = False
-        obj = resolvable.resolve(self, **kwargs) if found else Fork(self)
-        try:
-            modify = obj.modify
-        except AttributeError:
-            return obj
-        modcontext = self.subcontext(path)
-        for modpath in modpaths:
-            modify(modpath[n], modcontext.resolved(*modpath))
-        return obj
+            return self.resolved(path[0]).resolved(*path[1:], **kwargs)
+        else:
+            return self.getresolvable(path).resolve(self, **kwargs)
+
+    def resolve(self, that, **kwargs):
+        return self
+
+    def unravel(self):
+        return OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
+
+    def __iter__(self):
+        return iter(self.resolvables)
 
     def source(self, prefix, path):
         oldhere = self.resolvables.get(('here',))
