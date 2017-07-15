@@ -29,14 +29,14 @@ class TestContext(unittest.TestCase):
             repl('x = y')
             repl('x2 = y $.(=) z') # FIXME: Quote should work too.
             repl('blank =')
-            repl('= blank')
+            repl("$'() = blank")
             repl('$.(write) = yo')
             repl('write yo')
         ae = self.assertEqual
         ae('y', c.resolved('x').unravel())
         ae('y = z', c.resolved('x2').unravel())
         ae('', c.resolved('blank').unravel())
-        ae('blank', c.resolvables[()].unravel())
+        ae('blank', c.resolved('').unravel())
         ae('yo', c.resolved('write').unravel())
 
     def test_modifiers(self):

@@ -38,16 +38,17 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
         for name in path[:-1]:
-            that = self.resolvables.get((name,))
+            that = self.resolvables.get(name)
             if that is None:
                 that = Context(self)
-                self.resolvables[name,] = that
+                self.resolvables[name] = that
             self = that
-        self.resolvables[path[-1:]] = resolvable
+        self.resolvables[path[-1]] = resolvable
 
     def pathsimpl(self, paths):
         self.parent.pathsimpl(paths)
-        paths.update(self.resolvables.keys())
+        for name in self.resolvables.keys():
+            paths.add((name,))
 
     def paths(self):
         paths = OrderedSet()
@@ -55,8 +56,9 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
         return paths
 
     def getresolvable(self, path):
+        name, = path
         try:
-            return self.resolvables[path]
+            return self.resolvables[name]
         except KeyError:
             return self.parent.getresolvable(path)
 
@@ -66,15 +68,15 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
         return self
 
     def unravel(self):
-        d = OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
+        d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items() if k is not None)
         return list(d) if self.islist else d
 
     def __iter__(self):
         return iter(self.resolvables)
 
     def source(self, prefix, path):
-        oldhere = self.resolvables.get(('here',))
-        self.resolvables['here',] = Text(os.path.dirname(path))
+        oldhere = self.resolvables.get('here')
+        self.resolvables['here'] = Text(os.path.dirname(path))
         try:
             with Repl(self, rootprefix = prefix) as repl:
                 with open(path) as f:
@@ -82,9 +84,9 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
                         repl(line)
         finally:
             if oldhere is None:
-                del self.resolvables['here',]
+                del self.resolvables['here']
             else:
-                self.resolvables['here',] = oldhere
+                self.resolvables['here'] = oldhere
 
     def execute(self, entry):
         directives = []
@@ -107,7 +109,7 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
             while True:
                 try: d = c.resolvables
                 except AttributeError: break
-                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, ' '.join(str(w) for w in path), r) for path, r in d.items()))
+                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
                 c = c.parent
         return eol.join(g())
 
