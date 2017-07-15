@@ -61,8 +61,6 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
             return self.parent.getresolvable(path)
 
     def resolved(self, *path, **kwargs):
-        if not path:
-            return self
         for name in path[:-1]:
             self = self.getresolvable((name,)).resolve(self)
         return self.getresolvable(path[-1:]).resolve(self, **kwargs)
