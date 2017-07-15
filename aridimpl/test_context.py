@@ -226,7 +226,7 @@ class TestContext(unittest.TestCase):
             with Repl(context) as repl:
                 repl.printf("ns . %s", f.name)
         ae = self.assertEqual
-        ae({'ns': {'woo': 'yay'}}, context.unravel())
+        ae({'ns': {'woo': 'yay'}}, context.resolved().unravel())
         ae({'woo': 'yay'}, context.resolved('ns').unravel())
         ae('yay', context.resolved('ns', 'woo').unravel())
 
