@@ -163,3 +163,6 @@ class Context(AbstractContext):
             return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
         else:
             return "(%s)" % ' '.join(x.resolve(self).tobash() for x in self)
+
+    def tojava(self):
+        return Text(''.join("%s %s\n" % (k, v.resolve(self).unravel()) for k, v in self.resolvables.items())) # TODO: Escaping.
