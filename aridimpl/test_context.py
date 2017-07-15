@@ -147,6 +147,16 @@ class TestContext(unittest.TestCase):
         ae([True, False], context.resolved('x', 'y', aslist = True).unravel())
         ae([True, False], context.resolved('tf').unravel())
 
+    def test_aslistemptypath(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x = y z')
+        ae = self.assertEqual
+        ae('y z', c.resolved('x').unravel())
+        ae(['y', 'z'], c.resolved('x', aslist = True).unravel())
+        ae({'x': 'y z'}, c.resolved().unravel())
+        ae({'x': 'y z'}, c.resolved(aslist = True).unravel()) # XXX: Really?
+
     def test_donotresolvewholeforktogetonething(self):
         context = Context()
         with Repl(context) as repl:
