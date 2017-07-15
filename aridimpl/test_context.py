@@ -245,4 +245,4 @@ class TestContext(unittest.TestCase):
             repl('x paths += yay')
             repl('y paths = $(x paths)')
         ae = self.assertEqual
-        ae(['woo', 'yay'], context.resolved('y', 'paths').unravel())
+        ae({'woo': 'woo', 'yay': 'yay'}, context.resolved('y', 'paths').unravel())
