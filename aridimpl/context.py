@@ -74,7 +74,8 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
         return self
 
     def unravel(self):
-        return OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
+        d = OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
+        return list(d) if self.islist else d
 
     def __iter__(self):
         return iter(self.resolvables)
@@ -161,8 +162,9 @@ supercontext = SuperContext()
 
 class Context(AbstractContext):
 
-    def __init__(self, parent = supercontext):
+    def __init__(self, parent = supercontext, islist = False):
         super(Context, self).__init__(parent)
+        self.islist = islist
 
-    def createchild(self):
-        return type(self)(self)
+    def createchild(self, **kwargs):
+        return type(self)(self, **kwargs)

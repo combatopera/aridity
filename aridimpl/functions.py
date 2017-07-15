@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Text, List, Fork, Number
+from .model import Text, List, Number
 from .util import allfunctions, NoSuchPathException, realname
 
 class Functions:
@@ -80,10 +80,13 @@ class Functions:
         return resolvable.resolve(context).tojava()
 
     def list(context, *resolvables):
-        return List([r.resolve(context) for r in resolvables])
+        v = context.createchild(islist = True)
+        for r in resolvables:
+            v[r.unparse(),] = r
+        return v
 
     def fork(context):
-        return Fork(context)
+        return context.createchild()
 
     @realname('try')
     def try_(context, *resolvables):

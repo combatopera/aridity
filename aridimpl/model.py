@@ -16,7 +16,6 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 import itertools
-from .util import OrderedDict
 
 class Struct(object):
 
@@ -189,49 +188,6 @@ class List(Resolved):
 
     def unravel(self):
         return list(x.unravel() for x in self)
-
-class Fork(Resolved):
-
-    def __init__(self, parent):
-        self.objs = OrderedDict()
-        self.parent = parent
-
-    def __setitem__(self, path, obj):
-        name, = path
-        self.objs[name] = obj
-
-    def modify(self, name, obj):
-        self.objs[name] = obj
-
-    def getresolvable(self, path):
-        if 1 == len(path):
-            try:
-                return self.objs[path[0]]
-            except KeyError:
-                pass
-        return self.parent.getresolvable(path)
-
-    def resolved(self, *path, **kwargs):
-        return self.getresolvable(path).resolve(self, **kwargs)
-
-    def __iter__(self):
-        return iter(self.objs)
-
-    def createchild(self):
-        return type(self)(self)
-
-    def unravel(self):
-        # XXX: Add ancestor items?
-        return OrderedDict([k, v.unravel()] for k, v in self.objs.items())
-
-    def tobash(self, toplevel = False):
-        if toplevel:
-            return ''.join("%s=%s\n" % (name, obj.tobash()) for name, obj in self.objs.items())
-        else:
-            return "(%s)" % ' '.join(x.tobash() for x in self)
-
-    def tojava(self):
-        return Text(''.join("%s %s\n" % (k, v.unravel()) for k, v in self.objs.items())) # TODO: Escaping.
 
 class Function(Resolved):
 
