@@ -61,10 +61,12 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             return self.parent.getresolvable(path)
 
     def resolved(self, *path, **kwargs):
-        if len(path) > 1:
-            return self.resolved(path[0]).resolved(*path[1:], **kwargs)
-        else:
+        if not path:
+            return self
+        elif 1 == len(path):
             return self.getresolvable(path).resolve(self, **kwargs)
+        else:
+            return self.resolved(path[0]).resolved(*path[1:], **kwargs)
 
     def resolve(self, that, **kwargs):
         return self
