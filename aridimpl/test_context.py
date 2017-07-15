@@ -40,7 +40,7 @@ class TestContext(unittest.TestCase):
         ae('yo', c.resolved('write').unravel())
 
     def test_modifiers(self):
-        self.modifiers('v = $list()\nv one = $list()\nv one 1 = $list()\nv one 1 un = uno')
+        self.modifiers('v := $list()\nv one := $list()\nv one 1 := $list()\nv one 1 un = uno')
 
     def test_modifiers2(self):
         self.modifiers('v one 1 un = uno')
@@ -56,10 +56,12 @@ class TestContext(unittest.TestCase):
         ae({'one': {'1': {'un': 'uno'}}}, context.resolved('v').unravel())
 
     def test_fork(self):
-        self.fork('hmm = woo\nv = $list()\nv one = $fork()\nv one 1 = uno\nv two = $fork()\n\r\r\nv two hmm = yay')
+        c = self.fork('hmm = woo\nv := $list()\nv one := $fork()\nv one 1 = uno\nv two := $fork()\n\r\r\nv two hmm = yay')
+        self.assertEqual([{'1': 'uno'}, {'hmm': 'yay'}], c.resolved('v').unravel())
 
     def test_fork2(self):
-        self.fork('hmm = woo\nv one 1 = uno\n\r\r\nv two hmm = yay')
+        c = self.fork('hmm = woo\nv one 1 = uno\n\r\r\nv two hmm = yay')
+        self.assertEqual({'one': {'1': 'uno'}, 'two': {'hmm': 'yay'}}, c.resolved('v').unravel())
 
     def fork(self, text):
         context = Context()
@@ -71,7 +73,7 @@ class TestContext(unittest.TestCase):
         ae({'hmm': 'yay'}, context.resolved('v', 'two').unravel())
         ae(Text('woo'), context.resolved('v', 'one').resolved('hmm'))
         ae(Text('yay'), context.resolved('v', 'two').resolved('hmm'))
-        ae({'one': {'1': 'uno'}, 'two': {'hmm': 'yay'}}, context.resolved('v').unravel())
+        return context
 
     def test_absent(self):
         c = Context()

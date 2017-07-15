@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Stream, Resolvable
+from .model import Function, Text, Stream, Resolvable, Resolved
 from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -26,7 +26,7 @@ class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
-class AbstractContext(object): # TODO LATER: Some methods should probably be moved to Context.
+class AbstractContext(Resolved): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
         self.resolvables = OrderedDict()
@@ -42,8 +42,6 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             if that is None:
                 that = Context(self)
                 self.resolvables[name,] = that
-            else:
-                that = that.resolve(self)
             self = that
         self.resolvables[path[-1:]] = resolvable
 
@@ -69,9 +67,6 @@ class AbstractContext(object): # TODO LATER: Some methods should probably be mov
             return self.getresolvable(path).resolve(self, **kwargs)
         else:
             return self.resolved(path[0]).resolved(*path[1:], **kwargs)
-
-    def resolve(self, that, **kwargs):
-        return self
 
     def unravel(self):
         d = OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
