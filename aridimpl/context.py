@@ -37,13 +37,16 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        for name in path[:-1]:
+        self.subcontext(path[:-1]).resolvables[path[-1]] = resolvable
+
+    def subcontext(self, path):
+        for name in path:
             that = self.resolvables.get(name)
             if that is None:
                 that = Context(self)
                 self.resolvables[name] = that
             self = that
-        self.resolvables[path[-1]] = resolvable
+        return self
 
     def pathsimpl(self, paths):
         self.parent.pathsimpl(paths)
@@ -55,16 +58,15 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
         self.pathsimpl(paths)
         return paths
 
-    def getresolvable(self, path):
-        name, = path
+    def getresolvable(self, name):
         try:
             return self.resolvables[name]
         except KeyError:
-            return self.parent.getresolvable(path)
+            return self.parent.getresolvable(name)
 
     def resolved(self, *path, **kwargs):
         for name, kwargs in zip(path, [{}] * (len(path) - 1) + [kwargs]):
-            self = self.getresolvable((name,)).resolve(self, **kwargs)
+            self = self.getresolvable(name).resolve(self, **kwargs)
         return self
 
     def unravel(self):
@@ -113,16 +115,6 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
                 c = c.parent
         return eol.join(g())
 
-    def subcontext(self, path):
-        for name in path:
-            paths = self.paths()
-            self = Context(self)
-            for word in None, name:
-                for path in paths:
-                    if len(path) > 1 and word == path[0]:
-                        self[path[1:]] = self.parent.getresolvable(path)
-        return self
-
 class SuperContext(AbstractContext):
 
     class EmptyContext:
@@ -130,8 +122,8 @@ class SuperContext(AbstractContext):
         def pathsimpl(self, paths):
             pass
 
-        def getresolvable(self, path):
-            raise NoSuchPathException(path)
+        def getresolvable(self, name):
+            raise NoSuchPathException(name)
 
     def __init__(self):
         super(SuperContext, self).__init__(self.EmptyContext())
