@@ -49,7 +49,7 @@ class Functions:
             kname = kname.resolve(context).cat()
             vname = vname.resolve(context).cat()
             def g():
-                for k, v in objs.resolve(context).objs.items():
+                for k, v in objs.resolve(context).resolvables.items():
                     c = context.createchild()
                     c[kname,] = Text(k)
                     c[vname,] = v
