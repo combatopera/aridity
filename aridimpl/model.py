@@ -180,9 +180,6 @@ class List(Resolved):
     def __init__(self, objs):
         self.objs = objs
 
-    def modify(self, name, obj):
-        self.objs.append(obj)
-
     def __iter__(self):
         return iter(self.objs)
 
