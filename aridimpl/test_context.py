@@ -162,8 +162,11 @@ class TestContext(unittest.TestCase):
             repl('hmm item woo = itemYay')
             repl('hmm item2 x = y')
             repl("hmm $.(*) woo2 = yay2")
-        items = context.resolved('hmm').unravel()
         ae = self.assertEqual
+        ae({'woo': 'yay', 'x': 'y'}, context.resolved('hmm', 'item2').unravel())
+        ae({'woo': 'yay', 'woo2': 'yay2'}, context.resolved('hmm', '*').unravel())
+        ae({'woo': 'itemYay'}, context.resolved('hmm', 'item').unravel())
+        items = context.resolved('hmm').unravel()
         ae('itemYay', items['item']['woo'])
         ae('y', items['item2']['x'])
         ae('yay2', items['*']['woo2'])
