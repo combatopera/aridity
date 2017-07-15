@@ -63,10 +63,9 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
     def resolved(self, *path, **kwargs):
         if not path:
             return self
-        elif 1 == len(path):
-            return self.getresolvable(path).resolve(self, **kwargs)
-        else:
-            return self.resolved(path[0]).resolved(*path[1:], **kwargs)
+        for name in path[:-1]:
+            self = self.getresolvable((name,)).resolve(self)
+        return self.getresolvable(path[-1:]).resolve(self, **kwargs)
 
     def unravel(self):
         d = OrderedDict([k[0], v.resolve(self).unravel()] for k, v in self.resolvables.items() if k[0] is not None)
