@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Function, Text, Stream, Resolvable, Resolved
-from .util import OrderedSet, NoSuchPathException, UnsupportedEntryException, OrderedDict
+from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
 from .repl import Repl
@@ -47,16 +47,6 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
                 self.resolvables[name] = that
             self = that
         return self
-
-    def pathsimpl(self, paths):
-        self.parent.pathsimpl(paths)
-        for name in self.resolvables.keys():
-            paths.add((name,))
-
-    def paths(self):
-        paths = OrderedSet()
-        self.pathsimpl(paths)
-        return paths
 
     def getresolvable(self, name):
         try:
@@ -118,9 +108,6 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
 class SuperContext(AbstractContext):
 
     class EmptyContext:
-
-        def pathsimpl(self, paths):
-            pass
 
         def getresolvable(self, name):
             raise NoSuchPathException(name)
