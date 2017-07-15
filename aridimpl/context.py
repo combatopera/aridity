@@ -66,19 +66,24 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def __iter__(self):
         return iter(self.resolvables)
 
-    def source(self, prefix, path):
-        oldhere = self.resolvables.get('here')
-        self.resolvables['here'] = Text(os.path.dirname(path))
+    def temporarily(self, name, resolvable, block):
+        oldornone = self.resolvables.get(name)
+        self.resolvables[name] = resolvable
         try:
+            return block()
+        finally:
+            if oldornone is None:
+                del self.resolvables[name]
+            else:
+                self.resolvables[name] = oldornone
+
+    def source(self, prefix, path):
+        def block():
             with Repl(self, rootprefix = prefix) as repl:
                 with open(path) as f:
                     for line in f:
                         repl(line)
-        finally:
-            if oldhere is None:
-                del self.resolvables['here']
-            else:
-                self.resolvables['here'] = oldhere
+        self.temporarily('here', Text(os.path.dirname(path)), block)
 
     def execute(self, entry):
         directives = []
