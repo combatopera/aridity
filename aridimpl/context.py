@@ -159,3 +159,9 @@ class Context(AbstractContext):
 
     def createchild(self, **kwargs):
         return type(self)(self, **kwargs)
+
+    def tobash(self, toplevel = False):
+        if toplevel:
+            return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
+        else:
+            return "(%s)" % ' '.join(x.resolve(self).tobash() for x in self)
