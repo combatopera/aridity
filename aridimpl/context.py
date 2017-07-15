@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Function, Text, Stream, Resolvable, Resolved
+from .model import Function, Text, Stream, Resolvable
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -26,7 +26,7 @@ class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
-class AbstractContext(Resolved): # TODO LATER: Some methods should probably be moved to Context.
+class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
         self.resolvables = OrderedDict()
@@ -60,7 +60,7 @@ class AbstractContext(Resolved): # TODO LATER: Some methods should probably be m
         return self
 
     def unravel(self):
-        d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items() if k is not None)
+        d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
         return list(d) if self.islist else d
 
     def __iter__(self):
@@ -138,6 +138,13 @@ class Context(AbstractContext):
     def __init__(self, parent = supercontext, islist = False):
         super(Context, self).__init__(parent)
         self.islist = islist
+
+    def resolve(self, context):
+        c = Context(self.parent, self.islist)
+        for name, r in self.resolvables.items():
+            if name is not None:
+                c.resolvables[name] = r
+        return c
 
     def createchild(self, **kwargs):
         return type(self)(self, **kwargs)
