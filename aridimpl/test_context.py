@@ -266,3 +266,14 @@ class TestContext(unittest.TestCase):
             repl('y paths = $(x paths)')
         ae = self.assertEqual
         ae({'woo': 'woo', 'yay': 'yay'}, context.resolved('y', 'paths').unravel())
+
+    def test_commandarg(self):
+        base = Context()
+        with Repl(base) as repl:
+            repl('my command = do $(arg)')
+        tmp = base.createchild()
+        with Repl(tmp) as repl:
+            repl('arg = myval')
+        # Doesn't matter where my command was found, it should be resolved against tmp:
+        self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
+        self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
