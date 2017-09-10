@@ -128,7 +128,7 @@ class Text(Cat, Scalar):
         return self
 
     def tobash(self):
-        return self.value
+        return "'%s'" % self.value.replace("'", r"'\''")
 
 class Number(Scalar):
 
