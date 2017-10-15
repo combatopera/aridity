@@ -28,5 +28,6 @@ def configpath(configname):
 
 def main():
     context = Context()
+    # XXX: Don't use PATH if arg contains a name separator?
     context.source(Entry([]), configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
