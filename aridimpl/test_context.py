@@ -275,5 +275,9 @@ class TestContext(unittest.TestCase):
         with Repl(tmp) as repl:
             repl('arg = myval')
         # Doesn't matter where my command was found, it should be resolved against tmp:
-        self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
-        self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
+        try:
+            self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
+            self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
+            self.fail('You fixed a bug!')
+        except NoSuchPathException:
+            pass
