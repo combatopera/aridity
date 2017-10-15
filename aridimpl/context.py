@@ -43,8 +43,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         for name in path:
             that = self.resolvables.get(name)
             if that is None:
-                that = Context(self)
-                self.resolvables[name] = that
+                self.resolvables[name] = that = Context(self)
             self = that
         return self
 
@@ -93,7 +92,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if d is not None:
                 directives.append((d, i))
         if 1 != len(directives):
-            raise UnsupportedEntryException(entry)
+            raise UnsupportedEntryException(entry) # TODO: Describe the error.
         d, i = directives[0]
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
