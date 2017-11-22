@@ -20,6 +20,8 @@ from aridimpl.context import Context
 from aridimpl.model import Entry
 
 def configpath(configname):
+    if os.sep in configname:
+        return configname
     for parent in os.environ['PATH'].split(os.pathsep):
         path = os.path.join(parent, configname)
         if os.path.exists(path):
@@ -28,6 +30,5 @@ def configpath(configname):
 
 def main():
     context = Context()
-    # XXX: Don't use PATH if arg contains a name separator?
     context.source(Entry([]), configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
