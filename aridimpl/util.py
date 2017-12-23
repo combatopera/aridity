@@ -58,8 +58,8 @@ class OrderedDict(OrderedDictWrapper):
     def __delitem__(self, k):
         del self.d[k]
 
-    def get(self, k):
-        return self.d.get(k)
+    def get(self, k, default = None):
+        return self.d.get(k, default)
 
     def keys(self):
         return self.d.keys()
