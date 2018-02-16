@@ -71,7 +71,7 @@ class Functions:
 
     @realname(',') # XXX: Oh yeah?
     def aslist(context, *resolvables):
-        return context.resolved(*(r.resolve(context).cat() for r in resolvables), aslist = True)
+        return context.resolved(*(r.resolve(context).cat() for r in resolvables), **{'aslist': True})
 
     def str(context, resolvable):
         return resolvable.resolve(context).totext()

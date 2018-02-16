@@ -23,7 +23,7 @@ import re
 class AnyScalar:
 
     numberpattern = re.compile('^-?(?:[0-9]+|[0-9]*[.][0-9]+)$')
-    booleans = {str(x).lower(): Boolean(x) for x in [True, False]}
+    booleans = dict([str(x).lower(), Boolean(x)] for x in [True, False])
 
     @classmethod
     def pa(cls, s, l, t):

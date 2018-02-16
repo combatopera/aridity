@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
 from .model import Function, Text, Stream, Resolvable
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
