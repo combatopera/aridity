@@ -64,6 +64,9 @@ class OrderedDict(OrderedDictWrapper):
     def keys(self):
         return self.d.keys()
 
+    def values(self):
+        return self.d.values()
+
     def items(self):
         return self.d.items()
 
