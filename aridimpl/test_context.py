@@ -281,3 +281,13 @@ class TestContext(unittest.TestCase):
             self.fail('You fixed a bug!')
         except NoSuchPathException:
             pass
+
+    def test_blanklines(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('')
+            repl('woo = yay')
+            repl('')
+            repl('woo2 = yay2')
+            repl('')
+        self.assertEqual({'woo': 'yay', 'woo2': 'yay2'}, context.resolved().unravel())

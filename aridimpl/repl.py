@@ -76,12 +76,13 @@ class Repl:
         self.indent = indent
 
     def fire(self):
-        try:
-            self.context.execute(self.command)
-        except:
-            if not self.interactive:
-                raise
-            traceback.print_exc(0)
+        if self.command.size():
+            try:
+                self.context.execute(self.command)
+            except:
+                if not self.interactive:
+                    raise
+                traceback.print_exc(0)
 
     def __exit__(self, exc_type, *args):
         if exc_type is None:
