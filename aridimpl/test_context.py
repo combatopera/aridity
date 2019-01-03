@@ -291,3 +291,12 @@ class TestContext(unittest.TestCase):
             repl('woo2 = yay2')
             repl('')
         self.assertEqual({'woo': 'yay', 'woo2': 'yay2'}, context.resolved().unravel())
+
+    def test_try(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('woo = yay1')
+            repl('yay1 = $try($(woo) yay2)')
+            repl('yay2 = $try($(xxx) yay2)')
+        self.assertEqual('yay1', context.resolved('yay1').unravel())
+        self.assertEqual('yay2', context.resolved('yay2').unravel())
