@@ -103,6 +103,12 @@ class Functions:
             x *= r.resolve(context).value
         return Number(x)
 
+    def div(context, r, *resolvables):
+        x = r.resolve(context).value
+        for r in resolvables:
+            x /= r.resolve(context).value
+        return Number(x)
+
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))
 
