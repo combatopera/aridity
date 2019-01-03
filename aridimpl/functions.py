@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from .model import Text, List, Number
 from .util import allfunctions, NoSuchPathException, realname
 
