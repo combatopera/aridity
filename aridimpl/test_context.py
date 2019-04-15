@@ -231,7 +231,7 @@ class TestContext(unittest.TestCase):
     def test_nestedinclude(self):
         context = Context()
         with tempfile.NamedTemporaryFile() as f:
-            f.write('woo = yay'.encode())
+            f.write('\t\n\nwoo = yay'.encode()) # Blank lines should be ignored.
             f.flush()
             with Repl(context) as repl:
                 repl.printf("ns . %s", f.name)

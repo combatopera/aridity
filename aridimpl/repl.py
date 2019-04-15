@@ -42,6 +42,7 @@ class Repl:
         self.stack = []
         self.indent = ''
         self.command = Entry([Text(':')])
+        self.commandsize = self.command.size()
         self.partials = {'': rootprefix}
         self.context = context
         self.interactive = interactive
@@ -73,10 +74,11 @@ class Repl:
             if len(indent) < len(i):
                 del self.partials[i]
         self.command = Entry(self.partials[indent].resolvables + suffix.resolvables)
+        self.commandsize = Entry(suffix.resolvables).size()
         self.indent = indent
 
     def fire(self):
-        if self.command.size():
+        if self.commandsize:
             try:
                 self.context.execute(self.command)
             except:
