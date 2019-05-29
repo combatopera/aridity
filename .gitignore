@@ -1,3 +1,5 @@
+/var/
+#gclean
 __pycache__/
 *.pyc
 *.class
