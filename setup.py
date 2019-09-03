@@ -19,5 +19,6 @@ import setuptools
 
 setuptools.setup(
         name = 'aridity',
-        version = '3-SNAPSHOT',
-        packages = setuptools.find_packages())
+        version = '3',
+        packages = setuptools.find_packages(),
+        py_modules = ['aridity'])
