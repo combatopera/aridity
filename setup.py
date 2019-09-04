@@ -19,7 +19,7 @@ import setuptools
 
 setuptools.setup(
         name = 'aridity',
-        version = '4',
+        version = '5-SNAPSHOT',
         install_requires = ['pyparsing'],
         packages = setuptools.find_packages(),
         py_modules = ['aridity'])
