@@ -3,3 +3,6 @@
 __pycache__/
 *.pyc
 *.class
+/aridity.egg-info/
+/build/
+/dist/
