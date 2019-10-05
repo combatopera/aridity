@@ -5,3 +5,5 @@ __pycache__/
 /aridity.egg-info/
 /build/
 /dist/
+/setup.py
+/setup.cfg
