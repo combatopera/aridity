@@ -1,5 +1,0 @@
-{|
-! master
-|-
-| [[Image:https://travis-ci.org/combatopera/aridity.svg?branch=master]]
-|}
