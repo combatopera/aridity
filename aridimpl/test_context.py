@@ -312,5 +312,6 @@ class TestContext(unittest.TestCase):
             repl('\t\tparent foo = u')
         self.assertEqual('e', context.resolved('root', 'eranu', 'parent', 'foo').unravel())
         self.assertEqual('u', context.resolved('root', 'uvavu', 'parent', 'foo').unravel())
+        self.assertEqual('x', context.resolved('root', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'eranu', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'uvavu', 'parent', 'bar').unravel())
