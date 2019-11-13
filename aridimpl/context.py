@@ -48,14 +48,20 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             self = that
         return self
 
-    def getresolvable(self, name):
+    def getresolvables(self, name, append):
         r = self.resolvables.get(name)
-        return self.parent.getresolvable(name) if r is None else r
+        if r is not None:
+            append(r)
+        self.parent.getresolvables(name, append)
 
     def resolved(self, *path, **kwargs):
         if not path:
             return self
-        resolvable = self.getresolvable(path[0])
+        resolvables = []
+        self.getresolvables(path[0], resolvables.append)
+        if not resolvables:
+            raise NoSuchPathException(path[0])
+        resolvable = resolvables[0]
         tail = path[1:]
         return resolvable.resolve(self).resolved(*tail, **kwargs) if tail else resolvable.resolve(self, **kwargs)
 
@@ -114,8 +120,8 @@ class SuperContext(AbstractContext):
 
     class EmptyContext:
 
-        def getresolvable(self, name):
-            raise NoSuchPathException(name)
+        def getresolvables(self, name, append):
+            pass
 
     def __init__(self):
         super(SuperContext, self).__init__(self.EmptyContext())
