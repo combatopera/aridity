@@ -300,3 +300,17 @@ class TestContext(unittest.TestCase):
             repl('yay2 = $try($(xxx) yay2)')
         self.assertEqual('yay1', context.resolved('yay1').unravel())
         self.assertEqual('yay2', context.resolved('yay2').unravel())
+
+    def test_findpath(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl('root')
+            repl('\tparent bar = x')
+            repl('\teranu')
+            repl('\t\tparent foo = e')
+            repl('\tuvavu')
+            repl('\t\tparent foo = u')
+        self.assertEqual('e', context.resolved('root', 'eranu', 'parent', 'foo').unravel())
+        self.assertEqual('u', context.resolved('root', 'uvavu', 'parent', 'foo').unravel())
+        self.assertEqual('x', context.resolved('root', 'eranu', 'parent', 'bar').unravel())
+        self.assertEqual('x', context.resolved('root', 'uvavu', 'parent', 'bar').unravel())
