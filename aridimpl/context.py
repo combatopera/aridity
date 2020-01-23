@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .model import Function, Text, Stream, Resolvable
+from .model import Function, Text, Stream, Resolvable, Scalar
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -136,6 +136,7 @@ class SuperContext(AbstractContext):
         self['EOL',] = Text(os.linesep)
         self['stdout',] = Stream(sys.stdout)
         self['/',] = Slash()
+        self['None',] = Scalar(None)
 
 class Slash(Text, Function):
 
