@@ -30,6 +30,10 @@ class Functions:
         text = resolvable.resolve(context).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
+    def groovystr(context, resolvable):
+        text = resolvable.resolve(context).cat()
+        return Text("'%s'" % text.replace('\\', '\\\\').replace('\n', '\\n').replace("'", "\\'"))
+
     def pystr(context, resolvable):
         return Text(repr(resolvable.resolve(context).cat()))
 
