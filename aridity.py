@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright 2017 Andrzej Cichocki
 
 # This file is part of aridity.
@@ -17,18 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
-import sys
-from aridimpl.model import Stream
 from aridimpl.context import Context
+from aridimpl.model import Stream
 from aridimpl.repl import Repl
 
-def main():
-    context = Context()
-    context['stdout',] = Stream(sys.stdout)
-    with Repl(context, True) as repl:
-        for line in sys.stdin:
-            repl(line)
-
-if '__main__' == __name__:
-    main()
+assert Context
+assert Stream
+assert Repl
