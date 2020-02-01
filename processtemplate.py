@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright 2017 Andrzej Cichocki
 
 # This file is part of aridity.
@@ -19,12 +17,9 @@
 
 import aridity, os, sys
 
-def main():
+def main_processtemplate():
     templatepath, = sys.argv[1:]
     with aridity.Repl(aridity.Context()) as repl:
         for line in sys.stdin:
             repl(line)
         repl.printf("< %s", os.path.abspath(templatepath))
-
-if '__main__' == __name__:
-    main()

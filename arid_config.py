@@ -28,7 +28,7 @@ def configpath(configname):
             return path
     raise Exception("Not found: %s" % configname)
 
-def main():
+def main_arid_config():
     context = Context()
     context.source(Entry([]), configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))

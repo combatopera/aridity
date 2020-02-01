@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
+#!/bin/bash
 
-import arid_config
-
-arid_config.main()
+exec arid_config "$@"
