@@ -15,10 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from aridimpl.context import Context
+from __future__ import with_statement
+import sys
 from aridimpl.model import Stream
+from aridimpl.context import Context
 from aridimpl.repl import Repl
 
-assert Context
-assert Stream
-assert Repl
+def main_aridity():
+    context = Context()
+    context['stdout',] = Stream(sys.stdout)
+    with Repl(context, True) as repl:
+        for line in sys.stdin:
+            repl(line)
