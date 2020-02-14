@@ -44,4 +44,32 @@ app1 feature1 data2 = value2
 app2 feature1 data = value3
 app2 feature2 data1 = value4
 app2 feature2 data2 = value5
+
+: The right hand side of an equals is actually an expression.
+: In an expression, a dollar sign with brackets can be used to refer to another path:
+has value
+    bar = $(foo)
+    value3 = $(app2 feature1 data)
+: Round brackets and square brackets have exactly the same effect:
+also has value bar = $[foo]
+
+: To get a literal dollar there is a special form for quoting:
+financial report = $'(We lost $100 on Friday.)
+: Be careful with nested brackets, the first matching bracket ends the special form:
+behaviour
+    expected   = $'[Lunch cost $20 (worth it though).]
+    unexpected = $'(Lunch cost $20 (worth it though).)
+
+: Evaluation is lazy, the expression is what is actually assigned to the path:
+no problem = $(this path will get a value later)
+: If your use-case demands it, you can force eager evaluation:
+bar even if foo changes later := $(foo)
+
+: When evaluating a path the local context is examined first, then its parents if path not found:
+host
+    short path = nope
+    guest short path = yep
+    should be nope = $(short path)
+    guest should be yep = $(short path)
+does not work = $(short path)
 ```
