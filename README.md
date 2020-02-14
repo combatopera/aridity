@@ -52,6 +52,11 @@ has value
     value3 = $(app2 feature1 data)
 : Round brackets and square brackets have exactly the same effect:
 also has value bar = $[foo]
+: Values can be concatenated:
+two bars
+    without spacing = $(foo)$(foo)
+    with one space  = $(foo) $(foo)
+    with 2 spaces   = $(foo)  $(foo)
 
 : To get a literal dollar there is a special form for quoting:
 financial report = $'(We lost $100 on Friday.)
@@ -59,6 +64,16 @@ financial report = $'(We lost $100 on Friday.)
 behaviour
     expected   = $'[Lunch cost $20 (worth it though).]
     unexpected = $'(Lunch cost $20 (worth it though).)
+
+: Another special form can be used to preserve leading/trailing whitespace:
+padded bars = $.( $(foo) $(foo) )
+: Brackets can span multiple lines:
+bar per line
+    without final newline = $.($(foo)
+$(foo))
+    with final newline = $.($(foo)
+$(foo)
+)
 
 : Evaluation is lazy, the expression is what is actually assigned to the path:
 no problem = $(this path will get a value later)
