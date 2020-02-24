@@ -18,7 +18,7 @@
 from __future__ import division
 from .model import Text, List, Number
 from .util import allfunctions, NoSuchPathException, realname
-import shlex
+import json, shlex
 
 class Functions:
 
@@ -44,6 +44,10 @@ class Functions:
 
     def shstr(context, resolvable):
         return Text(shlex.quote(resolvable.resolve(context).cat()))
+
+    def jsonquote(context, resolvable):
+        'Also suitable for YAML.'
+        return Text(json.dumps(resolvable.resolve(context).value))
 
     def map(context, objs, *args):
         if 1 == len(args):
