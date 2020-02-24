@@ -27,6 +27,11 @@ class Functions:
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
     def scstr(context, resolvable):
+        'SuperCollider string literal.'
+        text = resolvable.resolve(context).cat()
+        return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
+
+    def hclstr(context, resolvable):
         text = resolvable.resolve(context).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
