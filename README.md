@@ -25,6 +25,9 @@ foo = bar
 : This does what you'd expect - assign the string value bar to foo.
 : foo is actually a path of length 1, path components are whitespace-separated:
 this is a path = this is a value
+: Any existing assignment can be overridden:
+foo = baz
+this is a path = this is different
 
 : Internal whitespace in values is preserved (leading and trailing whitespace is not):
 two sentences = Some like 2 spaces.  After a full stop.
@@ -75,7 +78,7 @@ $(foo))
 $(foo)
 )
 
-: Evaluation is lazy, the expression is what is actually assigned to the path:
+: Evaluation is lazy, the expression is what is actually (and eagerly) assigned to the path:
 no problem = $(this path will get a value later)
 : If your use-case demands it, you can force eager evaluation:
 bar even if foo changes later := $(foo)
@@ -90,6 +93,7 @@ does not work = $(short path)
 
 : Use the dot directive to include config from another file:
 . /path/to/other/config.arid
+: Thus you can factor out any config that's common to multiple deployments, and override as needed.
 : It's possible (but maybe not so useful) to include under a non-trivial path:
 other stuff . /path/to/other/config.arid
 : There is no default context for relative paths, you must set cwd up-front as inclusion is not lazy:
