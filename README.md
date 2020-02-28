@@ -87,4 +87,12 @@ host
     should be nope = $(short path)
     guest should be yep = $(short path)
 does not work = $(short path)
+
+: Use the dot directive to include config from another file:
+. /path/to/other/config.arid
+: It's possible (but maybe not so useful) to include under a non-trivial path:
+other stuff . /path/to/other/config.arid
+: There is no default context for relative paths, you must set cwd up-front as inclusion is not lazy:
+cwd = /path/to
+. other/config.arid
 ```
