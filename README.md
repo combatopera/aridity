@@ -137,4 +137,4 @@ summary = Person of the Year was $join($map($(person) $.($label() in $(year))) $
 processtemplate app.json.aridt <config.arid >app.json
 ```
 * Conventionally the `"` path is set to the most useful escape function for the target format
-  * One-arg brackets can be elided e.g. `$"$(key)` is the same as `$"($(key))`
+  * Brackets can be elided in function composition e.g. `$"$(key)` is the same as `$"($(key))`
