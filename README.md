@@ -60,6 +60,8 @@ two bars
     without spacing = $(foo)$(foo)
     with one space  = $(foo) $(foo)
     with 2 spaces   = $(foo)  $(foo)
+: A few paths are predefined in every new context, such as:
+home directory = $(~)
 
 : To get a literal dollar there is a special form for quoting:
 financial report = $'(We lost $100 on Friday.)
@@ -99,4 +101,14 @@ other stuff . /path/to/other/config.arid
 : There is no default context for relative paths, you must set cwd up-front as inclusion is not lazy:
 cwd = /path/to
 . other/config.arid
+
+: Text between dollar and open bracket (that isn't a special form) is a function name.
+: A useful function predefined in every new context is the platform slash:
+path = $/($(~) Desktop report.txt)
+: Unlike most functions, / can also be used (less legibly) as a value:
+path = $(~)$(/)Desktop$(/)report.txt
+: All functions are first class objects that can be assigned and overridden in the usual ways:
+slash := $(/)
+/ = something else
+path = $slash($(~) Desktop report.txt)
 ```
