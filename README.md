@@ -111,4 +111,20 @@ path = $(~)$(/)Desktop$(/)report.txt
 slash := $(/)
 / = something else
 path = $slash($(~) Desktop report.txt)
+
+: Simple lists can be created using the plus equals convenience directive.
+: Indentation means you don't have to repeat the directive for every list element:
+years +=
+    2018
+    2019
+years += 2020
+: A predefined join function takes a list and a separator and does what you'd expect:
+copyright = $join($(years) $.(, ))
+: Observe that functions typically take values not identifiers, so you have to 'get' explicitly.
+: Lists are just a special case of nested contexts, which are much more powerful:
+person
+    $.(The Guardians) year = 2018
+    Greta year = 2019
+summary = Person of the Year was $join($map($(person) $.($label() in $(year))) $.(, )).
+: Here the predefined label function gives you access to the last path component of a list element.
 ```
