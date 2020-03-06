@@ -18,7 +18,7 @@
 author = Andrzej Cichocki
 name = aridity
 years += 2017
-deps += pyparsing
+requires += pyparsing
 pyversions +=
     3
     2
