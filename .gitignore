@@ -7,4 +7,3 @@ __pycache__/
 /dist/
 /setup.py
 /setup.cfg
-/nosetests.xml
