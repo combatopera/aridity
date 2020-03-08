@@ -112,6 +112,7 @@ class TestRepl(unittest.TestCase):
         with Repl(context) as repl:
             repl.printf("ddot = %s", Path('..'))
             repl.printf("dot = %s", Path('.'))
+        # XXX: Preserve type?
         self.assertEqual('..', context.resolved('ddot').value)
         self.assertEqual('.', context.resolved('dot').value)
 
