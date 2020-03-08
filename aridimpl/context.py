@@ -76,7 +76,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def __iter__(self):
         return iter(self.resolvables)
 
-    def temporarily(self, name, resolvable, block):
+    def temporarily(self, name, resolvable, block): # FIXME: Retire.
         oldornone = self.resolvables.get(name)
         self.resolvables[name] = resolvable
         try:
