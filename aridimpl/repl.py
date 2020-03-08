@@ -27,15 +27,14 @@ class MalformedEntryException(Exception): pass
 
 class Repl:
 
-    quotable = re.compile(r"^\s+%s*|%s*\s+$|%s+" % (('[$\r\n)]',) * 3))
+    quotable = re.compile('[$)]+')
 
     @classmethod
     def quote(cls, obj):
         try:
-            textliteral = cls.quotable.sub(lambda m: "$'[%s]" % m.group(), obj)
+            return "$.(%s)" % cls.quotable.sub(lambda m: "$'[%s]" % m.group(), obj)
         except TypeError:
             return obj
-        return "$.(%s)" % textliteral # In case it's a directive.
 
     def __init__(self, context, interactive = False, rootprefix = Entry([])):
         self.stack = []
