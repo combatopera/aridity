@@ -30,7 +30,7 @@ class Repl:
     quotablebysquare = re.compile('[$)]+')
 
     @classmethod
-    def quote(cls, obj):
+    def _quote(cls, obj):
         try:
             return "$.(%s)" % cls.quotablebysquare.sub(lambda m: "$'[%s]" % m.group(), obj)
         except TypeError:
@@ -49,7 +49,7 @@ class Repl:
         return self
 
     def printf(self, template, *args): # TODO: Replace with methods corresponding to directives.
-        self(template % tuple(self.quote(a) for a in args))
+        self(template % tuple(self._quote(a) for a in args))
 
     def __call__(self, line):
         try:
