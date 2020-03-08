@@ -99,3 +99,13 @@ class TestRepl(unittest.TestCase):
         self.assertEqual('=', context.resolved('eq', '0', 'als').value)
         self.assertEqual('=', context.resolved('path').value)
         self.assertEqual({'val': 100, 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
+
+    def test_printf2(self):
+        a = ' hello\nthere\ragain\t'
+        b = ' \nhello\n\rthere\r\nagain \t'
+        context = Context()
+        with Repl(context) as repl:
+            repl.printf("a = %s", a)
+            repl.printf("b = %s", b)
+        self.assertEqual(a, context.resolved('a').value)
+        self.assertEqual(b, context.resolved('b').value)
