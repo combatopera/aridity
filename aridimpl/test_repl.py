@@ -87,18 +87,20 @@ class TestRepl(unittest.TestCase):
         context = Context()
         with Repl(context) as repl:
             repl.printf("val = %s", 100)
+            repl.printf("val2 = %s", .34)
             repl.printf("text = %s", 'hello')
             repl.printf("empty = %s", '')
             repl.printf("dot = %s", '.')
             repl.printf("eq 0 als = %s", '=')
             repl.printf("path = $(eq %s %s)", 0, 'als')
         self.assertEqual(100, context.resolved('val').value)
+        self.assertEqual(.34, context.resolved('val2').value)
         self.assertEqual('hello', context.resolved('text').value)
         self.assertEqual('', context.resolved('empty').value)
         self.assertEqual('.', context.resolved('dot').value)
         self.assertEqual('=', context.resolved('eq', '0', 'als').value)
         self.assertEqual('=', context.resolved('path').value)
-        self.assertEqual({'val': 100, 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
+        self.assertEqual({'val': 100, 'val2': .34, 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
 
     def test_printf2(self):
         a = ' hello\nthere\ragain\t'
