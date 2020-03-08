@@ -104,7 +104,10 @@ class TestRepl(unittest.TestCase):
         self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
 
     def test_printfpath(self):
-        from pathlib import Path
+        try:
+            from pathlib import Path
+        except ImportError:
+            return
         context = Context()
         with Repl(context) as repl:
             repl.printf("ddot = %s", Path('..'))
