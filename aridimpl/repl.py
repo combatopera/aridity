@@ -32,6 +32,12 @@ class Repl:
     @classmethod
     def _quote(cls, obj):
         try:
+            from pathlib import PurePath
+            if isinstance(obj, PurePath):
+                obj = str(obj)
+        except ImportError:
+            pass
+        try:
             return "$.(%s)" % cls.quotablebysquare.sub(lambda m: "$'[%s]" % m.group(), obj)
         except TypeError:
             return obj
