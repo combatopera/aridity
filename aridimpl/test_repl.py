@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from .context import Context
-from .repl import Repl, NoSuchIndentException, MalformedEntryException
+from .repl import MalformedEntryException, NoSuchIndentException, Repl
 from .util import UnsupportedEntryException
+from decimal import Decimal
+import unittest
 
 class TestRepl(unittest.TestCase):
 
@@ -94,13 +95,13 @@ class TestRepl(unittest.TestCase):
             repl.printf("eq 0 als = %s", '=')
             repl.printf("path = $(eq %s %s)", 0, 'als')
         self.assertEqual(100, context.resolved('val').value)
-        self.assertEqual(.34, context.resolved('val2').value)
+        self.assertEqual(Decimal('.34'), context.resolved('val2').value)
         self.assertEqual('hello', context.resolved('text').value)
         self.assertEqual('', context.resolved('empty').value)
         self.assertEqual('.', context.resolved('dot').value)
         self.assertEqual('=', context.resolved('eq', '0', 'als').value)
         self.assertEqual('=', context.resolved('path').value)
-        self.assertEqual({'val': 100, 'val2': .34, 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
+        self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
 
     def test_printf2(self):
         a = ' hello\nthere\ragain\t'
