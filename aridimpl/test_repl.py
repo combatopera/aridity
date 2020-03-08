@@ -109,3 +109,11 @@ class TestRepl(unittest.TestCase):
             repl.printf("b = %s", b)
         self.assertEqual(a, context.resolved('a').value)
         self.assertEqual(b, context.resolved('b').value)
+
+    def test_printf3(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl.printf("a = %s", 'x)y')
+            repl.printf("b = %s", 'x]y')
+        self.assertEqual('x)y', context.resolved('a').value)
+        self.assertEqual('x]y', context.resolved('b').value)
