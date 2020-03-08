@@ -27,12 +27,12 @@ class MalformedEntryException(Exception): pass
 
 class Repl:
 
-    quotable = re.compile('[$)]+')
+    quotablebysquare = re.compile('[$)]+')
 
     @classmethod
     def quote(cls, obj):
         try:
-            return "$.(%s)" % cls.quotable.sub(lambda m: "$'[%s]" % m.group(), obj)
+            return "$.(%s)" % cls.quotablebysquare.sub(lambda m: "$'[%s]" % m.group(), obj)
         except TypeError:
             return obj
 
