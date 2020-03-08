@@ -82,3 +82,20 @@ class TestRepl(unittest.TestCase):
             with self.assertRaises(MalformedEntryException):
                 repl('  woo = yay')
             repl('\t woo = yay')
+
+    def test_printf(self):
+        context = Context()
+        with Repl(context) as repl:
+            repl.printf("val = %s", 100)
+            repl.printf("text = %s", 'hello')
+            repl.printf("empty = %s", '')
+            repl.printf("dot = %s", '.')
+            repl.printf("eq 0 als = %s", '=')
+            repl.printf("path = $(eq %s %s)", 0, 'als')
+        self.assertEqual(100, context.resolved('val').value)
+        self.assertEqual('hello', context.resolved('text').value)
+        self.assertEqual('', context.resolved('empty').value)
+        self.assertEqual('.', context.resolved('dot').value)
+        self.assertEqual('=', context.resolved('eq', '0', 'als').value)
+        self.assertEqual('=', context.resolved('path').value)
+        self.assertEqual({'val': 100, 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
