@@ -18,7 +18,7 @@
 from __future__ import division
 from .model import Text, List, Number
 from .util import allfunctions, NoSuchPathException, realname
-import json, shlex
+import json, os, shlex
 
 class Functions:
 
