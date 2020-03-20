@@ -138,6 +138,10 @@ class Functions:
     def repr(context, resolvable):
         return Text(repr(resolvable.resolve(context).unravel()))
 
+    @realname('./')
+    def hereslash(context, *resolvables):
+        return Text(os.path.join(context.resolved('here').cat(), *(r.resolve(context).cat() for r in resolvables)))
+
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))
 
