@@ -142,6 +142,14 @@ class Functions:
     def hereslash(context, *resolvables):
         return Text(os.path.join(context.resolved('here').cat(), *(r.resolve(context).cat() for r in resolvables)))
 
+    def readfile(context, resolvable):
+        with open(resolvable.resolve(context).cat()) as f:
+            return Text(f.read())
+
+    def processtemplate(context, resolvable):
+        with open(resolvable.resolve(context).cat()) as f:
+            return Text(Concat(templateparser(f.read())).resolve(context).cat()) # TODO: Duplicated code.
+
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))
 
