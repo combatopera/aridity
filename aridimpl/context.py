@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .model import Function, Text, Stream, Resolvable, Scalar
+from .model import Directive, Function, Resolvable, Scalar, Stream, Text
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -129,6 +129,8 @@ class SuperContext(AbstractContext):
 
     def __init__(self):
         super(SuperContext, self).__init__(self.EmptyContext())
+        for word, d in lookup.items():
+            self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
             self[name,] = Function(f)
         self['~',] = Text(os.path.expanduser('~'))

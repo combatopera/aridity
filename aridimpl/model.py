@@ -186,6 +186,11 @@ class List(Resolved):
     def unravel(self):
         return list(x.unravel() for x in self)
 
+class Directive(Resolved):
+
+    def __init__(self, d):
+        self.d = d
+
 class Function(Resolved):
 
     def __init__(self, f):
