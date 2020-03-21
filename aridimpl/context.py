@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .model import Directive, Function, Resolvable, Scalar, Stream, Text
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
@@ -99,13 +99,24 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         directives = []
         for i, word in enumerate(entry.words()):
             try:
-                d = lookup.get(word)
-            except TypeError:
-                d = None
-            if d is not None:
+                cat = word.cat
+            except AttributeError:
+                continue
+            resolvables = []
+            try:
+                self.getresolvables(cat(), resolvables.append)
+            except CatNotSupportedException:
+                continue
+            for r in resolvables:
+                try:
+                    d = r.directivevalue
+                except AttributeError:
+                    continue
                 directives.append((d, i))
-        if 1 != len(directives):
-            raise UnsupportedEntryException(entry) # TODO: Describe the error.
+                break
+        n = len(directives)
+        if 1 != n:
+            raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (n, entry))
         d, i = directives[0]
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 

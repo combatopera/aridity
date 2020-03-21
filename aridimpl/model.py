@@ -189,7 +189,7 @@ class List(Resolved):
 class Directive(Resolved):
 
     def __init__(self, d):
-        self.d = d
+        self.directivevalue = d
 
 class Function(Resolved):
 
