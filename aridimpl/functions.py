@@ -16,7 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from .model import Text, List, Number
+from .grammar import templateparser
+from .model import Concat, List, Number, Text
 from .util import allfunctions, NoSuchPathException, realname
 import json, os, shlex
 
