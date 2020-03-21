@@ -114,9 +114,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                     continue
                 directives.append((d, i))
                 break
-        n = len(directives)
-        if 1 != n:
-            raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (n, entry))
+        if 1 != len(directives):
+            raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (directives, entry))
         d, i = directives[0]
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
