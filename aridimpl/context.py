@@ -95,25 +95,18 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                         repl(line)
         self.temporarily('here', Text(os.path.dirname(path)), block)
 
+    class Enough(Exception): pass
+
     def execute(self, entry):
         directives = []
         for i, word in enumerate(entry.words()):
+            def append(resolvable):
+                directives.append((resolvable.directivevalue, i))
+                raise self.Enough
             try:
-                cat = word.cat
-            except AttributeError:
-                continue
-            resolvables = []
-            try:
-                self.getresolvables(cat(), resolvables.append)
-            except CatNotSupportedException:
-                continue
-            for r in resolvables:
-                try:
-                    d = r.directivevalue
-                except AttributeError:
-                    continue
-                directives.append((d, i))
-                break
+                self.getresolvables(word.cat(), append)
+            except (AttributeError, CatNotSupportedException, self.Enough):
+                pass
         if 1 != len(directives):
             raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (directives, entry))
         d, i = directives[0]

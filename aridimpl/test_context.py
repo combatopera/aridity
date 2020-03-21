@@ -17,7 +17,7 @@
 
 import unittest, tempfile, collections
 from .grammar import loader as l
-from .model import Text, Stream
+from .model import Directive, Stream, Text
 from .context import Context, NoSuchPathException
 from .repl import Repl
 
@@ -30,14 +30,28 @@ class TestContext(unittest.TestCase):
             repl('x2 = y $.(=) z') # FIXME: Quote should work too.
             repl('blank =')
             repl("$'() = blank")
-            repl('$.(write) = yo')
             repl('write yo')
+            repl('$.(write) = yo')
         ae = self.assertEqual
         ae('y', c.resolved('x').unravel())
         ae('y = z', c.resolved('x2').unravel())
         ae('', c.resolved('blank').unravel())
         ae('blank', c.resolved('').unravel())
         ae('yo', c.resolved('write').unravel())
+
+    def test_directivestack(self):
+        phrases = []
+        def eq(prefix, phrase, context):
+            phrases.append(phrase.cat())
+        c = Context()
+        self.assertEqual(0, len(c.resolvables.keys()))
+        c['=',] = Directive(eq)
+        self.assertEqual(1, len(c.resolvables.keys()))
+        with Repl(c) as repl:
+            repl('woo = yay')
+        self.assertEqual(['yay'], phrases)
+        with self.assertRaises(NoSuchPathException):
+            c.resolved('woo')
 
     def test_modifiers(self):
         context = self.modifiers('v := $list()\nv one := $list()\nv one 1 := $list()\nv one 1 un = uno')
