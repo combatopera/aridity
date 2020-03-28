@@ -188,8 +188,8 @@ class List(Resolved):
 
 class Directive(Resolved):
 
-    def __init__(self, d):
-        self.directivevalue = d
+    def __init__(self, directivevalue):
+        self.directivevalue = directivevalue
 
 class Function(Resolved):
 
