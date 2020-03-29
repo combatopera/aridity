@@ -14,6 +14,7 @@
 * Easy tasks are easy, hard tasks are possible
 * Many applications can share one user config
 * Principle of least astonishment driven design
+* Don't make users jump through hoops
 
 ## Config file syntax
 ```
