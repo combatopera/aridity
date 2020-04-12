@@ -296,6 +296,34 @@ class TestContext(unittest.TestCase):
         except NoSuchPathException:
             pass
 
+    def test_overridetwowordpath(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('calc.single = 5')
+            repl('calc.double = $mul($(calc.single) 2)')
+            repl('X = $fork()')
+            repl('A calc.single = 6')
+        self.assertEqual(10, c.resolved('X', 'calc.double').value)
+        self.assertEqual(12, c.resolved('A', 'calc.double').value)
+        c = Context()
+        with Repl(c) as repl:
+            repl('calc single = 5')
+            repl('calc double = $mul($(single) 2)')
+            repl('X = $fork()')
+            repl('A calc single = 6')
+        self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
+        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
+            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        c = Context()
+        with Repl(c) as repl:
+            repl('calc single = 5')
+            repl('calc double = $mul($(calc single) 2)') # The calc here is redundant.
+            repl('X = $fork()')
+            repl('A calc single = 6')
+        self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
+        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
+            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+
     def test_blanklines(self):
         context = Context()
         with Repl(context) as repl:
