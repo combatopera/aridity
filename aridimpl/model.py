@@ -130,6 +130,16 @@ class Text(Cat, Scalar):
     def tobash(self):
         return "'%s'" % self.value.replace("'", r"'\''")
 
+    def writeout(self, path):
+        with open(path, 'w') as f:
+            f.write(self.value)
+
+class Binary(Scalar):
+
+    def writeout(self, path):
+        with open(path, 'wb') as f:
+            f.write(self.value)
+
 class Number(Scalar):
 
     def totext(self):
