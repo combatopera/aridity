@@ -64,16 +64,10 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         if not path:
             return self
         name, tail = path[0], path[1:]
-        resolvables = []
-        self.getresolvables(name, resolvables.append)
-        if not resolvables:
-            raise NoSuchPathException(name)
-        for i, resolvable in enumerate(resolvables):
-            try:
-                return resolvable.resolve(self).resolved(*tail, **kwargs) if tail else resolvable.resolve(self, **kwargs)
-            except NoSuchPathException:
-                if i + 1 == len(resolvables):
-                    raise
+        resolvable = self.resolvables.get(name)
+        if resolvable is None:
+            raise NoSuchPathException(path)
+        return resolvable.resolve(self).resolved(*tail, **kwargs) if tail else resolvable.resolve(self, **kwargs)
 
     def unravel(self):
         d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())

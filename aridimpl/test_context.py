@@ -289,12 +289,8 @@ class TestContext(unittest.TestCase):
         with Repl(tmp) as repl:
             repl('arg = myval')
         # Doesn't matter where my command was found, it should be resolved against tmp:
-        try:
-            self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
-            self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
-            self.fail('You fixed a bug!')
-        except NoSuchPathException:
-            pass
+        self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
+        self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
 
     def test_overridetwowordpath(self):
         c = Context()
@@ -312,8 +308,7 @@ class TestContext(unittest.TestCase):
             repl('X = $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
-            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
@@ -321,8 +316,7 @@ class TestContext(unittest.TestCase):
             repl('X = $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
-            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
 
     def test_blanklines(self):
         context = Context()
