@@ -55,7 +55,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         self.parent.getresolvables(name, append)
 
     def resolved(self, *path, **kwargs):
-        return self._resolved(path, self._findresolvable(path), kwargs)
+        r = self._findresolvable(path)
+        return self._resolved(path, r, kwargs)
 
     def _subcontext(self, path):
         c = self # Assume we are resolved.
@@ -68,7 +69,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 return
         return c
 
-    def _resolvables(self, path):
+    def _subresolvables(self, path):
         c = self._subcontext(path)
         return {} if c is None else c.resolvables
 
@@ -77,7 +78,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         while p:
             c = self
             while True:
-                r = c._resolvables(path[:-1]).get(path[-1])
+                resolvables = c._subresolvables(p[:-1])
+                r = resolvables.get(p[-1])
                 if r is not None:
                     return r
                 c = c.parent
@@ -91,7 +93,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         while True:
             c = self
             while True:
-                sc = self._subcontext(p)
+                sc = c._subcontext(p)
                 if sc is not None:
                     try:
                         return resolvable.resolve(sc, **kwargs)
