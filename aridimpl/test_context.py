@@ -318,6 +318,30 @@ class TestContext(unittest.TestCase):
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
 
+    def test_resolvepathincontext(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x y = $(z)') # The resolvable.
+            repl('z = 0')
+            repl('A z = 1')
+            repl('B z = 2')
+            repl('A B z = 3') # Should be resolved against context at [A, B].
+            repl('A B x z = 4')
+            repl('B C z = 5')
+            repl('C z = 6')
+        self.assertEqual(3, c.resolved('A', 'B', 'x', 'y').value)
+        '''
+        ABxy does not exist
+        Bxy does not either
+        xy does! resolve against AB
+        '''
+        self.assertEqual(5, c.resolved('A', 'B', 'C', 'x', 'y').value)
+        '''
+        ABCxy, BCxy, Cxy, xy
+        no ABC! but we have AB, BC
+        if we were looking for ABCz, we'd choose BCz
+        '''
+
     def test_blanklines(self):
         context = Context()
         with Repl(context) as repl:
