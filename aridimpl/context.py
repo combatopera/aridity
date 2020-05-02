@@ -69,12 +69,30 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def _resolved(self, path, kwargs):
         if not path:
             return self
-        c = self
-        for name in path[:-1]:
-            that = self.resolvables.get(name)
-            c = Context(c) if that is None else that.resolve(c)
+        def trycut():
+            c = self
+            for name in path[cut:-1]:
+                r = c.resolvables.get(name)
+                if r is None:
+                    return
+                c = r.resolve(c)
+            return c
+        def cutctx():
+            c = self
+            for name in path[:cut]:
+                c = c.resolvables[name].resolve(c)
+            return c
+        for cut in range(len(path)):
+            c = trycut()
+            if c is None or not hasattr(c, 'resolvables'):
+                continue
+            r = c.resolvables.get(path[-1])
+            if r is None:
+                continue
+            #print(cut, c, path[-1], r)
+            return r.resolve(cutctx(), **kwargs)
+            break
 
-        del c
 
         name, tail = path[0], path[1:]
         resolvable = self.resolvables.get(name)
@@ -126,15 +144,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
     def __str__(self):
-        eol = '\n'
-        def g():
-            c = self
-            while True:
-                try: d = c.resolvables
-                except AttributeError: break
-                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
-                c = c.parent
-        return eol.join(g())
+        return ','.join(map(str, self.resolvables.keys()))
 
 class SuperContext(AbstractContext):
 
