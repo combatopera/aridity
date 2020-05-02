@@ -72,7 +72,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         c = self
         for name in path[:-1]:
             that = self.resolvables.get(name)
-            that = Context(c) if that is None else that.resolve(c)
+            c = Context(c) if that is None else that.resolve(c)
 
         del c
 
