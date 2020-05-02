@@ -322,6 +322,8 @@ class TestContext(unittest.TestCase):
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
         '''
+        X.calc.double does not exist, but calc.double does so got expr
+        try resolve against X.calc, no such thing, no X either, but () should work
         A.calc.double does not exist, but calc.double does so got expr
         want to resolve against A.calc, which exists. easy
         '''
