@@ -215,7 +215,13 @@ class TestContext(unittest.TestCase):
         ae = self.assertEqual
         ae({'item': {'woo': 'value'}, 'my.key': 'value'}, context.resolved('ns').unravel())
         ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
+        print('MARK')
         ae('value', context.resolved('ns', 'item', 'woo').unravel())
+        '''
+        expression exists at ns.item.woo
+        should resolve against (ns item) or (ns) or () in that order of pref
+        this is simply resolve against ns item and if that doesn't work try parent
+        '''
 
     def test_relmod3(self):
         context = Context()
@@ -291,6 +297,12 @@ class TestContext(unittest.TestCase):
         # Doesn't matter where my command was found, it should be resolved against tmp:
         self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
         self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
+        '''
+        context has no my.command nor command, but parent has expr at my.command, all good
+        what do we resolve it against? normally my then its parent
+        my does not exist in context but does in parent, so we should check that first which fails
+        than check my's parent i.e. context which should succeed.
+        '''
 
     def test_overridetwowordpath(self):
         c = Context()
@@ -325,21 +337,22 @@ class TestContext(unittest.TestCase):
             repl('z = 0')
             repl('A z = 1')
             repl('B z = 2')
-            repl('A B z = 3') # Should be resolved against context at [A, B].
-            repl('A B x z = 4')
+            repl('A B z = 3')
+            repl('A B x z = 4') # XXX: Confusing?
             repl('B C z = 5')
             repl('C z = 6')
-        self.assertEqual(3, c.resolved('A', 'B', 'x', 'y').value)
+        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value)
         '''
-        ABxy does not exist
-        Bxy does not either
-        xy does! resolve against AB
+        ABxy does not exist - if it did, resolve against ABx
+        Bxy does not either - if did, resolve against... ABx i guess
+        xy does! resolve against ABx then parents
         '''
-        self.assertEqual(5, c.resolved('A', 'B', 'C', 'x', 'y').value)
+        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value)
         '''
         ABCxy, BCxy, Cxy, xy
-        no ABC! but we have AB, BC
-        if we were looking for ABCz, we'd choose BCz
+        resolve against ABCx, ABC, AB
+        #no ABC! but we have AB, BC
+        #if we were looking for ABCz, we'd choose BCz
         '''
 
     def test_blanklines(self):
