@@ -57,19 +57,17 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def resolved(self, *path, **kwargs):
         if not path:
             return self
-        name = path[-1]
-        for cut in range(len(path)):
-            c = self.resolved(*path[cut:-1])
-            if name not in c.resolvables.keys():
-                continue
-            r = c.resolvables[name]
+        name, tail = path[0], path[1:]
+        resolvables = []
+        self.getresolvables(name, resolvables.append)
+        if not resolvables:
+            raise NoSuchPathException(name)
+        for i, resolvable in enumerate(resolvables):
             try:
-                return r.resolve(self.resolved(*path[:cut]), **kwargs)
+                return resolvable.resolve(self).resolved(*tail, **kwargs) if tail else resolvable.resolve(self, **kwargs)
             except NoSuchPathException:
-                pass
-        if SuperContext.EmptyContext != type(self.parent):
-            return self.parent.resolved(*path, **kwargs)
-        raise NoSuchPathException(path)
+                if i + 1 == len(resolvables):
+                    raise
 
     def unravel(self):
         d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
