@@ -54,11 +54,17 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             append(r)
         self.parent.getresolvables(name, append)
 
+    depth = 0
+
     def resolved(self, *path, **kwargs):
+        self.depth += 1
         try:
+            print(' '*self.depth, path)
             return self._resolved(path, kwargs)
         except NoSuchPathException:
             return self.parent.resolved(*path, **kwargs)
+        finally:
+            self.depth -= 1
 
     def _resolved(self, path, kwargs):
         if not path:
