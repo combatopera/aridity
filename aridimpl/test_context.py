@@ -321,6 +321,10 @@ class TestContext(unittest.TestCase):
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        '''
+        A.calc.double does not exist, but calc.double does so got expr
+        want to resolve against A.calc, which exists. easy
+        '''
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
@@ -329,6 +333,12 @@ class TestContext(unittest.TestCase):
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        '''
+        A.calc.double does not exist, but calc.double does so got expr
+        want to resolve against A.calc, which exists
+        but does calc.single resolve against A.calc?
+        first fallback should be calc.single in parent i.e. A, which is 6
+        '''
 
     def test_resolvepathincontext(self):
         c = Context()
