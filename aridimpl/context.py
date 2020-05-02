@@ -54,51 +54,55 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             append(r)
         self.parent.getresolvables(name, append)
 
-    depth = 0
-
     def resolved(self, *path, **kwargs):
-        self.depth += 1
-        try:
-            print(' '*self.depth, path)
-            return self._resolved(path, kwargs)
-        except NoSuchPathException:
-            return self.parent.resolved(*path, **kwargs)
-        finally:
-            self.depth -= 1
+        return self._resolved(path, self._findresolvable(path), kwargs)
 
-    def _resolved(self, path, kwargs):
-        if not path:
-            return self
-        def trycut():
-            c = self
-            for name in path[cut:-1]:
-                r = c.resolvables.get(name)
-                if r is None:
-                    return
-                c = r.resolve(c)
-            return c
-        def cutctx():
-            c = self
-            for name in path[:cut]:
-                c = c.resolvables[name].resolve(c)
-            return c
-        for cut in range(len(path)):
-            c = trycut()
-            if c is None or not hasattr(c, 'resolvables'):
-                continue
-            r = c.resolvables.get(path[-1])
+    def _subcontext(self, path):
+        c = self # Assume we are resolved.
+        for name in path:
+            r = c.resolvables.get(name)
             if r is None:
-                continue
-            #print(cut, c, path[-1], r)
-            return r.resolve(cutctx(), **kwargs)
-            break
+                return
+            c = r.resolve(c)
+            if not hasattr(c, 'resolvables'):
+                return
+        return c
 
+    def _resolvables(self, path):
+        c = self._subcontext(path)
+        return {} if c is None else c.resolvables
 
-        name, tail = path[0], path[1:]
-        resolvable = self.resolvables.get(name)
-        if resolvable is None:
-            raise NoSuchPathException(path)
-        return resolvable.resolve(self).resolved(*tail, **kwargs) if tail else resolvable.resolve(self, **kwargs)
+    def _findresolvable(self, path):
+        p = path
+        while p:
+            c = self
+            while True:
+                r = c._resolvables(path[:-1]).get(path[-1])
+                if r is not None:
+                    return r
+                c = c.parent
+                if SuperContext.EmptyContext == type(c):
+                    break
+            p = p[1:]
+        raise NoSuchPathException(path)
+
+    def _resolved(self, path, resolvable, kwargs):
+        p = path[:-1]
+        while True:
+            c = self
+            while True:
+                sc = self._subcontext(p)
+                if sc is not None:
+                    try:
+                        return resolvable.resolve(sc, **kwargs)
+                    except NoSuchPathException:
+                        pass
+                c = c.parent
+                if SuperContext.EmptyContext == type(c):
+                    break
+            if not p:
+                raise NoSuchPathException(path)
+            p = p[:-1]
 
     def unravel(self):
         d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
