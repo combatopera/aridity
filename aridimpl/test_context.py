@@ -91,6 +91,7 @@ class TestContext(unittest.TestCase):
         ae({'1': 'uno'}, context.resolved('v', 'one').unravel())
         ae({'hmm': 'yay'}, context.resolved('v', 'two').unravel())
         ae(Text('woo'), context.resolved('v', 'one').resolved('hmm'))
+        print(context.resolved('v', 'two'))
         ae(Text('yay'), context.resolved('v', 'two').resolved('hmm'))
         return context
 
@@ -289,12 +290,8 @@ class TestContext(unittest.TestCase):
         with Repl(tmp) as repl:
             repl('arg = myval')
         # Doesn't matter where my command was found, it should be resolved against tmp:
-        try:
-            self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
-            self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
-            self.fail('You fixed a bug!')
-        except NoSuchPathException:
-            pass
+        self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
+        self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
 
     def test_overridetwowordpath(self):
         c = Context()
@@ -312,8 +309,7 @@ class TestContext(unittest.TestCase):
             repl('X = $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
-            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
@@ -321,8 +317,31 @@ class TestContext(unittest.TestCase):
             repl('X = $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        with self.assertRaises(AssertionError, msg = 'You fixed a bug!'):
-            self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+
+    def test_resolvepathincontext(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x y = $(z)') # The resolvable.
+            repl('z = 0')
+            repl('A z = 1')
+            repl('B z = 2')
+            repl('A B z = 3') # Should be resolved against context at [A, B].
+            repl('A B x z = 4')
+            repl('B C z = 5')
+            repl('C z = 6')
+        self.assertEqual(3, c.resolved('A', 'B', 'x', 'y').value)
+        '''
+        ABxy does not exist
+        Bxy does not either
+        xy does! resolve against AB
+        '''
+        self.assertEqual(5, c.resolved('A', 'B', 'C', 'x', 'y').value)
+        '''
+        ABCxy, BCxy, Cxy, xy
+        no ABC! but we have AB, BC
+        if we were looking for ABCz, we'd choose BCz
+        '''
 
     def test_blanklines(self):
         context = Context()
