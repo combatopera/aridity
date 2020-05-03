@@ -102,7 +102,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             obj = self._resolvedshallow(path[i:], resolvable, kwargs)
             if obj is not None:
                 return obj
-        raise NoSuchPathException(path)
+        raise NoSuchPathException(path) # FIXME: Misleading.
 
     def _resolvedshallow(self, path, resolvable, kwargs):
         while path:
