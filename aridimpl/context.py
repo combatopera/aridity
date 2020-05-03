@@ -76,11 +76,10 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return {} if c is None else c.resolvables
 
     def _selfandparents(self):
-        c = self
         while True:
-            yield c
-            c = c.parent
-            if SuperContext.EmptyContext == c.__class__:
+            yield self
+            self = self.parent
+            if SuperContext.EmptyContext == self.__class__:
                 break
 
     def _findresolvable(self, path):
