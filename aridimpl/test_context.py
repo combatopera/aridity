@@ -320,10 +320,14 @@ class TestContext(unittest.TestCase):
             repl('A calc single = 6')
         print('MARK')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
+        '''
+        X calc double does not exist, but calc double does so got expr
+        try resolve against X calc, no such thing
+        X exists but does not have single available, neither does ()
+        what if we tried resolving against calc? that would work
+        '''
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
         '''
-        X.calc.double does not exist, but calc.double does so got expr
-        try resolve against X.calc, no such thing, no X either, but () should work
         A.calc.double does not exist, but calc.double does so got expr
         want to resolve against A.calc, which exists. easy
         '''
