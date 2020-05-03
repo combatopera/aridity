@@ -215,7 +215,6 @@ class TestContext(unittest.TestCase):
         ae = self.assertEqual
         ae({'item': {'woo': 'value'}, 'my.key': 'value'}, context.resolved('ns').unravel())
         ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
-        print('MARK')
         ae('value', context.resolved('ns', 'item', 'woo').unravel())
         '''
         expression exists at ns.item.woo
