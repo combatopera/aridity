@@ -105,25 +105,21 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _resolved(self, path, resolvable, kwargs):
         for i in range(len(path)):
-            try:
-                return self._resolvedshallow(path[i:], resolvable, kwargs)
-            except NoSuchPathException:
-                pass
+            obj = self._resolvedshallow(path[i:], resolvable, kwargs)
+            if obj is not None:
+                return obj
         raise NoSuchPathException(path)
 
     def _resolvedshallow(self, path, resolvable, kwargs):
-        p = path[:-1]
-        while True:
+        while path:
+            path = path[:-1]
             for c in self._selfandparents():
-                sc = c._resolvedcontextornone(p)
+                sc = c._resolvedcontextornone(path)
                 if sc is not None:
                     try:
                         return resolvable.resolve(sc, **kwargs)
                     except NoSuchPathException:
                         pass
-            if not p:
-                raise NoSuchPathException(path)
-            p = p[:-1]
 
     def unravel(self):
         d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
