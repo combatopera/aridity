@@ -153,7 +153,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 directives.append((resolvable.directivevalue, i))
                 raise self.Enough
             try:
-                self.getresolvables(word.cat(), append)
+                self.getresolvables(word.cat(), append) # XXX: Can this be retired?
             except (AttributeError, CatNotSupportedException, self.Enough):
                 pass
         if 1 != len(directives):
