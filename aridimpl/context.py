@@ -161,9 +161,6 @@ class SuperContext(AbstractContext):
         def getresolvables(self, name, append):
             pass
 
-        def resolved(self, *path, **kwargs):
-            raise NoSuchPathException(path)
-
     def __init__(self):
         super(SuperContext, self).__init__(self.EmptyContext())
         for word, d in lookup.items():
