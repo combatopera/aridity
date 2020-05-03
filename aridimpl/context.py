@@ -84,6 +84,16 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 break
 
     def _findresolvable(self, path):
+        for i in range(len(path)):
+            c = self._resolvedcontextornone(path[:i])
+            if c is None:
+                break
+            r = c._findresolvableshallow(path[i:])
+            if r is not None:
+                return r
+        raise NoSuchPathException(path)
+
+    def _findresolvableshallow(self, path):
         p = path
         while p:
             for c in self._selfandparents():
@@ -92,7 +102,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 if r is not None:
                     return r
             p = p[1:]
-        raise NoSuchPathException(path)
 
     def _resolved(self, path, resolvable, kwargs):
         p = path[:-1]

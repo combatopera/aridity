@@ -318,6 +318,7 @@ class TestContext(unittest.TestCase):
             repl('calc double = $mul($(single) 2)')
             repl('X = $fork()')
             repl('A calc single = 6')
+        print('MARK')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
         '''
@@ -398,4 +399,8 @@ class TestContext(unittest.TestCase):
         self.assertEqual('u', context.resolved('root', 'uvavu', 'parent', 'foo').unravel())
         self.assertEqual('x', context.resolved('root', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'eranu', 'parent', 'bar').unravel())
+        '''
+        repb does not exist, neither do epb, pb, b
+        r exists so try epb against it. that fails, but pb succeeds
+        '''
         self.assertEqual('x', context.resolved('root', 'uvavu', 'parent', 'bar').unravel())
