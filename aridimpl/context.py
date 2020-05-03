@@ -80,7 +80,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         while True:
             yield c
             c = c.parent
-            if SuperContext.EmptyContext == type(c):
+            if SuperContext.EmptyContext == c.__class__:
                 break
 
     def _findresolvable(self, path):
