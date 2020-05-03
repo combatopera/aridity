@@ -75,35 +75,35 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         c = self._resolvedcontextornone(path)
         return {} if c is None else c.resolvables
 
+    def _selfandparents(self):
+        c = self
+        while True:
+            yield c
+            c = c.parent
+            if SuperContext.EmptyContext == type(c):
+                break
+
     def _findresolvable(self, path):
         p = path
         while p:
-            c = self
-            while True:
+            for c in self._selfandparents():
                 resolvables = c._subresolvables(p[:-1])
                 r = resolvables.get(p[-1])
                 if r is not None:
                     return r
-                c = c.parent
-                if SuperContext.EmptyContext == type(c):
-                    break
             p = p[1:]
         raise NoSuchPathException(path)
 
     def _resolved(self, path, resolvable, kwargs):
         p = path[:-1]
         while True:
-            c = self
-            while True:
+            for c in self._selfandparents():
                 sc = c._resolvedcontextornone(p)
                 if sc is not None:
                     try:
                         return resolvable.resolve(sc, **kwargs)
                     except NoSuchPathException:
                         pass
-                c = c.parent
-                if SuperContext.EmptyContext == type(c):
-                    break
             if not p:
                 raise NoSuchPathException(path)
             p = p[:-1]
