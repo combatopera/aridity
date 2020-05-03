@@ -216,11 +216,6 @@ class TestContext(unittest.TestCase):
         ae({'item': {'woo': 'value'}, 'my.key': 'value'}, context.resolved('ns').unravel())
         ae({'woo': 'value'}, context.resolved('ns', 'item').unravel())
         ae('value', context.resolved('ns', 'item', 'woo').unravel())
-        '''
-        expression exists at ns.item.woo
-        should resolve against (ns item) or (ns) or () in that order of pref
-        this is simply resolve against ns item and if that doesn't work try parent
-        '''
 
     def test_relmod3(self):
         context = Context()
@@ -296,12 +291,6 @@ class TestContext(unittest.TestCase):
         # Doesn't matter where my command was found, it should be resolved against tmp:
         self.assertEqual('do myval', tmp.resolved('my', 'command').unravel())
         self.assertEqual(['do', 'myval'], tmp.resolved('my', 'command', aslist = True).unravel())
-        '''
-        context has no my.command nor command, but parent has expr at my.command, all good
-        what do we resolve it against? normally my then its parent
-        my does not exist in context but does in parent, so we should check that first which fails
-        than check my's parent i.e. context which should succeed.
-        '''
 
     def test_overridetwowordpath(self):
         c = Context()
@@ -319,17 +308,7 @@ class TestContext(unittest.TestCase):
             repl('X = $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        '''
-        X calc double does not exist, but calc double does so got expr
-        try resolve against X calc, no such thing
-        X exists but does not have single available, neither does ()
-        what if we tried resolving against calc? that would work
-        '''
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
-        '''
-        A.calc.double does not exist, but calc.double does so got expr
-        want to resolve against A.calc, which exists. easy
-        '''
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
@@ -338,12 +317,6 @@ class TestContext(unittest.TestCase):
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
-        '''
-        A.calc.double does not exist, but calc.double does so got expr
-        want to resolve against A.calc, which exists
-        but does calc.single resolve against A.calc?
-        first fallback should be calc.single in parent i.e. A, which is 6
-        '''
 
     def test_resolvepathincontext(self):
         c = Context()
@@ -357,18 +330,7 @@ class TestContext(unittest.TestCase):
             repl('B C z = 5')
             repl('C z = 6')
         self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value)
-        '''
-        ABxy does not exist - if it did, resolve against ABx
-        Bxy does not either - if did, resolve against... ABx i guess
-        xy does! resolve against ABx then parents
-        '''
         self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value)
-        '''
-        ABCxy, BCxy, Cxy, xy
-        resolve against ABCx, ABC, AB
-        #no ABC! but we have AB, BC
-        #if we were looking for ABCz, we'd choose BCz
-        '''
 
     def test_blanklines(self):
         context = Context()
@@ -402,8 +364,4 @@ class TestContext(unittest.TestCase):
         self.assertEqual('u', context.resolved('root', 'uvavu', 'parent', 'foo').unravel())
         self.assertEqual('x', context.resolved('root', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'eranu', 'parent', 'bar').unravel())
-        '''
-        repb does not exist, neither do epb, pb, b
-        r exists so try epb against it. that fails, but pb succeeds
-        '''
         self.assertEqual('x', context.resolved('root', 'uvavu', 'parent', 'bar').unravel())
