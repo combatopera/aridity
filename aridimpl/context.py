@@ -57,8 +57,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def resolved(self, *path, **kwargs):
         if not path:
             return self
-        r = self._findresolvable(path)
-        return self._resolved(path, r, kwargs)
+        resolvable = self._findresolvable(path)
+        return self._resolved(path, resolvable, kwargs)
 
     def _resolvedcontextornone(self, path):
         c = self # Assume we are resolved.
