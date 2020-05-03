@@ -326,11 +326,11 @@ class TestContext(unittest.TestCase):
             repl('A z = 1')
             repl('B z = 2')
             repl('A B z = 3')
-            repl('A B x z = 4') # XXX: Confusing?
+            repl('A B x z = 4')
             repl('B C z = 5')
             repl('C z = 6')
-        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value)
-        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value)
+        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value) # XXX: Confusing?
+        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value) # XXX: Confusing?
 
     def test_blanklines(self):
         context = Context()
