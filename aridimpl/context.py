@@ -104,9 +104,18 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             p = p[1:]
 
     def _resolved(self, path, resolvable, kwargs):
+        for i in range(len(path)):
+            try:
+                return self._resolvedshallow(path[i:], resolvable, kwargs)
+            except NoSuchPathException:
+                pass
+        raise NoSuchPathException(path)
+
+    def _resolvedshallow(self, path, resolvable, kwargs):
         p = path[:-1]
         while True:
             for c in self._selfandparents():
+                print(p)
                 sc = c._resolvedcontextornone(p)
                 if sc is not None:
                     try:
