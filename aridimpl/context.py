@@ -38,9 +38,9 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        self.subcontext(path[:-1]).resolvables[path[-1]] = resolvable
+        self.getorcreatesubcontext(path[:-1]).resolvables[path[-1]] = resolvable
 
-    def subcontext(self, path):
+    def getorcreatesubcontext(self, path):
         for name in path:
             that = self.resolvables.get(name)
             if that is None:

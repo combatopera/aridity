@@ -86,7 +86,7 @@ class PlusEquals:
 class Cat:
     name = '<'
     def __call__(self, prefix, phrase, context):
-        context = context.subcontext(prefix.topath(context))
+        context = context.getorcreatesubcontext(prefix.topath(context))
         with open(resolvepath(phrase, context)) as f:
             context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
