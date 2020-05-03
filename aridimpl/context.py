@@ -115,7 +115,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         p = path[:-1]
         while True:
             for c in self._selfandparents():
-                print(p)
                 sc = c._resolvedcontextornone(p)
                 if sc is not None:
                     try:

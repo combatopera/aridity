@@ -318,7 +318,6 @@ class TestContext(unittest.TestCase):
             repl('calc double = $mul($(single) 2)')
             repl('X = $fork()')
             repl('A calc single = 6')
-        print('MARK')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         '''
         X calc double does not exist, but calc double does so got expr
