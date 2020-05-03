@@ -152,7 +152,15 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         d(entry.subentry(0, i), entry.phrase(i + 1), self)
 
     def __str__(self):
-        return ','.join(map(str, self.resolvables.keys()))
+        eol = '\n'
+        def g():
+            c = self
+            while True:
+                try: d = c.resolvables
+                except AttributeError: break
+                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
+                c = c.parent
+        return eol.join(g())
 
 class SuperContext(AbstractContext):
 
