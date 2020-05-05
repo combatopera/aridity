@@ -90,6 +90,6 @@ class Cat:
         with open(resolvepath(phrase, context)) as f:
             context.resolved('stdout').flush(Concat(templateparser(f.read())).resolve(context).cat())
 
-def resolvepath(phrase, context):
-    path = phrase.resolve(context).cat()
+def resolvepath(resolvable, context):
+    path = resolvable.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
