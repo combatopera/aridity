@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+from .directives import resolvepath
 from .grammar import templateparser
 from .model import Concat, List, Number, Text
 from .util import allfunctions, NoSuchPathException, realname
@@ -144,7 +145,7 @@ class Functions:
         return Text(os.path.join(context.resolved('here').cat(), *(r.resolve(context).cat() for r in resolvables)))
 
     def readfile(context, resolvable):
-        with open(resolvable.resolve(context).cat()) as f:
+        with open(resolvepath(resolvable, context)) as f:
             return Text(f.read())
 
     def processtemplate(context, resolvable):
