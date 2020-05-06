@@ -195,7 +195,13 @@ class Slash(Text, Function):
         Function.__init__(self, slashfunction)
 
 def slashfunction(context, *resolvables):
-    return Text(os.path.join(*(r.resolve(context).cat() for r in resolvables)))
+    path = None
+    for r in reversed(resolvables):
+        component = r.resolve(context).cat()
+        path = component if path is None else os.path.join(component, path)
+        if os.path.isabs(path):
+            break
+    return Text(os.path.join() if path is None else path)
 
 supercontext = SuperContext()
 
