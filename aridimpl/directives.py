@@ -95,5 +95,6 @@ def resolvepath(resolvable, context):
 
 def processtemplate(context, pathresolvable):
     path = resolvepath(pathresolvable, context)
-    with open(path) as f, context.dynamicancestor().here.push(Text(os.path.dirname(path))):
+    dynamic = context.dynamicancestor()
+    with open(path) as f, dynamic.here.push(Text(os.path.dirname(path))), dynamic.indent.push():
         return Concat(templateparser(f.read())).resolve(context).cat()

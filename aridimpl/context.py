@@ -23,7 +23,7 @@ from .directives import lookup
 from .repl import Repl
 from collections import defaultdict
 from contextlib import contextmanager
-import os, sys
+import os, re, sys
 
 class NotAPathException(Exception): pass
 
@@ -202,19 +202,45 @@ class DynamicContext(AbstractContext):
             self.stack = []
 
         @contextmanager
-        def push(self, value):
+        def _push(self, value):
             self.stack.append(value)
             try:
                 yield
             finally:
                 self.stack.pop()
 
+    class SimpleStack(Stack):
+
+        def push(self, value):
+            return self._push(value)
+
         def resolve(self, context):
             return self.stack[-1]
 
+    class Indent(Stack):
+
+        textblock = re.compile(r'(?:.*[\r\n]+)+')
+        whitespace = re.compile(r'\s*')
+
+        def push(self):
+            return self._push([])
+
+        def addtext(self, text):
+            if self.stack:
+                head = self.stack[-1]
+                m = self.textblock.match(text)
+                if m is None:
+                    head.append(text)
+                else:
+                    head[:] = text[m.end():],
+
+        def resolve(self, context):
+            return Text(self.whitespace.match(''.join(self.stack[-1])).group())
+
     def __init__(self):
         super(DynamicContext, self).__init__(StaticContext)
-        self['here',] = self.here = self.Stack()
+        self['here',] = self.here = self.SimpleStack()
+        self['indent',] = self.indent = self.Indent()
 
 class Context(AbstractContext):
 

@@ -67,8 +67,13 @@ class Concat(Resolvable):
     def resolve(self, context, aslist = False):
         if aslist:
             return List([part.resolve(context) for part in self.parts if not part.ignorable])
-        else:
-            return Text(''.join(part.resolve(context).cat() for part in self.parts))
+        def g():
+            indent = context.dynamicancestor().indent
+            for part in self.parts:
+                text = part.resolve(context).cat()
+                yield text
+                indent.addtext(text)
+        return Text(''.join(g()))
 
     def unparse(self):
         return ''.join(part.unparse() for part in self.parts)
