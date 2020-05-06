@@ -49,9 +49,11 @@ class TestFunctions(TestCase):
         with NamedTemporaryFile('w') as f:
             f.write('hereval := $(here)\n')
             f.write('sibpath := $./(sibling)\n')
+            f.write('sibpath2 := $./(sib child)\n')
             f.flush()
             c = Context()
             with Repl(c) as repl:
                 repl.printf(". %s", f.name)
             self.assertEqual(os.path.dirname(f.name), c.resolved('hereval').value)
             self.assertEqual(os.path.join(os.path.dirname(f.name), 'sibling'), c.resolved('sibpath').value)
+            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sib', 'child'), c.resolved('sibpath2').value)
