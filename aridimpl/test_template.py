@@ -18,12 +18,13 @@
 from .context import Context
 from .directives import processtemplate
 from .model import Function, Text
+from .repl import Repl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
-def quot(context, *resolvables):
+def quot(context, resolvable):
     indent = context.resolved('indent').value
-    return Text('\n'.join((indent if i else '') + r.resolve(context).value for i, r in enumerate(resolvables)))
+    return Text('\n'.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines())))
 
 class TestTemplate(TestCase):
 
@@ -52,11 +53,13 @@ class TestTemplate(TestCase):
             f.flush()
             self.assertEqual(' should not fail', processtemplate(c, Text(f.name)))
 
-    def test_indentfromfunction(self):
+    def test_getindentinfunction(self):
         c = Context()
         c['"',] = Function(quot)
+        with Repl(c) as repl:
+            repl('block = $.(z\ny\nx)')
         with NamedTemporaryFile('w') as f:
-            f.write('  hmm: $"(z y x)')
+            f.write('  hmm: $"$(block)')
             f.flush()
             self.assertEqual('''  hmm: z
   y

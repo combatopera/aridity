@@ -61,8 +61,9 @@ class Concat(Resolvable):
     def unlesssingleton(cls, v):
         return v[0] if 1 == len(v) else cls(v)
 
-    def __init__(self, parts):
+    def __init__(self, parts, template = False):
         self.parts = parts
+        self.template = template
 
     def resolve(self, context, aslist = False):
         if aslist:
@@ -72,7 +73,8 @@ class Concat(Resolvable):
             for part in self.parts:
                 text = part.resolve(context).cat()
                 yield text
-                indent.addtext(text)
+                if self.template:
+                    indent.addtext(text)
         return Text(''.join(g()))
 
     def unparse(self):
