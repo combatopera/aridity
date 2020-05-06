@@ -214,7 +214,7 @@ class DynamicContext(AbstractContext):
         def _push(self, value):
             self.stack.append(value)
             try:
-                yield
+                yield value
             finally:
                 self.stack.pop()
 
@@ -228,20 +228,21 @@ class DynamicContext(AbstractContext):
 
     class Indent(Stack):
 
-        textblock = re.compile(r'(?:.*[\r\n]+)+')
+        class Monitor(list):
+
+            textblock = re.compile(r'(?:.*[\r\n]+)+')
+
+            def __call__(self, text):
+                m = self.textblock.match(text)
+                if m is None:
+                    self.append(text)
+                else:
+                    self[:] = text[m.end():],
+
         whitespace = re.compile(r'\s*')
 
         def push(self):
-            return self._push([])
-
-        def addtext(self, text):
-            if self.stack:
-                head = self.stack[-1]
-                m = self.textblock.match(text)
-                if m is None:
-                    head.append(text)
-                else:
-                    head[:] = text[m.end():],
+            return self._push(self.Monitor())
 
         def resolve(self, context):
             return Text(self.whitespace.match(''.join(self.stack[-1])).group())

@@ -61,20 +61,18 @@ class Concat(Resolvable):
     def unlesssingleton(cls, v):
         return v[0] if 1 == len(v) else cls(v)
 
-    def __init__(self, parts, template = False):
+    def __init__(self, parts, monitor = lambda text: None):
         self.parts = parts
-        self.template = template
+        self.monitor = monitor
 
     def resolve(self, context, aslist = False):
         if aslist:
             return List([part.resolve(context) for part in self.parts if not part.ignorable])
         def g():
-            indent = context.dynamicancestor().indent
             for part in self.parts:
                 text = part.resolve(context).cat()
                 yield text
-                if self.template:
-                    indent.addtext(text)
+                self.monitor(text)
         return Text(''.join(g()))
 
     def unparse(self):
