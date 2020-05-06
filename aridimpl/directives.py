@@ -94,5 +94,8 @@ def resolvepath(resolvable, context):
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
 
 def processtemplate(context, pathresolvable):
-    with open(resolvepath(pathresolvable, context)) as f:
+    def block():
         return Concat(templateparser(f.read())).resolve(context).cat()
+    path = resolvepath(pathresolvable, context)
+    with open(path) as f:
+        return context.temporarily('here', Text(os.path.dirname(path)), block)

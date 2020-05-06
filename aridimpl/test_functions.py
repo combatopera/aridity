@@ -57,3 +57,17 @@ class TestFunctions(TestCase):
             self.assertEqual(os.path.dirname(f.name), c.resolved('hereval').value)
             self.assertEqual(os.path.join(os.path.dirname(f.name), 'sibling'), c.resolved('sibpath').value)
             self.assertEqual(os.path.join(os.path.dirname(f.name), 'sib', 'child'), c.resolved('sibpath2').value)
+
+    def test_hereisavailableduringprocesstemplate(self):
+        with NamedTemporaryFile('w') as f, NamedTemporaryFile('r') as g:
+            f.write('$(here) $./(sibling) $./(sib child)')
+            f.flush()
+            c = Context()
+            with Repl(c) as repl:
+                repl.printf("text = $processtemplate(%s)", f.name)
+                repl.printf("redirect %s", g.name)
+                repl.printf("< %s", f.name)
+            d = os.path.dirname(f.name)
+            expected = "%s %s %s" % (d, os.path.join(d, 'sibling'), os.path.join(d, 'sib', 'child'))
+            self.assertEqual(expected, c.resolved('text').value)
+            self.assertEqual(expected, g.read())
