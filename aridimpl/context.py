@@ -77,7 +77,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         while True:
             yield self
             self = self.parent
-            if SuperContext.EmptyContext == self.__class__:
+            if StaticContext.EmptyContext == self.__class__:
                 break
 
     def _findresolvable(self, path):
@@ -170,7 +170,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 c = c.parent
         return eol.join(g())
 
-class SuperContext(AbstractContext):
+class StaticContext(AbstractContext):
 
     class EmptyContext:
 
@@ -178,7 +178,7 @@ class SuperContext(AbstractContext):
             pass
 
     def __init__(self):
-        super(SuperContext, self).__init__(self.EmptyContext())
+        super(StaticContext, self).__init__(self.EmptyContext())
         for word, d in lookup.items():
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
@@ -205,11 +205,11 @@ def slashfunction(context, *resolvables):
             break
     return Text(os.path.join() if path is None else path)
 
-supercontext = SuperContext()
+StaticContext = StaticContext()
 
 class Context(AbstractContext):
 
-    def __init__(self, parent = supercontext, islist = False):
+    def __init__(self, parent = StaticContext, islist = False):
         super(Context, self).__init__(parent)
         self.islist = islist
 
