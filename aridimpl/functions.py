@@ -122,7 +122,7 @@ class Functions:
             try:
                 return r.resolve(context)
             except NoSuchPathException:
-                pass
+                pass # XXX: Log it at a fine level?
         return resolvables[-1].resolve(context)
 
     def mul(context, *resolvables):
