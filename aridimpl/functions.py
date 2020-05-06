@@ -16,9 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from .directives import resolvepath
-from .grammar import templateparser
-from .model import Concat, List, Number, Text
+from .directives import processtemplate, resolvepath
+from .model import List, Number, Text
 from .util import allfunctions, NoSuchPathException, realname
 import json, os, shlex
 
@@ -150,7 +149,7 @@ class Functions:
 
     def processtemplate(context, resolvable):
         with open(resolvable.resolve(context).cat()) as f:
-            return Text(Concat(templateparser(f.read())).resolve(context).cat()) # TODO: Duplicated code.
+            return Text(processtemplate(context, f))
 
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))
