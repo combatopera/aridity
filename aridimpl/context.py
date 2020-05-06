@@ -77,7 +77,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         while True:
             yield self
             self = self.parent
-            if StaticContext.EmptyContext == self.__class__:
+            if self is None:
                 break
 
     def _findresolvable(self, path):
@@ -172,13 +172,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
 class StaticContext(AbstractContext):
 
-    class EmptyContext:
-
-        def getresolvables(self, name, append):
-            pass
-
     def __init__(self):
-        super(StaticContext, self).__init__(self.EmptyContext())
+        super(StaticContext, self).__init__(None)
         for word, d in lookup.items():
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
