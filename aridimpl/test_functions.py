@@ -18,7 +18,9 @@
 from .context import Context
 from .repl import Repl
 from .util import NoSuchPathException
+from tempfile import NamedTemporaryFile
 from unittest import TestCase
+import os
 
 class TestFunctions(TestCase):
 
@@ -42,3 +44,14 @@ class TestFunctions(TestCase):
         with self.assertRaises(NoSuchPathException):
             c.resolved('lazyfail')
         ae('/woo/yay', c.resolved('lazyok').value)
+
+    def test_hereisavailableduringinclude(self):
+        with NamedTemporaryFile('w') as f:
+            f.write('hereval := $(here)\n')
+            f.write('sibpath := $./(sibling)\n')
+            f.flush()
+            c = Context()
+            with Repl(c) as repl:
+                repl.printf(". %s", f.name)
+            self.assertEqual(os.path.dirname(f.name), c.resolved('hereval').value)
+            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sibling'), c.resolved('sibpath').value)
