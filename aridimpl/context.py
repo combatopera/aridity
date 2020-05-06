@@ -21,6 +21,7 @@ from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from .functions import getfunctions
 from .directives import lookup
 from .repl import Repl
+from collections import defaultdict
 import os, sys
 
 class NotAPathException(Exception): pass
@@ -98,21 +99,22 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             path = path[1:]
 
     def _resolved(self, path, resolvable, kwargs):
+        errortocount = defaultdict(lambda: 0)
         for i in range(len(path)):
-            obj = self._resolvedshallow(path[i:], resolvable, kwargs)
+            obj = self._resolvedshallow(path[i:], resolvable, kwargs, errortocount)
             if obj is not None:
                 return obj
-        raise NoSuchPathException(path) # FIXME: Misleading.
+        raise NoSuchPathException(path, dict(errortocount))
 
-    def _resolvedshallow(self, path, resolvable, kwargs):
+    def _resolvedshallow(self, path, resolvable, kwargs, errortocount):
         while path:
             path = path[:-1]
             for c in (c._resolvedcontextornone(path) for c in self._selfandparents()):
                 if c is not None:
                     try:
                         return resolvable.resolve(c, **kwargs)
-                    except NoSuchPathException:
-                        pass
+                    except NoSuchPathException as e:
+                        errortocount[str(e)] += 1
 
     def unravel(self):
         d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
