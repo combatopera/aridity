@@ -23,7 +23,7 @@ from .directives import lookup
 from .repl import Repl
 from collections import defaultdict
 from contextlib import contextmanager
-import os, re, sys
+import os, re, sys, threading
 
 class NotAPathException(Exception): pass
 
@@ -196,7 +196,16 @@ StaticContext = StaticContext()
 
 class DynamicContext(AbstractContext):
 
-    class Stack(Resolvable):
+    class ThreadLocalResolvable(Resolvable):
+
+        def __init__(self, threadlocals, name):
+            self.threadlocals = threadlocals
+            self.name = name
+
+        def resolve(self, context):
+            return getattr(self.threadlocals, self.name).resolve(context)
+
+    class Stack:
 
         def __init__(self):
             self.stack = []
@@ -237,10 +246,22 @@ class DynamicContext(AbstractContext):
         def resolve(self, context):
             return Text(self.whitespace.match(''.join(self.stack[-1])).group())
 
+    factories = dict(here = SimpleStack, indent = Indent)
+
     def __init__(self):
         super(DynamicContext, self).__init__(StaticContext)
-        self['here',] = self.here = self.SimpleStack()
-        self['indent',] = self.indent = self.Indent()
+        self.threadlocals = threading.local()
+        for name in self.factories:
+            self[name,] = self.ThreadLocalResolvable(self.threadlocals, name)
+
+    def __getattr__(self, name):
+        threadlocals = self.threadlocals
+        try:
+            return getattr(threadlocals, name)
+        except AttributeError:
+            r = self.factories[name]()
+            setattr(threadlocals, name, r)
+            return r
 
 class Context(AbstractContext):
 
