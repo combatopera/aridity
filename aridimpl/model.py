@@ -271,5 +271,5 @@ class Entry(Struct):
         for r in self.resolvables:
             if not r.ignorable or r.boundary:
                 break
-            indent.append(r)
-        return Concat.unlesssingleton(indent).resolve(None).cat()
+            indent.append(r.value)
+        return ''.join(indent)
