@@ -87,12 +87,12 @@ class Cat:
     name = '<'
     def __call__(self, prefix, phrase, context):
         context = context.getorcreatesubcontext(prefix.topath(context))
-        with open(resolvepath(phrase, context)) as f:
-            context.resolved('stdout').flush(processtemplate(context, f))
+        context.resolved('stdout').flush(processtemplate(context, phrase))
 
 def resolvepath(resolvable, context):
     path = resolvable.resolve(context).cat()
     return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
 
-def processtemplate(context, f):
-    return Concat(templateparser(f.read())).resolve(context).cat()
+def processtemplate(context, pathresolvable):
+    with open(resolvepath(pathresolvable, context)) as f:
+        return Concat(templateparser(f.read())).resolve(context).cat()

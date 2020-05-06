@@ -148,8 +148,7 @@ class Functions:
             return Text(f.read())
 
     def processtemplate(context, resolvable):
-        with open(resolvepath(resolvable, context)) as f:
-            return Text(processtemplate(context, f))
+        return Text(processtemplate(context, resolvable))
 
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))
