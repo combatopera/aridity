@@ -22,6 +22,7 @@ from .functions import getfunctions
 from .directives import lookup
 from .repl import Repl
 from collections import defaultdict
+from contextlib import contextmanager
 import os, sys
 
 class NotAPathException(Exception): pass
@@ -123,24 +124,15 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def __iter__(self):
         return iter(self.resolvables)
 
-    def temporarily(self, name, resolvable, block): # FIXME: Retire.
-        oldornone = self.resolvables.get(name)
-        self.resolvables[name] = resolvable
-        try:
-            return block()
-        finally:
-            if oldornone is None:
-                del self.resolvables[name]
-            else:
-                self.resolvables[name] = oldornone
+    def dynamicancestor(self):
+        for c in self._selfandparents():
+            if StaticContext == c.parent:
+                return c
 
     def source(self, prefix, path):
-        def block():
-            with Repl(self, rootprefix = prefix) as repl:
-                with open(path) as f:
-                    for line in f:
-                        repl(line)
-        self.temporarily('here', Text(os.path.dirname(path)), block)
+        with self.dynamicancestor().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
+            for line in f:
+                repl(line)
 
     class Enough(Exception): pass
 
@@ -202,10 +194,32 @@ def slashfunction(context, *resolvables):
 
 StaticContext = StaticContext()
 
+class DynamicContext(AbstractContext):
+
+    class Stack(Resolvable):
+
+        def __init__(self):
+            self.stack = []
+
+        @contextmanager
+        def push(self, value):
+            self.stack.append(value)
+            try:
+                yield
+            finally:
+                self.stack.pop()
+
+        def resolve(self, context):
+            return self.stack[-1]
+
+    def __init__(self):
+        super(DynamicContext, self).__init__(StaticContext)
+        self['here',] = self.here = self.Stack()
+
 class Context(AbstractContext):
 
-    def __init__(self, parent = StaticContext, islist = False):
-        super(Context, self).__init__(parent)
+    def __init__(self, parent = None, islist = False):
+        super(Context, self).__init__(DynamicContext() if parent is None else parent)
         self.islist = islist
 
     def resolve(self, context):
