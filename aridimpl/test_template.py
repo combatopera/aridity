@@ -17,9 +17,13 @@
 
 from .context import Context
 from .directives import processtemplate
-from .model import Text
+from .model import Function, Text
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
+
+def quot(context, *resolvables):
+    indent = context.resolved('indent').value
+    return Text('\n'.join((indent if i else '') + r.resolve(context).value for i, r in enumerate(resolvables)))
 
 class TestTemplate(TestCase):
 
@@ -47,3 +51,13 @@ class TestTemplate(TestCase):
             f.write('$(indent) should not fail')
             f.flush()
             self.assertEqual(' should not fail', processtemplate(c, Text(f.name)))
+
+    def test_indentfromfunction(self):
+        c = Context()
+        c['"',] = Function(quot)
+        with NamedTemporaryFile('w') as f:
+            f.write('  hmm: $"(z y x)')
+            f.flush()
+            self.assertEqual('''  hmm: z
+  y
+  x''', processtemplate(c, Text(f.name)))
