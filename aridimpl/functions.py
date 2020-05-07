@@ -1,4 +1,4 @@
-# Copyright 2017 Andrzej Cichocki
+# Copyright 2017, 2020 Andrzej Cichocki
 
 # This file is part of aridity.
 #

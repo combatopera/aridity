@@ -1,4 +1,4 @@
-# Copyright 2017 Andrzej Cichocki
+# Copyright 2017, 2020 Andrzej Cichocki
 
 # This file is part of aridity.
 #
@@ -20,7 +20,7 @@ from .directives import lookup
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .repl import Repl
-from .stacks import ThreadLocalResolvable, SimpleStack, IndentStack
+from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from collections import defaultdict
 import os, sys, threading
