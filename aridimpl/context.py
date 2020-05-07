@@ -124,13 +124,13 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def __iter__(self):
         return iter(self.resolvables)
 
-    def dynamicancestor(self):
+    def staticcontext(self):
         for c in self._selfandparents():
-            if StaticContext == c.parent:
+            if c.parent is None:
                 return c
 
     def source(self, prefix, path):
-        with self.dynamicancestor().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
+        with self.staticcontext().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
             for line in f:
                 repl(line)
 
@@ -163,38 +163,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return eol.join(g())
 
 class StaticContext(AbstractContext):
-
-    def __init__(self):
-        super(StaticContext, self).__init__(None)
-        for word, d in lookup.items():
-            self[word.cat(),] = Directive(d)
-        for name, f in getfunctions():
-            self[name,] = Function(f)
-        self['~',] = Text(os.path.expanduser('~'))
-        self['LF',] = Text('\n')
-        self['EOL',] = Text(os.linesep)
-        self['stdout',] = Stream(sys.stdout)
-        self['/',] = Slash()
-        self['None',] = Scalar(None)
-
-class Slash(Text, Function):
-
-    def __init__(self):
-        Text.__init__(self, os.sep)
-        Function.__init__(self, slashfunction)
-
-def slashfunction(context, *resolvables):
-    path = None
-    for r in reversed(resolvables):
-        component = r.resolve(context).cat()
-        path = component if path is None else os.path.join(component, path)
-        if os.path.isabs(path):
-            break
-    return Text(os.path.join() if path is None else path)
-
-StaticContext = StaticContext()
-
-class DynamicContext(AbstractContext):
 
     class ThreadLocalResolvable(Resolvable):
 
@@ -250,7 +218,17 @@ class DynamicContext(AbstractContext):
     factories = dict(here = SimpleStack, indent = Indent)
 
     def __init__(self):
-        super(DynamicContext, self).__init__(StaticContext)
+        super(StaticContext, self).__init__(None)
+        for word, d in lookup.items():
+            self[word.cat(),] = Directive(d)
+        for name, f in getfunctions():
+            self[name,] = Function(f)
+        self['~',] = Text(os.path.expanduser('~'))
+        self['LF',] = Text('\n')
+        self['EOL',] = Text(os.linesep)
+        self['stdout',] = Stream(sys.stdout)
+        self['/',] = Slash()
+        self['None',] = Scalar(None)
         self.threadlocals = threading.local()
         for name in self.factories:
             self[name,] = self.ThreadLocalResolvable(self.threadlocals, name)
@@ -264,10 +242,27 @@ class DynamicContext(AbstractContext):
             setattr(threadlocals, name, r)
             return r
 
+class Slash(Text, Function):
+
+    def __init__(self):
+        Text.__init__(self, os.sep)
+        Function.__init__(self, slashfunction)
+
+def slashfunction(context, *resolvables):
+    path = None
+    for r in reversed(resolvables):
+        component = r.resolve(context).cat()
+        path = component if path is None else os.path.join(component, path)
+        if os.path.isabs(path):
+            break
+    return Text(os.path.join() if path is None else path)
+
+StaticContext = StaticContext()
+
 class Context(AbstractContext):
 
-    def __init__(self, parent = None, islist = False):
-        super(Context, self).__init__(DynamicContext() if parent is None else parent)
+    def __init__(self, parent = StaticContext, islist = False):
+        super(Context, self).__init__(parent)
         self.islist = islist
 
     def resolve(self, context):
