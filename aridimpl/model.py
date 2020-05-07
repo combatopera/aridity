@@ -276,5 +276,5 @@ class Entry(Struct):
         for r in self.resolvables:
             if not r.ignorable or r.boundary:
                 break
-            indent.append(r.value)
-        return ''.join(indent)
+            indent.append(r) # XXX: Can we simply grab its value?
+        return Concat.unlesssingleton(indent).resolve(None).cat()
