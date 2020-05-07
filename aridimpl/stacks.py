@@ -53,21 +53,21 @@ class IndentStack(Stack):
 
     class Monitor:
 
-        textblock = re.compile(r'(?:.*[\r\n]+)+')
-        whitespace = re.compile(r'\s*')
+        nontrivialtextblock = re.compile(r'(?:.*[\r\n]+)+')
+        indentpattern = re.compile(r'\s*')
 
         def __init__(self):
             self.parts = []
 
         def __call__(self, text):
-            m = self.textblock.match(text)
+            m = self.nontrivialtextblock.match(text)
             if m is None:
                 self.parts.append(text)
             else:
                 self.parts[:] = text[m.end():],
 
         def indent(self):
-            return Text(self.whitespace.match(''.join(self.parts)).group())
+            return Text(self.indentpattern.match(''.join(self.parts)).group())
 
     def push(self):
         return self.pushimpl(self.Monitor())
