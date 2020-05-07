@@ -92,12 +92,10 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         raise NoSuchPathException(path)
 
     def _findresolvableshallow(self, path):
-        while path:
-            for c in self._selfandparents():
-                r = c._subresolvables(path[:-1]).get(path[-1])
-                if r is not None:
-                    return r
-            path = path[1:]
+        for c in self._selfandparents():
+            r = c._subresolvables(path[:-1]).get(path[-1])
+            if r is not None:
+                return r
 
     def _resolved(self, path, resolvable, kwargs):
         errortocount = defaultdict(lambda: 0)
