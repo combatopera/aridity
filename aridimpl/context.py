@@ -16,14 +16,14 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
-from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
-from .functions import getfunctions
 from .directives import lookup
+from .functions import getfunctions
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .repl import Repl
+from .stacks import ThreadLocalResolvable, SimpleStack, IndentStack
+from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from collections import defaultdict
-from contextlib import contextmanager
-import os, re, sys, threading
+import os, sys, threading
 
 class NotAPathException(Exception): pass
 
@@ -164,63 +164,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
 class StaticContext(AbstractContext):
 
-    class ThreadLocalResolvable(Resolvable):
-
-        def __init__(self, threadlocals, name):
-            self.threadlocals = threadlocals
-            self.name = name
-
-        def resolve(self, context):
-            return getattr(self.threadlocals, self.name).resolve(context)
-
-    class Stack:
-
-        def __init__(self):
-            self.stack = []
-
-        @contextmanager
-        def _push(self, value):
-            self.stack.append(value)
-            try:
-                yield value
-            finally:
-                self.stack.pop()
-
-    class SimpleStack(Stack):
-
-        def push(self, value):
-            return self._push(value)
-
-        def resolve(self, context):
-            return self.stack[-1]
-
-    class Indent(Stack):
-
-        class Monitor:
-
-            textblock = re.compile(r'(?:.*[\r\n]+)+')
-            whitespace = re.compile(r'\s*')
-
-            def __init__(self):
-                self.chunks = []
-
-            def __call__(self, text):
-                m = self.textblock.match(text)
-                if m is None:
-                    self.chunks.append(text)
-                else:
-                    self.chunks[:] = text[m.end():],
-
-            def indent(self):
-                return Text(self.whitespace.match(''.join(self.chunks)).group())
-
-        def push(self):
-            return self._push(self.Monitor())
-
-        def resolve(self, context):
-            return self.stack[-1].indent()
-
-    factories = dict(here = SimpleStack, indent = Indent)
+    stacktypes = dict(here = SimpleStack, indent = IndentStack)
 
     def __init__(self):
         super(StaticContext, self).__init__(None)
@@ -235,17 +179,17 @@ class StaticContext(AbstractContext):
         self['/',] = Slash()
         self['None',] = Scalar(None)
         self.threadlocals = threading.local()
-        for name in self.factories:
-            self[name,] = self.ThreadLocalResolvable(self.threadlocals, name)
+        for name in self.stacktypes:
+            self[name,] = ThreadLocalResolvable(self.threadlocals, name)
 
     def __getattr__(self, name):
         threadlocals = self.threadlocals
         try:
             return getattr(threadlocals, name)
         except AttributeError:
-            r = self.factories[name]()
-            setattr(threadlocals, name, r)
-            return r
+            stack = self.stacktypes[name]()
+            setattr(threadlocals, name, stack)
+            return stack
 
 class Slash(Text, Function):
 
