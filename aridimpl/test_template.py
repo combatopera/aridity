@@ -22,13 +22,13 @@ from .repl import Repl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
-def quot(context, resolvable):
+def blockquote(context, resolvable):
     indent = context.resolved('indent').value
     return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines(True))))
 
 class TestTemplate(TestCase):
 
-    def test_indent(self):
+    def test_indentworks(self):
         c = Context()
         with NamedTemporaryFile('w') as f:
             f.write('root: .$(indent).\n')
@@ -36,14 +36,14 @@ class TestTemplate(TestCase):
             f.write('    4sp: .$(indent).\n')
             f.write('\ttab: .$(indent).\n')
             f.write('\t mixed: .$(indent).\n')
-            f.write('\t$(indent) dynamic: .$(indent).\n')
+            f.write('\t$(indent) compound: .$(indent).\n')
             f.flush()
             self.assertEqual('''root: ..
  sp: . .
     4sp: .    .
 \ttab: .\t.
 \t mixed: .\t .
-\t\t dynamic: .\t\t .
+\t\t compound: .\t\t .
 ''', processtemplate(c, Text(f.name)))
 
     def test_trivialindent(self):
@@ -55,9 +55,9 @@ class TestTemplate(TestCase):
 
     def test_getindentinfunction(self):
         c = Context()
-        c['"',] = Function(quot)
+        c['"',] = Function(blockquote)
         with Repl(c) as repl:
-            repl('block = $.(z\ny\nx\n)')
+            repl('block = $.(z\ny\nx\n)') # XXX: Is this sane?
         with NamedTemporaryFile('w') as f:
             f.write('  hmm: $"$(block)\n')
             f.flush()
