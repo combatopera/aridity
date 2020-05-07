@@ -24,7 +24,7 @@ from unittest import TestCase
 
 def quot(context, resolvable):
     indent = context.resolved('indent').value
-    return Text('\n'.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines())))
+    return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines(True))))
 
 class TestTemplate(TestCase):
 
