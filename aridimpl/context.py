@@ -126,8 +126,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def staticcontext(self):
         for c in self._selfandparents():
-            if c.parent is None:
-                return c
+            pass
+        return c
 
     def source(self, prefix, path):
         with self.staticcontext().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
