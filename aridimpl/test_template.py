@@ -57,10 +57,12 @@ class TestTemplate(TestCase):
         c = Context()
         c['"',] = Function(quot)
         with Repl(c) as repl:
-            repl('block = $.(z\ny\nx)')
+            repl('block = $.(z\ny\nx\n)')
         with NamedTemporaryFile('w') as f:
-            f.write('  hmm: $"$(block)')
+            f.write('  hmm: $"$(block)\n')
             f.flush()
             self.assertEqual('''  hmm: z
   y
-  x''', processtemplate(c, Text(f.name)))
+  x
+
+''', processtemplate(c, Text(f.name)))
