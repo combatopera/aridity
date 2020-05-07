@@ -196,24 +196,29 @@ class StaticContext(AbstractContext):
 
     class Indent(Stack):
 
-        class Monitor(list):
+        class Monitor:
 
             textblock = re.compile(r'(?:.*[\r\n]+)+')
+            whitespace = re.compile(r'\s*')
+
+            def __init__(self):
+                self.chunks = []
 
             def __call__(self, text):
                 m = self.textblock.match(text)
                 if m is None:
-                    self.append(text)
+                    self.chunks.append(text)
                 else:
-                    self[:] = text[m.end():],
+                    self.chunks[:] = text[m.end():],
 
-        whitespace = re.compile(r'\s*')
+            def indent(self):
+                return Text(self.whitespace.match(''.join(self.chunks)).group())
 
         def push(self):
             return self._push(self.Monitor())
 
         def resolve(self, context):
-            return Text(self.whitespace.match(''.join(self.stack[-1])).group())
+            return self.stack[-1].indent()
 
     factories = dict(here = SimpleStack, indent = Indent)
 
