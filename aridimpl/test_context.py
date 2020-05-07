@@ -365,3 +365,15 @@ class TestContext(unittest.TestCase):
         self.assertEqual('x', context.resolved('root', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'eranu', 'parent', 'bar').unravel())
         self.assertEqual('x', context.resolved('root', 'uvavu', 'parent', 'bar').unravel())
+
+    def test_moreobviouspath(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('reference')
+            repl('\taccounts')
+            repl('\t\tname = hello')
+            repl('\tquoted = expected $(name)')
+            repl('config')
+            repl('\tquoted = not this one')
+            repl('\titem = $(reference accounts quoted)')
+        self.assertEqual('expected hello', c.resolved('config', 'item').value)
