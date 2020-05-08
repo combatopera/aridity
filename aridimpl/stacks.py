@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Resolvable, Text
+from .util import NoSuchPathException
 from contextlib import contextmanager
 import re
 
@@ -30,8 +31,9 @@ class ThreadLocalResolvable(Resolvable):
 
 class Stack:
 
-    def __init__(self):
+    def __init__(self, label):
         self.stack = []
+        self.label = label
 
     @contextmanager
     def pushimpl(self, value):
@@ -41,13 +43,19 @@ class Stack:
         finally:
             self.stack.pop()
 
+    def head(self):
+        try:
+            return self.stack[-1]
+        except IndexError:
+            raise NoSuchPathException("Head of thread-local stack: %s" % self.label)
+
 class SimpleStack(Stack):
 
     def push(self, value):
         return self.pushimpl(value)
 
     def resolve(self, context):
-        return self.stack[-1]
+        return self.head()
 
 class IndentStack(Stack):
 
@@ -73,4 +81,4 @@ class IndentStack(Stack):
         return self.pushimpl(self.Monitor())
 
     def resolve(self, context):
-        return self.stack[-1].indent()
+        return self.head().indent()

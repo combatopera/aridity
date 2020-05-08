@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, tempfile, collections
+from .context import StaticContext
 from .grammar import loader as l
 from .model import Directive, Stream, Text
 from .context import Context, NoSuchPathException
 from .repl import Repl
+from collections import namedtuple
+from tempfile import NamedTemporaryFile
+from unittest import TestCase
 
-class TestContext(unittest.TestCase):
+class TestContext(TestCase):
 
     def test_precedence(self):
         c = Context()
@@ -111,8 +114,8 @@ class TestContext(unittest.TestCase):
     def test_emptytemplate(self):
         context = Context()
         chunks = []
-        context['stdout',] = Stream(collections.namedtuple('Chunks', 'write flush')(chunks.append, lambda: None))
-        with tempfile.NamedTemporaryFile() as f, Repl(context) as repl:
+        context['stdout',] = Stream(namedtuple('Chunks', 'write flush')(chunks.append, lambda: None))
+        with NamedTemporaryFile() as f, Repl(context) as repl:
             repl.printf("< %s", f.name)
         self.assertEqual([''], chunks)
 
@@ -244,7 +247,7 @@ class TestContext(unittest.TestCase):
 
     def test_nestedinclude(self):
         context = Context()
-        with tempfile.NamedTemporaryFile() as f:
+        with NamedTemporaryFile() as f:
             f.write('\t\n\nwoo = yay'.encode()) # Blank lines should be ignored.
             f.flush()
             with Repl(context) as repl:
@@ -378,3 +381,9 @@ class TestContext(unittest.TestCase):
             repl('  quotedname = "NO!!"')
             repl('  item = $(reference myaccount quotedname)')
         self.assertEqual('"YES!"', c.resolved('config', 'item').value)
+
+    def test_hereandindentfailure(self):
+        c = Context()
+        for name in StaticContext.stacktypes:
+            with self.assertRaises(NoSuchPathException):
+                c.resolved(name)

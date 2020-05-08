@@ -185,7 +185,7 @@ class StaticContext(AbstractContext):
         try:
             return getattr(threadlocals, name)
         except AttributeError:
-            stack = self.stacktypes[name]()
+            stack = self.stacktypes[name](name)
             setattr(threadlocals, name, stack)
             return stack
 
