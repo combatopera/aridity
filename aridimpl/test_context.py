@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import StaticContext
+from .context import Context, NoSuchPathException, StaticContext
 from .grammar import loader as l
 from .model import Directive, Stream, Text
-from .context import Context, NoSuchPathException
 from .repl import Repl
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
