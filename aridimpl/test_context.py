@@ -386,3 +386,15 @@ class TestContext(TestCase):
         for name in StaticContext.stacktypes:
             with self.assertRaises(NoSuchPathException):
                 c.resolved(name)
+
+    def test_appendtolistinsubcontext(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('v := $list(x)')
+            repl('v += y')
+        d = c.createchild()
+        self.assertEqual(['x', 'y'], d.resolved('v').unravel()) # Good, same as parent.
+        with Repl(d) as repl:
+            repl('v += z')
+        self.assertEqual(['x', 'y'], c.resolved('v').unravel()) # Good, we should not modify parent.
+        self.assertEqual(['z'], list(d.resolved('v').unravel().values())) # Makes sense maybe.
