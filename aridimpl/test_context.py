@@ -398,3 +398,15 @@ class TestContext(TestCase):
             repl('v += z')
         self.assertEqual(['x', 'y'], c.resolved('v').unravel()) # Good, we should not modify parent.
         self.assertEqual(['z'], list(d.resolved('v').unravel().values())) # Makes sense maybe.
+
+    def test_appendtolistinsubcontext2(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('u v := $list(x)')
+            repl('u v += y')
+        d = c.createchild()
+        self.assertEqual(['x', 'y'], d.resolved('u', 'v').unravel())
+        with Repl(d) as repl:
+            repl('u v += z')
+        self.assertEqual(['x', 'y'], c.resolved('u', 'v').unravel())
+        self.assertEqual(['z'], list(d.resolved('u', 'v').unravel().values()))
