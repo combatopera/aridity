@@ -416,8 +416,21 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('woo = yay')
         d = c.createchild()
+        self.assertEqual('yay', d.resolved('woo').value)
         with Repl(d) as repl:
             repl('woo = $(void)')
         self.assertEqual('yay', c.resolved('woo').value)
         with self.assertRaises(NoSuchPathException):
             d.resolved('woo')
+
+    def test_poison2(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('u woo = yay')
+        d = c.createchild()
+        self.assertEqual('yay', d.resolved('u', 'woo').value)
+        with Repl(d) as repl:
+            repl('u woo = $(void)')
+        self.assertEqual('yay', c.resolved('u', 'woo').value)
+        with self.assertRaises(NoSuchPathException):
+            d.resolved('u', 'woo')
