@@ -410,3 +410,14 @@ class TestContext(TestCase):
             repl('u v += z')
         self.assertEqual(['x', 'y'], c.resolved('u', 'v').unravel())
         self.assertEqual(['z'], list(d.resolved('u', 'v').unravel().values()))
+
+    def test_poison(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('woo = yay')
+        d = c.createchild()
+        with Repl(d) as repl:
+            repl('woo = $(void)')
+        self.assertEqual('yay', c.resolved('woo').value)
+        with self.assertRaises(NoSuchPathException):
+            d.resolved('woo')
