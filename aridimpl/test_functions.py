@@ -110,3 +110,11 @@ class TestFunctions(TestCase):
             repl('v b = r$(a)')
             repl('j = $join($(v) ,)')
         self.assertEqual('x,rx', c.resolved('j').value)
+
+    def test_mapcommafunction(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('command = git rev-parse --show-toplevel')
+            repl('" = $(shstr)')
+            repl('text = $join($map($,(command) w $"$(w)) $.( ))')
+        self.assertEqual('FIXME', c.resolved('text').value)
