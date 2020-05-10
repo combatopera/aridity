@@ -110,7 +110,7 @@ class Functions:
     def list(context, *resolvables):
         v = context.createchild(islist = True)
         for r in resolvables:
-            v[r.unparse(),] = r
+            v[r.unparse(),] = r # TODO LATER: Investigate using new opaque path component per element.
         return v
 
     def fork(context):
