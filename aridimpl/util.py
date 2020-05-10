@@ -79,6 +79,9 @@ class OrderedDict(OrderedDictWrapper):
     def __repr__(self):
         return repr(self.d)
 
+    def update(self, other):
+        return self.d.update(other)
+
 def realname(name):
     def apply(f):
         f.realname = name

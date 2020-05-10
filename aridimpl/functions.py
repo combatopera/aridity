@@ -58,8 +58,7 @@ class Functions:
                 for k, v in objs.resolvables.items():
                     c = context.createchild()
                     c.label = Text(k)
-                    for vk, vv in v.resolvables.items():
-                        c[vk,] = vv
+                    c.resolvables.update(v.resolvables)
                     yield resolvable.resolve(c)
             return List(list(g()))
         elif 2 == len(args):
