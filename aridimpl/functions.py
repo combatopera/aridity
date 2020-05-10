@@ -56,8 +56,10 @@ class Functions:
             resolvable, = args
             def g():
                 for k, v in objs.resolvables.items():
-                    c = v.createchild()
+                    c = context.createchild()
                     c.label = Text(k)
+                    for vk, vv in v.resolvables.items():
+                        c[vk,] = vv
                     yield resolvable.resolve(c)
             return List(list(g()))
         elif 2 == len(args):
