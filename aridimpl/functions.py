@@ -50,11 +50,12 @@ class Functions:
         'Also suitable for YAML.'
         return Text(json.dumps(resolvable.resolve(context).value))
 
-    def map(context, objs, *args):
+    def map(context, objsresolvable, *args):
+        objs = objsresolvable.resolve(context)
         if 1 == len(args):
             expr, = args
             def g():
-                for k, v in objs.resolve(context).resolvables.items():
+                for k, v in objs.resolvables.items():
                     c = v.createchild()
                     c.label = Text(k)
                     yield expr.resolve(c)
@@ -63,7 +64,7 @@ class Functions:
             name, expr = args
             name = name.resolve(context).cat()
             def g():
-                for obj in objs.resolve(context):
+                for obj in objs:
                     c = context.createchild()
                     c[name,] = obj
                     yield expr.resolve(c)
@@ -73,7 +74,7 @@ class Functions:
             kname = kname.resolve(context).cat()
             vname = vname.resolve(context).cat()
             def g():
-                for k, v in objs.resolve(context).resolvables.items():
+                for k, v in objs.resolvables.items():
                     c = context.createchild()
                     c[kname,] = Text(k)
                     c[vname,] = v
