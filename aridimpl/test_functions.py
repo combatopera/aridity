@@ -114,7 +114,7 @@ class TestFunctions(TestCase):
     def test_mapcommafunction(self):
         c = Context()
         with Repl(c) as repl:
-            repl('command = git rev-parse --show-toplevel')
-            repl('" = $(shstr)')
+            repl('command = git rev-parse --abbrev-ref @{u}')
+            repl('" = $(pystr)')
             repl('text = $join($map($,(command) w $"$(w)) $.( ))')
-        self.assertEqual('FIXME', c.resolved('text').value)
+        self.assertEqual("'git' 'rev-parse' '--abbrev-ref' '@{u}'", c.resolved('text').value)

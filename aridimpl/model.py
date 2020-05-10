@@ -201,6 +201,13 @@ class List(Resolved):
     def unravel(self):
         return list(x.unravel() for x in self)
 
+    @property
+    def resolvables(self): # TODO: Bit of a hack.
+        class Resolvables:
+            def values(_):
+                return self.objs
+        return Resolvables()
+
 class Directive(Resolved):
 
     def __init__(self, directivevalue):
