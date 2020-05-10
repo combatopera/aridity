@@ -71,3 +71,22 @@ class TestFunctions(TestCase):
             expected = "%s %s %s" % (d, os.path.join(d, 'sibling'), os.path.join(d, 'sib', 'child'))
             self.assertEqual(expected, c.resolved('text').value)
             self.assertEqual(expected, g.read())
+
+    def test_listandmapincontext(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('my a eranu = x')
+            repl('my a uvavu = X')
+            repl('my b eranu = y')
+            repl('my b uvavu = Y')
+            repl('duped = $"$(my a eranu) & $"$(my a uvavu); $"$(my b eranu) & $"$(my b uvavu)')
+            repl('jlist = $join($list($.($"$(my a eranu) & $"$(my a uvavu)) $.($"$(my b eranu) & $"$(my b uvavu))) $.(; ))')
+            repl('mappd = $join($map($(my) $.($"$(eranu) & $"$(uvavu))) $.(; ))')
+            repl('sub1 " = $(pystr)')
+            repl('sub2 " = $(screenstr)')
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'duped').value)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'duped').value)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'jlist').value)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'jlist').value)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'mappd').value)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'mappd').value)
