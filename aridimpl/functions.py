@@ -90,7 +90,8 @@ class Functions:
             separator = r.resolve(context).cat()
         else:
             separator = ''
-        return Text(separator.join(r.cat() for r in resolvables.resolve(context)))
+        c = resolvables.resolve(context)
+        return Text(separator.join(r.resolve(c).cat() for r in c))
 
     def get(*args): return getimpl(*args)
 
