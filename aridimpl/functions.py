@@ -65,7 +65,7 @@ class Functions:
             vname, resolvable = args
             vname = vname.resolve(context).cat()
             def g():
-                for _, v in objs.resolvables.items():
+                for v in objs.resolvables.values():
                     c = context.createchild()
                     c[vname,] = v
                     yield resolvable.resolve(c)
