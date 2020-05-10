@@ -72,6 +72,15 @@ class TestFunctions(TestCase):
             self.assertEqual(expected, c.resolved('text').value)
             self.assertEqual(expected, g.read())
 
+    def test_concatinlist(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('a = x')
+            repl('b = y')
+            repl('c = z')
+            repl('j = $join($list($(a)$(b) $(b)$(c)) -)')
+        self.assertEqual('xy-yz', c.resolved('j').value)
+
     def test_listandmapincontext(self):
         c = Context()
         with Repl(c) as repl:
