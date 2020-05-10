@@ -61,12 +61,12 @@ class Functions:
                     yield resolvable.resolve(c)
             return List(list(g()))
         elif 2 == len(args):
-            name, resolvable = args
-            name = name.resolve(context).cat()
+            vname, resolvable = args
+            vname = vname.resolve(context).cat()
             def g():
-                for obj in objs:
+                for _, v in objs.resolvables.items():
                     c = context.createchild()
-                    c[name,] = obj
+                    c[vname,] = v
                     yield resolvable.resolve(c)
             return List(list(g()))
         else:
