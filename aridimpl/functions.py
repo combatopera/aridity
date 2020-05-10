@@ -53,24 +53,24 @@ class Functions:
     def map(context, objsresolvable, *args):
         objs = objsresolvable.resolve(context)
         if 1 == len(args):
-            expr, = args
+            resolvable, = args
             def g():
                 for k, v in objs.resolvables.items():
                     c = v.createchild()
                     c.label = Text(k)
-                    yield expr.resolve(c)
+                    yield resolvable.resolve(c)
             return List(list(g()))
         elif 2 == len(args):
-            name, expr = args
+            name, resolvable = args
             name = name.resolve(context).cat()
             def g():
                 for obj in objs:
                     c = context.createchild()
                     c[name,] = obj
-                    yield expr.resolve(c)
+                    yield resolvable.resolve(c)
             return List(list(g()))
         else:
-            kname, vname, expr = args
+            kname, vname, resolvable = args
             kname = kname.resolve(context).cat()
             vname = vname.resolve(context).cat()
             def g():
@@ -78,7 +78,7 @@ class Functions:
                     c = context.createchild()
                     c[kname,] = Text(k)
                     c[vname,] = v
-                    yield expr.resolve(c)
+                    yield resolvable.resolve(c)
             return List(list(g()))
 
     def label(context):
