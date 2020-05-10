@@ -102,3 +102,11 @@ class TestFunctions(TestCase):
         self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map2a').value)
         self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'map1a').value)
         self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map1a').value)
+
+    def test_joinlistwithinternalref(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('v a = x')
+            repl('v b = r$(a)')
+            repl('j = $join($(v) ,)')
+        self.assertEqual('x,rx', c.resolved('j').value)

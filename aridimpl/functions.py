@@ -92,7 +92,6 @@ class Functions:
         else:
             separator = ''
         c = resolvables.resolve(context)
-        # TODO LATER: Find a case where resolving against c rather than context is actually necessary.
         return Text(separator.join(r.resolve(c).cat() for r in c))
 
     def get(*args): return getimpl(*args)
