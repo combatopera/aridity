@@ -118,3 +118,16 @@ class TestFunctions(TestCase):
             repl('" = $(pystr)')
             repl('text = $join($map($,(command) w $"$(w)) $.( ))')
         self.assertEqual("'git' 'rev-parse' '--abbrev-ref' '@{u}'", c.resolved('text').value)
+
+    def test_mapreceiver(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x = $join($map($(v) $"$()) ,)')
+            repl('v += one')
+            repl('v += two')
+            repl('" = $(jsonquote)')
+        try:
+            self.assertEqual('"one","two"', c.resolved('x').value)
+            self.fail('You fixed a bug!')
+        except AttributeError:
+            pass
