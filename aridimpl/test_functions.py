@@ -131,3 +131,16 @@ class TestFunctions(TestCase):
             self.fail('You fixed a bug!')
         except AttributeError:
             pass
+
+    def test_listref(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('foo args += yyup=$(yyup)')
+            repl('foo args += w/e')
+            repl('foo yyup = YYUP')
+            repl('x = $join($map($(foo args) it $(it)) .)')
+        try:
+            self.assertEqual('yyup=YYUP.w/e', c.resolved('x').unravel())
+            self.fail('You fixed a bug!')
+        except NoSuchPathException:
+            pass
