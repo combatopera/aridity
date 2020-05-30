@@ -157,6 +157,9 @@ class Functions:
     def spread(context, resolvable):
         return Spread(resolvable.resolve(context))
 
+    def lower(context, resolvable):
+        return Text(resolvable.resolve(context).cat().lower())
+
 class Spread:
 
     def __init__(self, context):
