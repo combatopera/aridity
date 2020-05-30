@@ -122,6 +122,9 @@ class Scalar(SimpleValue):
     def __hash__(self):
         return hash(self.value)
 
+    def spread(self, k):
+        yield k, self
+
 class Text(Cat, Scalar):
 
     @classmethod
@@ -207,6 +210,10 @@ class List(Resolved):
             def values(_):
                 return self.objs
         return Resolvables()
+
+    def itero(self):
+        for o in self.objs:
+            yield None, o
 
 class Directive(Resolved):
 

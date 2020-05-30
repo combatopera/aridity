@@ -92,7 +92,7 @@ class Functions:
         else:
             separator = ''
         c = resolvables.resolve(context)
-        return Text(separator.join(r.resolve(c).cat() for r in c))
+        return Text(separator.join(o.cat() for _, o in c.itero()))
 
     def get(*args): return getimpl(*args)
 
@@ -152,6 +152,18 @@ class Functions:
 
     def processtemplate(context, resolvable):
         return Text(processtemplate(context, resolvable))
+
+    @realname('*')
+    def spread(context, resolvable):
+        return Spread(resolvable.resolve(context))
+
+class Spread:
+
+    def __init__(self, context):
+        self.context = context
+
+    def spread(self, _):
+        return self.context.itero() # XXX: Or just the resolvables?
 
 def getimpl(context, *resolvables):
     return context.resolved(*(r.resolve(context).cat() for r in resolvables))

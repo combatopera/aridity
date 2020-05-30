@@ -434,3 +434,15 @@ class TestContext(TestCase):
         self.assertEqual('yay', c.resolved('u', 'woo').value)
         with self.assertRaises(NoSuchPathException):
             d.resolved('u', 'woo')
+
+    def test_spread(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('v +=')
+            repl('\tx')
+            repl('\ty')
+            repl('\t$*$(z)')
+            repl('z = $list(a b)')
+            repl('j = $join($(v) ,)')
+        self.assertEqual('x,y,a,b', c.resolved('j').value)
+        self.assertEqual(dict(x='x', y='y', a='a', b='b'), c.resolved('v').unravel())

@@ -116,7 +116,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                         errortocount[str(e)] += 1
 
     def unravel(self):
-        d = OrderedDict([k, v.resolve(self).unravel()] for k, v in self.resolvables.items())
+        d = OrderedDict([k, o.unravel()] for k, o in self.itero())
         return list(d) if self.islist else d
 
     def __iter__(self):
@@ -159,6 +159,14 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
                 c = c.parent
         return eol.join(g())
+
+    def itero(self):
+        for k, r in self.resolvables.items():
+            for t in r.resolve(self).spread(k):
+                yield t
+
+    def spread(self, k):
+        yield k, self
 
 class StaticContext(AbstractContext):
 
