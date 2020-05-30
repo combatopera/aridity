@@ -193,27 +193,11 @@ class Call(Resolvable):
     def cat(self):
         return self.unparse()
 
-class List(Resolved):
-
-    def __init__(self, objs):
-        self.objs = objs
-
-    def __iter__(self):
-        return iter(self.objs)
-
-    def unravel(self):
-        return list(x.unravel() for x in self)
-
-    @property
-    def resolvables(self): # TODO: Bit of a hack.
-        class Resolvables:
-            def values(_):
-                return self.objs
-        return Resolvables()
-
-    def itero(self):
-        for o in self.objs:
-            yield None, o
+def List(objs):
+    from .context import Context
+    c = Context(islist = True)
+    c.resolvables.update([object(), obj] for obj in objs)
+    return c
 
 class Directive(Resolved):
 

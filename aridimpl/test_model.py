@@ -17,7 +17,7 @@
 
 import unittest
 from .grammar import expressionparser as p
-from .model import Text, Call, Blank, Concat, Number, Function, List
+from .model import Text, Call, Blank, Concat, Number, Function
 from .context import Context
 from .util import allfunctions
 
@@ -75,7 +75,7 @@ class TestModel(unittest.TestCase):
 
     def test_map(self): # TODO: Also test 2-arg form.
         call, = p('$map($list(a b 0) x $(x)2)')
-        self.assertEqual(List([Text('a2'), Text('b2'), Text('02')]), call.resolve(Context()))
+        self.assertEqual([Text('a2'), Text('b2'), Text('02')], list(call.resolve(Context())))
 
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')
