@@ -45,6 +45,9 @@ class Resolved(Resolvable):
     def resolve(self, context, aslist = False):
         return List([self]) if aslist else self
 
+    def spread(self, k):
+        yield k, self
+
 class Concat(Resolvable):
 
     ignorable = False
@@ -121,9 +124,6 @@ class Scalar(SimpleValue):
 
     def __hash__(self):
         return hash(self.value)
-
-    def spread(self, k):
-        yield k, self
 
 class Text(Cat, Scalar):
 
@@ -211,6 +211,9 @@ class Function(Resolved):
 
     def __call__(self, *args):
         return self.f(*args)
+
+    def unravel(self):
+        return self.f
 
 class Stream(Resolved):
 
