@@ -17,7 +17,7 @@
 
 from .context import Context, NoSuchPathException, StaticContext
 from .grammar import loader as l
-from .model import Directive, Stream, Text
+from .model import Directive, Function, Stream, Text
 from .repl import Repl
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
@@ -472,3 +472,17 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('c = $list()')
         self.assertEqual(dict(x='x', z='z'), c.resolved('a').unravel())
+
+    def test_spreadfunc(self):
+        def f(): pass
+        def g(): pass
+        c = Context()
+        c['f',] = Function(f)
+        c['g',] = Function(g)
+        with Repl(c) as repl:
+            repl('v +=')
+            repl('\t$(f)')
+            repl('\t$*$(w)')
+            repl('w +=')
+            repl('\t$(g)')
+        self.assertEqual([f, g], list(c.resolved('v').unravel()))
