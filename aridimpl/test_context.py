@@ -454,8 +454,11 @@ class TestContext(TestCase):
             repl('\tx')
             repl('\ty')
             repl('\t$*$map($(z) it $(it)!)')
-            repl('z = $list(a b)')
+            repl('z +=')
+            repl('\ta')
+            repl('\tb')
         self.assertEqual(dict(x='x', y='y', a='a!', b='b!'), c.resolved('n', 'v').unravel())
+        self.assertEqual(dict(x='x', y='y', a='a!', b='b!'), c.resolved('n').resolved('v').unravel())
 
     def test_nestedspread(self):
         c = Context()
