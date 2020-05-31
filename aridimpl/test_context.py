@@ -447,6 +447,16 @@ class TestContext(TestCase):
         self.assertEqual('x,y,a,b', c.resolved('j').value)
         self.assertEqual(dict(x='x', y='y', a='a', b='b'), c.resolved('v').unravel())
 
+    def test_spread2(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('n v +=')
+            repl('\tx')
+            repl('\ty')
+            repl('\t$*$map($(z) it $(it)!)')
+            repl('z = $list(a b)')
+        self.assertEqual(dict(x='x', y='y', a='a!', b='b!'), c.resolved('n', 'v').unravel())
+
     def test_nestedspread(self):
         c = Context()
         with Repl(c) as repl:

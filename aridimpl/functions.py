@@ -17,7 +17,7 @@
 
 from __future__ import division
 from .directives import processtemplate, resolvepath
-from .model import List, Number, Text
+from .model import Number, Text
 from .util import allfunctions, NoSuchPathException, realname
 import json, os, shlex
 
@@ -59,17 +59,15 @@ class Functions:
                     c = context.createchild()
                     c.label = Text(k)
                     c.resolvables.update(v.resolvables)
-                    yield resolvable.resolve(c)
-            return List(list(g()))
+                    yield k, resolvable.resolve(c)
         elif 2 == len(args):
             vname, resolvable = args
             vname = vname.resolve(context).cat()
             def g():
-                for v in objs.resolvables.values():
+                for k, v in objs.resolvables.items():
                     c = context.createchild()
                     c[vname,] = v
-                    yield resolvable.resolve(c)
-            return List(list(g()))
+                    yield k, resolvable.resolve(c)
         else:
             kname, vname, resolvable = args
             kname = kname.resolve(context).cat()
@@ -79,8 +77,11 @@ class Functions:
                     c = context.createchild()
                     c[kname,] = Text(k)
                     c[vname,] = v
-                    yield resolvable.resolve(c)
-            return List(list(g()))
+                    yield k, resolvable.resolve(c)
+        from .context import Context
+        c = Context(islist = True)
+        c.resolvables.update(g())
+        return c
 
     def label(context):
         return context.label
