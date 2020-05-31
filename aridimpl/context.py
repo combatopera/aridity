@@ -29,6 +29,7 @@ class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
+# XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
