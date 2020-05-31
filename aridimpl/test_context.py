@@ -456,3 +456,6 @@ class TestContext(TestCase):
             repl('c += y')
             repl('b += z')
         self.assertEqual(dict(x='x', y='y', z='z'), c.resolved('a').unravel())
+        with Repl(c) as repl:
+            repl('c = $list()')
+        self.assertEqual(dict(x='x', z='z'), c.resolved('a').unravel())
