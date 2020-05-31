@@ -220,7 +220,7 @@ class Context(AbstractContext):
         super(Context, self).__init__(parent)
         self.islist = islist
 
-    def resolve(self, context):
+    def resolve(self, context): # TODO: Retire * and then this can go.
         c = Context(self.parent, self.islist)
         for name, r in self.resolvables.items():
             if name is not None:
