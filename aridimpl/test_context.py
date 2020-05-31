@@ -446,3 +446,13 @@ class TestContext(TestCase):
             repl('j = $join($(v) ,)')
         self.assertEqual('x,y,a,b', c.resolved('j').value)
         self.assertEqual(dict(x='x', y='y', a='a', b='b'), c.resolved('v').unravel())
+
+    def test_nestedspread(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('a += x')
+            repl('a += $*$(b)')
+            repl('b += $*$(c)')
+            repl('c += y')
+            repl('b += z')
+        self.assertEqual(dict(x='x', y='y', z='z'), c.resolved('a').unravel())
