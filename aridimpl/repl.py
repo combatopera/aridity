@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 import traceback, pyparsing, re
+from .context import Context
 from .grammar import commandparser
 from .model import Entry, Text
 
@@ -42,13 +43,13 @@ class Repl:
         except TypeError:
             return obj
 
-    def __init__(self, context, interactive = False, rootprefix = Entry([])):
+    def __init__(self, context = None, interactive = False, rootprefix = Entry([])):
         self.stack = []
         self.indent = ''
         self.command = Entry([Text(':')])
         self.commandsize = self.command.size()
         self.partials = {'': rootprefix}
-        self.context = context
+        self.context = Context() if context is None else context
         self.interactive = interactive
 
     def __enter__(self):

@@ -19,7 +19,6 @@ from __future__ import with_statement
 from .directives import lookup
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
-from .repl import Repl
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
 from collections import defaultdict
@@ -129,6 +128,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return c
 
     def source(self, prefix, path):
+        from .repl import Repl
         with self.staticcontext().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
             for line in f:
                 repl(line)

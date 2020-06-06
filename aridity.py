@@ -16,10 +16,10 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-import sys
-from aridimpl.model import Stream
 from aridimpl.context import Context
+from aridimpl.model import Stream
 from aridimpl.repl import Repl
+import sys
 
 def main_aridity():
     context = Context()

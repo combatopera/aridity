@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import aridity, os, sys
+from aridimpl.repl import Repl
+import os, sys
 
 def main_processtemplate():
     templatepath, = sys.argv[1:]
-    with aridity.Repl(aridity.Context()) as repl:
+    with Repl() as repl:
         for line in sys.stdin:
             repl(line)
         repl.printf("< %s", os.path.abspath(templatepath))
