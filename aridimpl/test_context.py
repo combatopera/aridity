@@ -22,6 +22,7 @@ from .repl import Repl
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
+import os
 
 class TestContext(TestCase):
 
@@ -486,3 +487,19 @@ class TestContext(TestCase):
             repl('w +=')
             repl('\t$(g)')
         self.assertEqual([f, g], list(c.resolved('v').unravel()))
+
+    def test_fullpathtrick(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('full_path = $/($(base path) $(path))')
+            repl('base path = opt')
+            repl('icon path = icon.png')
+        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full_path').value)
+
+    def test_fullpathtrick2(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('full path = $/($(base path) $(path))') # XXX: Surprising that this works?
+            repl('base path = opt')
+            repl('icon path = icon.png')
+        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full', 'path').value)
