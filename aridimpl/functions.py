@@ -21,6 +21,8 @@ from .model import Number, Text
 from .util import allfunctions, NoSuchPathException, realname
 import json, os, shlex
 
+xmlentities = dict([c, "&%s;" % w] for c, w in [['"', 'quot'], ["'", 'apos']])
+
 class Functions:
 
     def screenstr(context, resolvable):
@@ -49,6 +51,15 @@ class Functions:
     def jsonquote(context, resolvable):
         'Also suitable for YAML.'
         return Text(json.dumps(resolvable.resolve(context).value))
+
+    def xmlattr(context, resolvable):
+        from xml.sax.saxutils import quoteattr
+        return Text(quoteattr(resolvable.resolve(context).cat()))
+
+    def xmltext(context, resolvable):
+        'Suggest assigning this to & with xmlattr assigned to " as is convention.'
+        from xml.sax.saxutils import escape
+        return Text(escape(resolvable.resolve(context).cat(), xmlentities))
 
     def map(context, objsresolvable, *args):
         objs = objsresolvable.resolve(context)

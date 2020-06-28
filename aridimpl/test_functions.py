@@ -147,3 +147,18 @@ class TestFunctions(TestCase):
             self.fail('You fixed a bug!')
         except NoSuchPathException:
             pass
+
+    def test_xmlquoting(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('" = $(xmlattr)')
+            repl('& = $(xmltext)')
+            repl('''x = $"(abc<>&"')''')
+            repl('''x2 = $"(abc<>&')''')
+            repl('''x3 = $"(abc<>&")''')
+            repl('''y = $&(abc<>&"')''')
+        self.assertEqual('''"abc&lt;&gt;&amp;&quot;'"''', c.resolved('x').cat())
+        self.assertEqual('''"abc&lt;&gt;&amp;'"''', c.resolved('x2').cat())
+        self.assertEqual("""'abc&lt;&gt;&amp;"'""", c.resolved('x3').cat())
+        # Escape all quotes as users may expect to be able to paste into attribute content:
+        self.assertEqual('abc&lt;&gt;&amp;&quot;&apos;', c.resolved('y').cat())
