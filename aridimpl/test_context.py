@@ -513,3 +513,19 @@ class TestContext(TestCase):
             repl('a w := $(w)')
         self.assertEqual({'1': 1}, c.resolved('v').unravel())
         self.assertEqual({'2': 2}, c.resolved('a', 'w').unravel())
+
+    def test_longref(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x dbl = $(name)$(name)')
+            repl('x y name = Y')
+            repl('ok = $(x y dbl)')
+            repl('wtf k = $(x y dbl)')
+        self.assertEqual('YY', c.resolved('x', 'y', 'dbl').value)
+        self.assertEqual('YY', c.resolved('ok').unravel())
+        self.assertEqual('YY', c.resolved('wtf', 'k').unravel())
+        try:
+            self.assertEqual({'k': 'YY'}, c.resolved('wtf').unravel())
+            self.fail('You fixed a bug!')
+        except NoSuchPathException:
+            pass
