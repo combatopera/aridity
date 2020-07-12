@@ -74,7 +74,8 @@ class Equals:
 class ColonEquals:
     name = ':='
     def __call__(self, prefix, phrase, context):
-        Equals(prefix, phrase.resolve(context), context)
+        path = prefix.topath(context)
+        context[path] = phrase.resolve(context.getorcreatesubcontext(path[:-1]))
 
 @directive
 class PlusEquals:
