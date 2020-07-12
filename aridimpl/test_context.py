@@ -503,3 +503,13 @@ class TestContext(TestCase):
             repl('base path = opt')
             repl('icon path = icon.png')
         self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full', 'path').value)
+
+    def test_bake(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('v += 1')
+            repl('v := $(v)')
+            repl('a w += 2')
+            repl('a w := $(w)')
+        self.assertEqual({'1': 1}, c.resolved('v').unravel())
+        self.assertEqual({'2': 2}, c.resolved('a', 'w').unravel())
