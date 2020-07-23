@@ -200,6 +200,20 @@ class TestContext(TestCase):
         ae('yay', items['item2']['woo'])
         ae('yay', items['*']['woo'])
 
+    def test_star2(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('hmm * woo yay = houpla')
+            repl('hmm item1 x = y')
+            repl('hmm item2 woo = notyay')
+            repl('hmm item3 woo yay = override')
+            repl('hmm item4 woo Else = other')
+        ae = self.assertEqual
+        ae(dict(woo = dict(yay = 'houpla'), x = 'y'), c.resolved('hmm', 'item1').unravel())
+        ae(dict(woo = 'notyay'), c.resolved('hmm', 'item2').unravel())
+        ae(dict(woo = dict(yay = 'override')), c.resolved('hmm', 'item3').unravel())
+        ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
+
     def test_relmod(self):
         context = Context()
         with Repl(context) as repl:
