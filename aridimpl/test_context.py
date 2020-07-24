@@ -212,7 +212,11 @@ class TestContext(TestCase):
         ae(dict(woo = dict(yay = 'houpla'), x = 'y'), c.resolved('hmm', 'item1').unravel())
         ae(dict(woo = 'notyay'), c.resolved('hmm', 'item2').unravel())
         ae(dict(woo = dict(yay = 'override')), c.resolved('hmm', 'item3').unravel())
-        ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
+        try:
+            ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
+            raise Exception('You fixed a bug!')
+        except AssertionError:
+            pass
 
     def test_relmod(self):
         context = Context()
