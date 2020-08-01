@@ -92,5 +92,5 @@ class Config(object):
 
     def processtemplate(self, frompath, topath):
         with Repl(self._localcontext()) as repl:
-            repl.printf("redirect %s", topath)
+            repl.printf("redirect %s", topath) # XXX: Could this modify the underlying context?
             repl.printf("< %s", frompath)
