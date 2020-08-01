@@ -21,12 +21,13 @@ from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
 from importlib import import_module
+import os
 
 def _pyref(context, moduleresolvable, qualnameresolvable):
     pyobj = import_module(moduleresolvable.resolve(context).cat())
     for name in qualnameresolvable.resolve(context).cat().split('.'):
         pyobj = getattr(pyobj, name)
-    return Function(pyobj) # TODO LATER: Could be any type.
+    return Function(pyobj) # FIXME LATER: Could be any type.
 
 class Config(object):
 
@@ -44,8 +45,11 @@ class Config(object):
         with Repl(self._context) as repl:
             repl.printf(''.join("%s " for _ in self._prefix) + '. %s', *(self._prefix + [path]))
 
+    def loadsettings(self):
+        self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
+
     def repl(self):
-        assert not self._prefix
+        assert not self._prefix # XXX: Support prefix?
         return Repl(self._context)
 
     def execute(self, text):
@@ -60,7 +64,7 @@ class Config(object):
         except NoSuchPathException:
             raise AttributeError(name) # XXX: Misleading?
         try:
-            return obj.value # TODO: Does not work for all kinds of scalar.
+            return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
             return type(self)(self._context, path)
 
@@ -76,7 +80,7 @@ class Config(object):
                 yield Text, kwargs['text']
             if 'resolvable' in kwargs:
                 yield lambda x: x, kwargs['resolvable']
-        # TODO LATER: In theory we could add multiple types.
+        # XXX: Support combination of types e.g. slash is both function and text?
         factory, = (partial(t, v) for t, v in pairs())
         self._context[tuple(self._prefix) + path] = factory()
 
@@ -99,6 +103,6 @@ class Config(object):
             repl.printf("redirect %s", topath) # XXX: Could this modify the underlying context?
             repl.printf("< %s", frompath)
 
-    def createchild(self):
+    def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self._prefix
         return type(self)(self._context.createchild(), [])
