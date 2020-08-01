@@ -70,16 +70,16 @@ class Config(object):
 
     def put(self, *path, **kwargs):
         def pairs():
-            if 'function' in kwargs:
-                yield Function, kwargs['function']
-            if 'number' in kwargs:
-                yield Number, kwargs['number']
-            if 'scalar' in kwargs:
-                yield Scalar, kwargs['scalar']
-            if 'text' in kwargs:
-                yield Text, kwargs['text']
-            if 'resolvable' in kwargs:
-                yield lambda x: x, kwargs['resolvable']
+            for t, k in [
+                    [Function, 'function'],
+                    [Number, 'number'],
+                    [Scalar, 'scalar'],
+                    [Text, 'text'],
+                    [lambda x: x, 'resolvable']]:
+                try:
+                    yield t, kwargs[k]
+                except KeyError:
+                    pass
         # XXX: Support combination of types e.g. slash is both function and text?
         factory, = (partial(t, v) for t, v in pairs())
         self._context[tuple(self._prefix) + path] = factory()
