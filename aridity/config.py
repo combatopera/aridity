@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .context import Context
-from .model import Function, Text
+from .model import Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
@@ -68,6 +68,10 @@ class Config(object):
         def pairs():
             if 'function' in kwargs:
                 yield Function, kwargs['function']
+            if 'number' in kwargs:
+                yield Number, kwargs['number']
+            if 'scalar' in kwargs:
+                yield Scalar, kwargs['scalar']
             if 'text' in kwargs:
                 yield Text, kwargs['text']
             if 'resolvable' in kwargs:
@@ -94,3 +98,7 @@ class Config(object):
         with Repl(self._localcontext()) as repl:
             repl.printf("redirect %s", topath) # XXX: Could this modify the underlying context?
             repl.printf("< %s", frompath)
+
+    def createchild(self):
+        assert not self._prefix
+        return type(self)(self._context.createchild(), [])
