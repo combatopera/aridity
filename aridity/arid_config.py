@@ -15,12 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from aridity.repl import Repl
+from .context import Context
+from .model import Entry
 import os, sys
 
-def main_processtemplate():
-    templatepath, = sys.argv[1:]
-    with Repl() as repl:
-        for line in sys.stdin:
-            repl(line)
-        repl.printf("< %s", os.path.abspath(templatepath))
+def _configpath(configname):
+    if os.sep in configname:
+        return configname
+    for parent in os.environ['PATH'].split(os.pathsep):
+        path = os.path.join(parent, configname)
+        if os.path.exists(path):
+            return path
+    raise Exception("Not found: %s" % configname)
+
+def main_arid_config():
+    context = Context()
+    context.source(Entry([]), _configpath(sys.argv[1]))
+    sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
