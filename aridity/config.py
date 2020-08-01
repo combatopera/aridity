@@ -44,9 +44,12 @@ class Config(object):
         with Repl(self._context) as repl:
             repl.printf(''.join("%s " for _ in self._prefix) + '. %s', *(self._prefix + [path]))
 
-    def execute(self, text):
+    def repl(self):
         assert not self._prefix
-        with Repl(self._context) as repl:
+        return Repl(self._context)
+
+    def execute(self, text):
+        with self.repl() as repl:
             for line in text.splitlines():
                 repl(line)
 
