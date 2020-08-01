@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os
-from aridimpl.context import Context
-from aridimpl.model import Entry
+from aridity.context import Context
+from aridity.model import Entry
+import os, sys
 
 def configpath(configname):
     if os.sep in configname:

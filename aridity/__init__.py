@@ -16,9 +16,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from aridimpl.context import Context
-from aridimpl.model import Stream
-from aridimpl.repl import Repl
+from .context import Context
+from .model import Stream
+from .repl import Repl
 import sys
 
 def main_aridity():
