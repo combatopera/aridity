@@ -19,7 +19,10 @@ from __future__ import with_statement
 from .context import Context
 from .model import Stream
 from .repl import Repl
+from .util import NoSuchPathException
 import sys
+
+assert NoSuchPathException
 
 def main_aridity():
     context = Context()
