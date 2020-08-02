@@ -106,3 +106,6 @@ class Config(object):
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self._prefix
         return type(self)(self._context.createchild(), [])
+
+    def unravel(self):
+        return self._localcontext().unravel()
