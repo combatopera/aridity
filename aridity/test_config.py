@@ -41,3 +41,11 @@ class TestConfig(TestCase):
         self.assertEqual('B', d['b'])
         self.assertEqual(['X'], list(d['c']))
         self.assertEqual(dict(x = 'X'), dict(d['c'].items()))
+
+    def test_printf(self):
+        c = Config.blank()
+        c.printf('woo a = b')
+        c.woo.printf('c = d')
+        self.assertEqual(['b', 'd'], list(c.woo))
+        self.assertEqual(dict(a = 'b', c = 'd'), dict(c.woo.items()))
+        self.assertEqual(dict(a = 'b', c = 'd'), c.woo.unravel())

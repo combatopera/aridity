@@ -21,6 +21,7 @@ from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
 from importlib import import_module
+from itertools import chain
 import os
 
 def _pyref(context, moduleresolvable, qualnameresolvable):
@@ -41,9 +42,12 @@ class Config(object):
         self._context = context
         self._prefix = prefix
 
-    def load(self, path):
+    def printf(self, template, *args):
         with Repl(self._context) as repl:
-            repl.printf(''.join("%s " for _ in self._prefix) + '. %s', *(self._prefix + [path]))
+            repl.printf(''.join(chain(("%s " for _ in self._prefix), [template])), *chain(self._prefix, args))
+
+    def load(self, path):
+        self.printf(". %s", path)
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
