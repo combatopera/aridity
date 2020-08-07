@@ -2,10 +2,10 @@
 [![Build Status](https://travis-ci.org/combatopera/aridity.svg?branch=master)](https://travis-ci.org/combatopera/aridity)
 
 ## The Arid Manifesto
-* Paths as keys to avoid key concatenation
+* Keys are paths to avoid concatenation
 * It's never necessary to repeat a value
 * Minimal syntax for surprise-free authoring
-* Lazy context-sensitive evaluation
+* Evaluation always lazy and influenced by context
 * Strongly (dynamically) typed values
 * Central defaulting rather than at call sites
 * Templating using same syntax as expressions
@@ -24,6 +24,7 @@
 : Here's the equals directive:
 foo = bar
 : This does what you'd expect - assign the string value bar to foo.
+: Observe that bar isn't quoted, values in aridity are normally barewords.
 : foo is actually a path of length 1, path components are whitespace-separated:
 this is a path = this is a value
 : Any existing assignment can be overridden:
