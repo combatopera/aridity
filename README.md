@@ -5,7 +5,7 @@
 * Keys are paths to avoid concatenation
 * It's never necessary to repeat a value
 * Minimal syntax for surprise-free authoring
-* Evaluation always lazy and influenced by context
+* Evaluation lazy and influenced by context
 * Strongly (dynamically) typed values
 * Central defaulting rather than at call sites
 * Templating using same syntax as expressions
