@@ -19,9 +19,15 @@ from __future__ import division
 from .directives import processtemplate, resolvepath
 from .model import Number, Text
 from .util import allfunctions, NoSuchPathException, realname
-import json, os, shlex
+import itertools, json, os, re, shlex
 
 xmlentities = dict([c, "&%s;" % w] for c, w in [['"', 'quot'], ["'", 'apos']])
+tomlbasicbadchars = re.compile('[%s]+' % re.escape(r'\"' + ''.join(chr(x) for x in itertools.chain(range(0x08 + 1), range(0x0A, 0x1F + 1), [0x7F]))))
+
+def _tomlquote(text):
+    def repl(m):
+        return ''.join(r"\u%04X" % ord(c) for c in m.group())
+    return '"%s"' % tomlbasicbadchars.sub(repl, text)
 
 class Functions:
 
@@ -60,6 +66,9 @@ class Functions:
         'Suggest assigning this to & with xmlattr assigned to " as is convention.'
         from xml.sax.saxutils import escape
         return Text(escape(resolvable.resolve(context).cat(), xmlentities))
+
+    def tomlquote(context, resolvable):
+        return Text(_tomlquote(resolvable.resolve(context).cat()))
 
     def map(context, objsresolvable, *args):
         objs = objsresolvable.resolve(context)

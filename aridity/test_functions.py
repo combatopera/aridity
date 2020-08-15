@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .context import Context
+from .functions import _tomlquote
 from .repl import Repl
 from .util import NoSuchPathException
 from tempfile import NamedTemporaryFile
@@ -162,3 +163,8 @@ class TestFunctions(TestCase):
         self.assertEqual("""'abc&lt;&gt;&amp;"'""", c.resolved('x3').cat())
         # Escape all quotes as users may expect to be able to paste into attribute content:
         self.assertEqual('abc&lt;&gt;&amp;&quot;&apos;', c.resolved('y').cat())
+
+    def test_tomlquote(self):
+        self.assertEqual('"abc\t \x7e\x80"', _tomlquote('abc\t \x7e\x80'))
+        self.assertEqual(r'"\u005C\u0022"', _tomlquote(r'\"'))
+        self.assertEqual(r'"\u0000\u0008\u000A\u001F\u007F"', _tomlquote('\x00\x08\x0a\x1f\x7f'))
