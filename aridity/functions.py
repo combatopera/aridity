@@ -49,7 +49,7 @@ class Functions:
         return Text("'%s'" % text.replace('\\', '\\\\').replace('\n', '\\n').replace("'", "\\'"))
 
     def pystr(context, resolvable):
-        return Text(repr(resolvable.resolve(context).cat()))
+        return Text(repr(resolvable.resolve(context).value))
 
     def shstr(context, resolvable):
         return Text(shlex.quote(resolvable.resolve(context).cat()))
