@@ -214,9 +214,15 @@ class TestContext(TestCase):
         ae(dict(yay = 'houpla'), c.resolved('hmm', 'item1', 'woo').unravel())
         ae('houpla', c.resolved('hmm', 'item1', 'woo', 'yay').unravel())
         ae(dict(woo = 'notyay'), c.resolved('hmm', 'item2').unravel())
+        ae('notyay', c.resolved('hmm', 'item2', 'woo').unravel())
         ae(dict(woo = dict(yay = 'override')), c.resolved('hmm', 'item3').unravel())
+        ae(dict(yay = 'override'), c.resolved('hmm', 'item3', 'woo').unravel())
+        ae('override', c.resolved('hmm', 'item3', 'woo', 'yay').unravel())
         try:
             ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
+            ae(dict(yay = 'houpla', Else = 'other'), c.resolved('hmm', 'item4', 'woo').unravel())
+            ae('houpla', c.resolved('hmm', 'item4', 'woo', 'yay').unravel())
+            ae('other', c.resolved('hmm', 'item4', 'woo', 'Else').unravel())
             raise Exception('You fixed a bug!')
         except AssertionError:
             pass
