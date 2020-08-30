@@ -46,7 +46,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         for name in path:
             that = self.resolvables.get(name)
             if that is None:
-                self.resolvables[name] = that = Context(self)
+                self.resolvables[name] = that = self.createchild()
             self = that
         return self
 
@@ -231,7 +231,7 @@ class Context(AbstractContext):
         self.islist = islist
 
     def resolve(self, context): # TODO: Retire * and then this can go.
-        c = Context(self.parent, self.islist)
+        c = type(self)(self.parent, self.islist)
         for name, r in self.resolvables.items():
             if name is not None:
                 c.resolvables[name] = r

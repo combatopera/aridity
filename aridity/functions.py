@@ -99,7 +99,7 @@ class Functions:
                     c[vname,] = v
                     yield k, resolvable.resolve(c)
         from .context import Context
-        c = Context(islist = True)
+        c = Context(islist = True) # XXX: Really no parent?
         c.resolvables.update(g())
         return c
 
