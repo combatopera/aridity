@@ -30,65 +30,66 @@ def directive(cls):
 @directive
 class Colon:
     name = ':'
-    def __call__(self, prefix, phrase, context):
+    def __call__(self, prefix, suffix, context):
         pass # Do nothing.
 
 @directive
 class Redirect:
     name = 'redirect'
-    def __call__(self, prefix, phrase, context):
-        context['stdout',] = Stream(open(resolvepath(phrase, context), 'w'))
+    def __call__(self, prefix, suffix, context):
+        context['stdout',] = Stream(open(resolvepath(suffix.tophrase(), context), 'w'))
 
 @directive
 class Write:
     name = 'write'
-    def __call__(self, prefix, phrase, context):
-        context.resolved('stdout').flush(phrase.resolve(context).cat())
+    def __call__(self, prefix, suffix, context):
+        context.resolved('stdout').flush(suffix.tophrase().resolve(context).cat())
 
 @directive
 class Source:
     name = '.'
-    def __call__(self, prefix, phrase, context):
-        context.source(prefix, resolvepath(phrase, context))
+    def __call__(self, prefix, suffix, context):
+        context.source(prefix, resolvepath(suffix.tophrase(), context))
 
 @directive
 class CD:
     name = 'cd'
-    def __call__(self, prefix, phrase, context):
-        context['cwd',] = Text(resolvepath(phrase, context))
+    def __call__(self, prefix, suffix, context):
+        context['cwd',] = Text(resolvepath(suffix.tophrase(), context))
 
 @directive
 class Test:
     name = 'test'
-    def __call__(self, prefix, phrase, context):
-        sys.stderr.write(phrase.resolve(context))
+    def __call__(self, prefix, suffix, context):
+        sys.stderr.write(suffix.tophrase().resolve(context))
         sys.stderr.write(os.linesep)
 
 @directive
 class Equals:
     name = '='
-    def __call__(self, prefix, phrase, context):
-        context[prefix.topath(context)] = phrase
+    def __call__(self, prefix, suffix, context):
+        context[prefix.topath(context)] = suffix.tophrase()
 
 @directive
 class ColonEquals:
     name = ':='
-    def __call__(self, prefix, phrase, context):
+    def __call__(self, prefix, suffix, context):
         path = prefix.topath(context)
-        context[path] = phrase.resolve(context.getorcreatesubcontext(path[:-1]))
+        context[path] = suffix.tophrase().resolve(context.getorcreatesubcontext(path[:-1]))
 
 @directive
 class PlusEquals:
     name = '+='
-    def __call__(self, prefix, phrase, context):
+    def __call__(self, prefix, suffix, context):
+        phrase = suffix.tophrase()
         context[prefix.topath(context) + (phrase.unparse(),)] = phrase
 
 @directive
 class Cat:
     name = '<'
-    def __call__(self, prefix, phrase, context):
+    def __call__(self, prefix, suffix, context):
         context = context.getorcreatesubcontext(prefix.topath(context))
-        context.resolved('stdout').flush(processtemplate(context, phrase))
+        context.resolved('stdout').flush(processtemplate(context, suffix.tophrase()))
 
 def resolvepath(resolvable, context):
     path = resolvable.resolve(context).cat()

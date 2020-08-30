@@ -45,8 +45,8 @@ class TestContext(TestCase):
 
     def test_directivestack(self):
         phrases = []
-        def eq(prefix, phrase, context):
-            phrases.append(phrase.cat())
+        def eq(prefix, suffix, context):
+            phrases.append(suffix.tophrase().cat())
         c = Context()
         self.assertEqual(0, len(c.resolvables.keys()))
         c['=',] = Directive(eq)

@@ -148,7 +148,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         if 1 != len(directives):
             raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (directives, entry))
         d, i = directives[0]
-        d(entry.subentry(0, i), entry.phrase(i + 1), self)
+        d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self)
 
     def __str__(self):
         eol = '\n'
