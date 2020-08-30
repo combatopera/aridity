@@ -184,6 +184,7 @@ class StaticContext(AbstractContext):
         self['EOL',] = Text(os.linesep)
         self['stdout',] = Stream(sys.stdout)
         self['/',] = Slash()
+        self['*',] = Star()
         self['None',] = Scalar(None)
         self.threadlocals = threading.local()
         for name in self.stacktypes:
@@ -212,6 +213,14 @@ def slashfunction(context, *resolvables):
         if os.path.isabs(path):
             break
     return Text(os.path.join() if path is None else path)
+
+class Star(Function):
+
+    def __init__(self):
+        def spread(context, resolvable):
+            from .functions import Spread
+            return Spread(resolvable.resolve(context))
+        Function.__init__(self, spread)
 
 StaticContext = StaticContext()
 
