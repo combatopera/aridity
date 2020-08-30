@@ -211,6 +211,8 @@ class TestContext(TestCase):
             repl('hmm item4 woo Else = other')
         ae = self.assertEqual
         ae(dict(woo = dict(yay = 'houpla'), x = 'y'), c.resolved('hmm', 'item1').unravel())
+        ae(dict(yay = 'houpla'), c.resolved('hmm', 'item1', 'woo').unravel())
+        ae('houpla', c.resolved('hmm', 'item1', 'woo', 'yay').unravel())
         ae(dict(woo = 'notyay'), c.resolved('hmm', 'item2').unravel())
         ae(dict(woo = dict(yay = 'override')), c.resolved('hmm', 'item3').unravel())
         try:
