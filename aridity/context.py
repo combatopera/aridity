@@ -37,7 +37,7 @@ class Resolvables:
 
     Null = Null()
 
-    def __init__(self, *args):
+    def __init__(self):
         self.d = collections.OrderedDict()
 
     def put(self, key, resolvable):
