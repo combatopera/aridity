@@ -201,14 +201,17 @@ class TestContext(TestCase):
         ae('yay', items['item2']['woo'])
         ae('yay', items['*']['woo'])
 
-    def test_star2(self):
+    def _star23(self, update):
         c = Context()
         with Repl(c) as repl:
-            repl('hmm * woo yay = houpla')
+            if not update:
+                repl('hmm * woo yay = houpla')
             repl('hmm item1 x = y')
             repl('hmm item2 woo = notyay')
             repl('hmm item3 woo yay = override')
             repl('hmm item4 woo Else = other')
+            if update:
+                repl('hmm * woo yay = houpla')
         ae = self.assertEqual
         ae(dict(woo = dict(yay = 'houpla'), x = 'y'), c.resolved('hmm', 'item1').unravel())
         ae(dict(yay = 'houpla'), c.resolved('hmm', 'item1', 'woo').unravel())
@@ -226,6 +229,12 @@ class TestContext(TestCase):
             raise Exception('You fixed a bug!')
         except AssertionError:
             pass
+
+    def test_star2(self):
+        self._star23(False)
+
+    def test_star3(self):
+        self._star23(True)
 
     def test_relmod(self):
         context = Context()
