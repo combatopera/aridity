@@ -119,9 +119,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         d = OrderedDict([k, o.unravel()] for k, o in self.itero())
         return list(d) if self.islist else d
 
-    def __iter__(self):
-        return iter(self.resolvables)
-
     def staticcontext(self):
         for c in self._selfandparents():
             pass

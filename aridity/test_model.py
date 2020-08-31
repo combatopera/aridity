@@ -75,7 +75,7 @@ class TestModel(unittest.TestCase):
 
     def test_map(self): # TODO: Also test 2-arg form.
         call, = p('$map($list(a b 0) x $(x)2)')
-        self.assertEqual([Text('a2'), Text('b2'), Text('02')], list(call.resolve(Context())))
+        self.assertEqual([Text('a2'), Text('b2'), Text('02')], list(call.resolve(Context()).resolvables.values()))
 
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')
