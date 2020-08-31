@@ -30,7 +30,7 @@ class OrderedDictWrapper:
         return bool(self.d)
 
     def __nonzero__(self):
-        return bool(self.d)
+        return self.__bool__()
 
 class OrderedSet(OrderedDictWrapper):
 
