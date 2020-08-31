@@ -20,7 +20,7 @@ from unittest import TestCase
 
 class TestDirectives(TestCase):
 
-    def test_commentpriority(self):
+    def test_commentprecedence(self):
         c = Config.blank()
         with c.repl() as repl:
             repl('woo = before')
@@ -29,7 +29,7 @@ class TestDirectives(TestCase):
             repl(': woo')
             repl(': woo = during') # Not executed.
             repl('houpla1 = 1 : woo = during') # Only first phrase is executed.
-            repl('houpla2 = 2 : houpla3 = 4 : woo = during') # Same.
+            repl('houpla2 = 2 : houpla3 = 4 : woo = during') # Same, second colon is part of comment.
             repl('yay := $(woo)')
             repl('woo = after')
         ae = self.assertEqual
@@ -38,3 +38,11 @@ class TestDirectives(TestCase):
         ae(1, c.houpla1)
         ae(2, c.houpla2)
         ae(3, c.houpla3)
+
+    def test_equalsprecedence(self):
+        c = Config.blank()
+        with c.repl() as repl:
+            repl('woo = before')
+            repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
+        ae = self.assertEqual
+        ae('and = after', c.woo)

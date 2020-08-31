@@ -20,6 +20,15 @@ from .model import Text, Stream, Concat
 from .grammar import templateparser
 import os, sys
 
+class Precedence:
+
+    void, = range(-1, 0)
+    default, colon = range(2)
+
+    @classmethod
+    def ofdirective(cls, d):
+        return getattr(d, 'precedence', cls.default)
+
 lookup = {}
 
 def directive(cls):
@@ -30,8 +39,10 @@ def directive(cls):
 @directive
 class Colon:
     name = ':'
+    precedence = Precedence.colon
     def __call__(self, prefix, suffix, context):
-        pass # Do nothing.
+        if prefix.size(): # TODO: Logic duplicated in Repl.
+            context.execute(prefix)
 
 @directive
 class Redirect:

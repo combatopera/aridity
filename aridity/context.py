@@ -16,11 +16,11 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .directives import lookup
+from .directives import lookup, Precedence
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import NoSuchPathException, UnsupportedEntryException, OrderedDict
+from .util import NoSuchPathException, OrderedDict, UnsupportedEntryException
 from collections import defaultdict
 import os, sys, threading
 
@@ -133,21 +133,22 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             for line in f:
                 repl(line)
 
-    class Enough(Exception): pass
-
     def execute(self, entry):
         directives = []
+        precedence = Precedence.void
         for i, word in enumerate(entry.words()):
-            def append(resolvable):
-                directives.append((resolvable.directivevalue, i))
-                raise self.Enough
             try:
-                self.getresolvables(word.cat(), append) # XXX: Can this be retired?
-            except (AttributeError, CatNotSupportedException, self.Enough):
+                d = self._findresolvable([word.cat()]).directivevalue
+                p = Precedence.ofdirective(d)
+                if p > precedence:
+                    del directives[:]
+                    precedence = p
+                directives.append((d, i))
+            except (AttributeError, CatNotSupportedException, NoSuchPathException):
                 pass
-        if 1 != len(directives):
-            raise UnsupportedEntryException("Expected 1 directive but %s found: %s" % (directives, entry))
-        d, i = directives[0]
+        if not directives:
+            raise UnsupportedEntryException("Expected at least one directive: %s" % entry)
+        d, i = directives[0] # XXX: Always use first?
         d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self)
 
     def __str__(self):
