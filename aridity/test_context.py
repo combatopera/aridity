@@ -221,14 +221,10 @@ class TestContext(TestCase):
         ae(dict(woo = dict(yay = 'override')), c.resolved('hmm', 'item3').unravel())
         ae(dict(yay = 'override'), c.resolved('hmm', 'item3', 'woo').unravel())
         ae('override', c.resolved('hmm', 'item3', 'woo', 'yay').unravel())
-        try:
-            ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
-            ae(dict(yay = 'houpla', Else = 'other'), c.resolved('hmm', 'item4', 'woo').unravel())
-            ae('houpla', c.resolved('hmm', 'item4', 'woo', 'yay').unravel())
-            ae('other', c.resolved('hmm', 'item4', 'woo', 'Else').unravel())
-            raise Exception('You fixed a bug!')
-        except AssertionError:
-            pass
+        ae(dict(woo = dict(yay = 'houpla', Else = 'other')), c.resolved('hmm', 'item4').unravel())
+        ae(dict(yay = 'houpla', Else = 'other'), c.resolved('hmm', 'item4', 'woo').unravel())
+        ae('houpla', c.resolved('hmm', 'item4', 'woo', 'yay').unravel())
+        ae('other', c.resolved('hmm', 'item4', 'woo', 'Else').unravel())
 
     def test_star2(self):
         self._star23(False)

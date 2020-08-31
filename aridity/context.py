@@ -37,26 +37,72 @@ class Resolvables:
 
     Null = Null()
 
-    def __init__(self):
+    @property
+    def _pd(self):
+        return {} if self.context is None else self.context.prototype
+
+    def __init__(self, context):
         self.d = collections.OrderedDict()
+        self.context = context
 
-    def put(self, key, resolvable):
-        self.d[key] = resolvable
+    def put(self, k, v):
+        self.d[k] = v
 
-    def getornone(self, key):
-        return self.d.get(key)
+    def getornone(self, k):
+        try:
+            return self._get(k)
+        except KeyError:
+            pass
+
+    def _get(self, k):
+        if k in self.d:
+            return self.d[k]
+        val = self._pd[k]
+        if Template != val.__class__: # TODO: Use polymorphism.
+            return val
+        # self.context.parent.childproto is the prototype for parent's children i.e. self.context itself
+        # val is a child of that childproto, so is the prototype for self.context's child with same key
+        # so the context we return here should inherit members from val
+        c = self.context.createchild()
+        c.prototype = val.resolvables
+        self.context.resolvables.put(k, c)
+        return c
 
     def items(self):
-        return self.d.items()
+        keys = self._pd.keys()
+        for k in keys:
+            yield k, self.getornone(k)
+        for k in self.d.keys():
+            if k not in keys:
+                yield k, self.getornone(k)
 
-    def haskey(self, k):
-        return k in self.d
+class Template:
+
+    def __init__(self):
+        self.resolvables = OrderedDict()
+
+    def __setitem__(self, path, resolvable):
+        if not (tuple == type(path) and set(type(name) for name in path) <= set([str, type(None)])):
+            raise NotAPathException(path)
+        if not isinstance(resolvable, Resolvable):
+            raise NotAResolvableException(resolvable)
+        self.getorcreatesubtemplate(path[:-1]).resolvables[path[-1]] = resolvable
+
+    def getorcreatesubtemplate(self, path):
+        for name in path:
+            that = self.resolvables.get(name)
+            if that is None:
+                self.resolvables[name] = that = Template()
+            self = that
+        return self
 
 # XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
-        self.resolvables = Resolvables()
+        self.resolvables = Resolvables(self)
+        self.childproto = Template()
+        self.prototype = {} if parent is None else parent.childproto.resolvables
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
@@ -149,7 +195,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             for line in f:
                 repl(line)
 
-    def execute(self, entry, lenient = False):
+    def execute(self, entry, lenient = False, alt = None):
         directives = []
         precedence = Precedence.void
         for i, word in enumerate(entry.words()):
@@ -164,7 +210,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 pass
         if directives:
             d, i = directives[0] # XXX: Always use first?
-            d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self)
+            d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self if alt is None else alt)
         elif not lenient:
             raise UnsupportedEntryException("Expected at least one directive: %s" % entry)
 
@@ -232,13 +278,19 @@ def slashfunction(context, *resolvables):
             break
     return Text(os.path.join() if path is None else path)
 
-class Star(Function):
+class Star(Function, Directive):
+
+    @staticmethod
+    def star(prefix, suffix, context):
+        c = context.getorcreatesubcontext(prefix.topath(context))
+        c.execute(suffix, alt = c.childproto)
 
     def __init__(self):
         def spread(context, resolvable):
             from .functions import Spread
             return Spread(resolvable.resolve(context))
         Function.__init__(self, spread)
+        Directive.__init__(self, self.star)
 
 StaticContext = StaticContext()
 
@@ -248,18 +300,8 @@ class Context(AbstractContext):
         super(Context, self).__init__(parent)
         self.islist = islist
 
-    def resolve(self, context): # TODO: Retire * and then this can go.
-        c = type(self)(self.parent, self.islist)
-        for name, r in self.resolvables.items():
-            if name is not None:
-                c.resolvables.put(name, r)
-        defaults = self.resolvables.getornone(None)
-        if defaults is not None:
-            for _, item in c.resolvables.items():
-                for dn, dr in defaults.resolvables.items():
-                    if not item.resolvables.haskey(dn):
-                        item.resolvables.put(dn, dr)
-        return c
+    def resolve(self, context):
+        return self
 
     def createchild(self, **kwargs):
         return type(self)(self, **kwargs)
