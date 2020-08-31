@@ -46,3 +46,10 @@ class TestDirectives(TestCase):
             repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
         ae = self.assertEqual
         ae('and = after', c.woo)
+
+    def test_starprecedence(self):
+        c = Config.blank()
+        with c.repl() as repl:
+            repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
+        ae = self.assertEqual
+        ae('yay * houpla', c.woo)
