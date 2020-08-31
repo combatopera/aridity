@@ -30,6 +30,13 @@ class NotAResolvableException(Exception): pass
 
 class Resolvables:
 
+    class Null:
+
+        def getornone(self, key):
+            pass
+
+    Null = Null()
+
     def __init__(self, *args):
         self.d = collections.OrderedDict()
 
@@ -90,7 +97,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _subresolvables(self, path):
         c = self._resolvedcontextornone(path)
-        return Resolvables() if c is None else c.resolvables
+        return Resolvables.Null if c is None else c.resolvables
 
     def _selfandparents(self):
         while True:
