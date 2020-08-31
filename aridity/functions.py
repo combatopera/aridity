@@ -78,7 +78,8 @@ class Functions:
                 for k, v in objs.resolvables.items():
                     c = context.createchild()
                     c.label = Text(k)
-                    c.resolvables.update(v.resolvables)
+                    for i in v.resolvables.items():
+                        c.resolvables.put(*i)
                     yield k, resolvable.resolve(c)
         elif 2 == len(args):
             vname, resolvable = args
@@ -100,7 +101,8 @@ class Functions:
                     yield k, resolvable.resolve(c)
         from .context import Context
         c = Context(islist = True) # XXX: Really no parent?
-        c.resolvables.update(g())
+        for i in g():
+            c.resolvables.put(*i)
         return c
 
     def label(context):

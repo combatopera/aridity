@@ -22,17 +22,34 @@ from .model import CatNotSupportedException, Directive, Function, Resolvable, Sc
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import NoSuchPathException, OrderedDict, UnsupportedEntryException
 from collections import defaultdict
-import os, sys, threading
+import collections, os, sys, threading
 
 class NotAPathException(Exception): pass
 
 class NotAResolvableException(Exception): pass
 
+class Resolvables:
+
+    def __init__(self, *args):
+        self.d = collections.OrderedDict()
+
+    def put(self, key, resolvable):
+        self.d[key] = resolvable
+
+    def getornone(self, key):
+        return self.d.get(key)
+
+    def items(self):
+        return self.d.items()
+
+    def haskey(self, k):
+        return k in self.d
+
 # XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
     def __init__(self, parent):
-        self.resolvables = OrderedDict()
+        self.resolvables = Resolvables()
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
@@ -40,18 +57,19 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        self.getorcreatesubcontext(path[:-1]).resolvables[path[-1]] = resolvable
+        self.getorcreatesubcontext(path[:-1]).resolvables.put(path[-1], resolvable)
 
     def getorcreatesubcontext(self, path):
         for name in path:
-            that = self.resolvables.get(name)
+            that = self.resolvables.getornone(name)
             if that is None:
-                self.resolvables[name] = that = self.createchild()
+                that = self.createchild()
+                self.resolvables.put(name, that)
             self = that
         return self
 
     def getresolvables(self, name, append):
-        r = self.resolvables.get(name)
+        r = self.resolvables.getornone(name)
         if r is not None:
             append(r)
         self.parent.getresolvables(name, append)
@@ -62,7 +80,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def _resolvedcontextornone(self, path):
         c = self # Assume we are resolved.
         for name in path:
-            r = c.resolvables.get(name)
+            r = c.resolvables.getornone(name)
             if r is None:
                 return
             c = r.resolve(c)
@@ -72,7 +90,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _subresolvables(self, path):
         c = self._resolvedcontextornone(path)
-        return {} if c is None else c.resolvables
+        return Resolvables() if c is None else c.resolvables
 
     def _selfandparents(self):
         while True:
@@ -93,7 +111,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _findresolvableshallow(self, path):
         for c in self._selfandparents():
-            r = c._subresolvables(path[:-1]).get(path[-1])
+            r = c._subresolvables(path[:-1]).getornone(path[-1])
             if r is not None:
                 return r
 
@@ -232,13 +250,13 @@ class Context(AbstractContext):
         c = type(self)(self.parent, self.islist)
         for name, r in self.resolvables.items():
             if name is not None:
-                c.resolvables[name] = r
-        defaults = self.resolvables.get(None)
+                c.resolvables.put(name, r)
+        defaults = self.resolvables.getornone(None)
         if defaults is not None:
-            for item in c.resolvables:
+            for _, item in c.resolvables.items():
                 for dn, dr in defaults.resolvables.items():
-                    if dn not in item.resolvables.keys():
-                        item.resolvables[dn] = dr
+                    if not item.resolvables.haskey(dn):
+                        item.resolvables.put(dn, dr)
         return c
 
     def createchild(self, **kwargs):

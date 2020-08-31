@@ -48,9 +48,9 @@ class TestContext(TestCase):
         def eq(prefix, suffix, context):
             phrases.append(suffix.tophrase().cat())
         c = Context()
-        self.assertEqual(0, len(c.resolvables.keys()))
+        self.assertEqual(0, sum(1 for _ in c.resolvables.items()))
         c['=',] = Directive(eq)
-        self.assertEqual(1, len(c.resolvables.keys()))
+        self.assertEqual(1, sum(1 for _ in c.resolvables.items()))
         with Repl(c) as repl:
             repl('woo = yay')
         self.assertEqual(['yay'], phrases)

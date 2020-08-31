@@ -196,7 +196,8 @@ class Call(Resolvable):
 def List(objs):
     from .context import Context
     c = Context(islist = True)
-    c.resolvables.update([object(), obj] for obj in objs)
+    for obj in objs:
+        c.resolvables.put(object(), obj)
     return c
 
 class Directive(Resolved):
