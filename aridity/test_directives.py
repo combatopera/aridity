@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import Config
+from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
 class TestDirectives(TestCase):
@@ -53,3 +54,15 @@ class TestDirectives(TestCase):
             repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
         ae = self.assertEqual
         ae('yay * houpla', c.woo)
+
+    def test_sourcecommentwithprefix(self):
+        c = Config.blank()
+        with NamedTemporaryFile('w') as f, c.repl() as repl:
+            f.write('woo = yay\n')
+            f.write('woo2 = yay2 : with comment\n')
+            f.write(': comment only\n')
+            f.flush()
+            repl.printf("prefix . %s", f.name)
+        ae = self.assertEqual
+        ae('yay', c.prefix.woo)
+        ae('yay2', c.prefix.woo2)
