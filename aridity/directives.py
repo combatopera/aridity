@@ -42,7 +42,7 @@ class Colon:
     precedence = Precedence.colon
     def __call__(self, prefix, suffix, context):
         if prefix.size(): # TODO: Logic duplicated in Repl.
-            context.execute(prefix) # FIXME: Does not work when sourcing a file with comments onto a prefix.
+            context.execute(prefix, True)
 
 @directive
 class Redirect:

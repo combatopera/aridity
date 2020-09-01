@@ -155,7 +155,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             for line in f:
                 repl(line)
 
-    def execute(self, entry):
+    def execute(self, entry, lenient = False):
         directives = []
         precedence = Precedence.void
         for i, word in enumerate(entry.words()):
@@ -168,10 +168,11 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 directives.append((d, i))
             except (AttributeError, CatNotSupportedException, NoSuchPathException):
                 pass
-        if not directives:
+        if directives:
+            d, i = directives[0] # XXX: Always use first?
+            d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self)
+        elif not lenient:
             raise UnsupportedEntryException("Expected at least one directive: %s" % entry)
-        d, i = directives[0] # XXX: Always use first?
-        d(entry.subentry(0, i), entry.subentry(i + 1, entry.size()), self)
 
     def __str__(self):
         eol = '\n'
