@@ -41,8 +41,7 @@ class Colon:
     name = ':'
     precedence = Precedence.colon
     def __call__(self, prefix, suffix, context):
-        if prefix.size(): # TODO: Logic duplicated in Repl.
-            context.execute(prefix, True)
+        context.execute(prefix, True)
 
 @directive
 class Redirect:
