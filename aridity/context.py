@@ -38,33 +38,23 @@ class Resolvables:
     Null = Null()
 
     def _proto(self):
-        # FIXME: Loop.
         revpath = []
         c = self.context
-        if c.parent is None:
-            return {}
-        try:
-            protoc = c.parent.resolvables.d[Star.protokey]
-        except KeyError:
-            pass
-        else:
-            return protoc.resolvables.d
-        try:
-            keyobj = c.label
-        except AttributeError:
-            return {}
-        revpath.append(keyobj.value)
-        c = c.parent
-        if c.parent is None:
-            return {}
-        try:
-            protoc = c.parent.resolvables.d[Star.protokey]
-        except KeyError:
-            pass
-        else:
-            for component in reversed(revpath):
-                protoc = protoc.resolvables.d[component]
-            return protoc.resolvables.d
+        while c.parent is not None:
+            try:
+                protoc = c.parent.resolvables.d[Star.protokey]
+            except KeyError:
+                pass
+            else:
+                for component in reversed(revpath):
+                    protoc = protoc.resolvables.d[component]
+                return protoc.resolvables.d
+            try:
+                keyobj = c.label
+            except AttributeError:
+                break
+            revpath.append(keyobj.value)
+            c = c.parent
         return {}
 
     def __init__(self, context):
