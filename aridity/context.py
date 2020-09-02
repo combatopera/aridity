@@ -75,7 +75,7 @@ class Resolvables:
                 return obj
             obj = self.context.createchild()
             obj.label = Text(key)
-            self.d[key] = obj
+            self.d[key] = obj # TODO: Only if we're about to put something in it.
             return obj
 
     def items(self):
