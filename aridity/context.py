@@ -69,7 +69,14 @@ class Resolvables:
             try:
                 return self.d[key]
             except KeyError:
-                return self._proto().get(key) # FIXME: Divert writes to non-proto resolvables.
+                pass
+            obj = self._proto().get(key)
+            if Context != obj.__class__:
+                return obj
+            obj = self.context.createchild()
+            obj.label = Text(key)
+            self.d[key] = obj
+            return obj
 
     def items(self):
         for k, v in self.d.items():
