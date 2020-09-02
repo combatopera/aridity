@@ -44,9 +44,11 @@ class Resolvables:
         if c.parent is None:
             return {}
         try:
-            return c.parent.resolvables.d[Star.protokey].resolvables.d
+            protoc = c.parent.resolvables.d[Star.protokey]
         except KeyError:
             pass
+        else:
+            return protoc.resolvables.d
         try:
             path.append(c.label.cat())
         except AttributeError:
@@ -55,9 +57,12 @@ class Resolvables:
         if c.parent is None:
             return {}
         try:
-            return c.parent.resolvables.d[Star.protokey].resolvables.d[path[0]].resolvables.d
+            protoc = c.parent.resolvables.d[Star.protokey]
         except KeyError:
-            return {}
+            pass
+        else:
+            return protoc.resolvables.d[path[0]].resolvables.d
+        return {}
 
     def __init__(self, context):
         self.d = collections.OrderedDict()
