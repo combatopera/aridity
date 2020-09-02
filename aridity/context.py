@@ -73,10 +73,7 @@ class Resolvables:
             obj = self._proto().get(key)
             if Context != obj.__class__:
                 return obj
-            obj = self.context.createchild()
-            obj.label = Text(key)
-            self.d[key] = obj # TODO: Only if we're about to put something in it.
-            return obj
+            return self.context._putchild(key) # TODO: Only if we're about to put something in it.
 
     def items(self):
         for k, v in self.d.items():
@@ -104,11 +101,15 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         for name in path:
             that = self.resolvables.getornone(name)
             if that is None:
-                that = self.createchild()
-                that.label = Text(name) # TODO: Not necessarily str.
-                self.resolvables.put(name, that)
+                that = self._putchild(name)
             self = that
         return self
+
+    def _putchild(self, key):
+        child = self.createchild()
+        child.label = Text(key) # TODO: Not necessarily str.
+        self.resolvables.put(key, child)
+        return child
 
     def resolved(self, *path, **kwargs):
         return self._resolved(path, self._findresolvable(path), kwargs) if path else self
