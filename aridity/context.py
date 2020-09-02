@@ -46,8 +46,11 @@ class Resolvables:
             except KeyError:
                 pass
             else:
-                for component in reversed(revpath):
-                    protoc = protoc.resolvables.d[component]
+                try:
+                    for component in reversed(revpath):
+                        protoc = protoc.resolvables.d[component]
+                except KeyError:
+                    break
                 return protoc.resolvables.d
             try:
                 keyobj = c.label
