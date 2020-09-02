@@ -39,7 +39,7 @@ class Resolvables:
 
     def _proto(self):
         # FIXME: Loop.
-        path = []
+        revpath = []
         c = self.context
         if c.parent is None:
             return {}
@@ -53,7 +53,7 @@ class Resolvables:
             keyobj = c.label
         except AttributeError:
             return {}
-        path.append(keyobj.value)
+        revpath.append(keyobj.value)
         c = c.parent
         if c.parent is None:
             return {}
@@ -62,7 +62,7 @@ class Resolvables:
         except KeyError:
             pass
         else:
-            for component in reversed(path):
+            for component in reversed(revpath):
                 protoc = protoc.resolvables.d[component]
             return protoc.resolvables.d
         return {}
