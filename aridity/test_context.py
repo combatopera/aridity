@@ -250,6 +250,17 @@ class TestContext(TestCase):
             repl('a x f = g')
         ae = self.assertEqual
         ae(dict(f = 'g'), c.resolved('a', 'x').unravel())
+        ae('g', c.resolved('a', 'x', 'f').unravel())
+
+    def test_shortstar(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('a * b = c')
+            repl('a x d e = f')
+        ae = self.assertEqual
+        ae(dict(b = 'c', d = dict(e = 'f')), c.resolved('a', 'x').unravel())
+        ae(dict(e = 'f'), c.resolved('a', 'x', 'd').unravel())
+        ae('f', c.resolved('a', 'x', 'd', 'e').unravel())
 
     def test_relmod(self):
         context = Context()
