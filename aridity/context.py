@@ -73,7 +73,7 @@ class Resolvables:
             obj = self._proto().get(key)
             if Context != obj.__class__:
                 return obj
-            return self.context._putchild(key) # TODO: Only if we're about to put something in it.
+            return self.context._putchild(key) # TODO LATER: Only if we're about to put something in it.
 
     def items(self):
         for k, v in self.d.items():
