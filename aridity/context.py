@@ -39,19 +39,24 @@ class Resolvables:
 
     def _proto(self):
         # FIXME: Loop.
-        c = self.context.parent
-        if c is None:
+        path = []
+        c = self.context
+        if c.parent is None:
             return {}
         try:
-            return c.resolvables.d[Star.protokey].resolvables.d
+            return c.parent.resolvables.d[Star.protokey].resolvables.d
         except KeyError:
             pass
+        try:
+            path.append(c.label.cat())
+        except AttributeError:
+            return {}
         c = c.parent
-        if c is None:
+        if c.parent is None:
             return {}
         try:
-            return c.resolvables.d[Star.protokey].resolvables.d[self.context.label.cat()].resolvables.d
-        except (KeyError, AttributeError):
+            return c.parent.resolvables.d[Star.protokey].resolvables.d[path[0]].resolvables.d
+        except KeyError:
             return {}
 
     def __init__(self, context):
