@@ -50,9 +50,10 @@ class Resolvables:
         else:
             return protoc.resolvables.d
         try:
-            path.append(c.label.cat())
+            keyobj = c.label
         except AttributeError:
             return {}
+        path.append(keyobj.value)
         c = c.parent
         if c.parent is None:
             return {}
@@ -61,7 +62,9 @@ class Resolvables:
         except KeyError:
             pass
         else:
-            return protoc.resolvables.d[path[0]].resolvables.d
+            for component in reversed(path):
+                protoc = protoc.resolvables.d[component]
+            return protoc.resolvables.d
         return {}
 
     def __init__(self, context):
@@ -105,7 +108,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             that = self.resolvables.getornone(name)
             if that is None:
                 that = self.createchild()
-                that.label = Text(name)
+                that.label = Text(name) # TODO: Not necessarily str.
                 self.resolvables.put(name, that)
             self = that
         return self
