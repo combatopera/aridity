@@ -232,6 +232,25 @@ class TestContext(TestCase):
     def test_star3(self):
         self._star23(True)
 
+    def test_longstar(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('a * b c d = e')
+            repl('a x f = g')
+        ae = self.assertEqual
+        ae(dict(f = 'g', b = dict(c = dict(d = 'e'))), c.resolved('a', 'x').unravel())
+        ae(dict(c = dict(d = 'e')), c.resolved('a', 'x', 'b').unravel())
+        ae(dict(d = 'e'), c.resolved('a', 'x', 'b', 'c').unravel())
+        ae('e', c.resolved('a', 'x', 'b', 'c', 'd').unravel())
+
+    def test_doublestar(self): # TODO: Lots more to test here.
+        c = Context()
+        with Repl(c) as repl:
+            repl('a * * b c = d')
+            repl('a x f = g')
+        ae = self.assertEqual
+        ae(dict(f = 'g'), c.resolved('a', 'x').unravel())
+
     def test_relmod(self):
         context = Context()
         with Repl(context) as repl:

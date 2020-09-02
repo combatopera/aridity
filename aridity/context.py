@@ -80,7 +80,7 @@ class Resolvables:
             if Star.protokey != k:
                 yield k, v
         for k, v in self._proto().items():
-            if k not in self.d:
+            if Star.protokey != k and k not in self.d:
                 yield k, v
 
 # XXX: Isn't this Resolved rather than Resolvable?
