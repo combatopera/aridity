@@ -71,9 +71,8 @@ class Resolvables:
             except KeyError:
                 pass
             obj = self._proto().get(key)
-            if hasattr(obj, 'resolvables'):
-                return self.context._putchild(key) # TODO LATER: Only if we're about to put something in it.
-            return obj
+            # TODO LATER: Only create child if we're about to put something in it.
+            return self.context._putchild(key) if hasattr(obj, 'resolvables') else obj
 
     def items(self):
         for k, v in self.d.items():
