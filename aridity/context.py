@@ -74,7 +74,7 @@ class Resolvables:
             except KeyError:
                 pass
             obj = self._proto().get(key)
-            # TODO LATER: Only create child if we're about to put something in it.
+            # FIXME LATER: Reads should be thread-safe, only create child if we're about to put something in it.
             return self.context._putchild(key) if hasattr(obj, 'resolvables') else obj
 
     def items(self):
