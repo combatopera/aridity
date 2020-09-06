@@ -20,7 +20,7 @@ name = aridity
 years +=
     2017
     2020
-requires += pyparsing
+requires += pyparsing>=2.4.7
 pyversions +=
     3
     2
