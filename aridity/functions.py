@@ -70,6 +70,10 @@ class Functions:
     def tomlquote(context, resolvable):
         return Text(_tomlquote(resolvable.resolve(context).cat()))
 
+    def urlquote(context, resolvable):
+        from urllib.parse import quote
+        return Text(quote(resolvable.resolve(context).cat(), safe = ''))
+
     def map(context, objsresolvable, *args):
         objs = objsresolvable.resolve(context)
         if 1 == len(args):

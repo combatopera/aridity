@@ -21,7 +21,7 @@ from .repl import Repl
 from .util import NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
-import os
+import os, sys
 
 class TestFunctions(TestCase):
 
@@ -168,3 +168,11 @@ class TestFunctions(TestCase):
         self.assertEqual('"abc\t \x7e\x80"', _tomlquote('abc\t \x7e\x80'))
         self.assertEqual(r'"\u005C\u0022"', _tomlquote(r'\"'))
         self.assertEqual(r'"\u0000\u0008\u000A\u001F\u007F"', _tomlquote('\x00\x08\x0a\x1f\x7f'))
+
+    def test_urlquote(self):
+        if sys.version_info.major < 3:
+            return
+        c = Context()
+        with Repl(c) as repl:
+            repl('a = $urlquote($.( /?&=_\N{POUND SIGN}))')
+        self.assertEqual('%20%2F%3F%26%3D_%C2%A3', c.resolved('a').cat())
