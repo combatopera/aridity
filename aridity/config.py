@@ -66,7 +66,7 @@ class Config(object):
         try:
             obj = self._context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
-            raise AttributeError(name) # XXX: Misleading?
+            raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
