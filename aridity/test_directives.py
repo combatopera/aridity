@@ -66,3 +66,14 @@ class TestDirectives(TestCase):
         ae = self.assertEqual
         ae('yay', c.prefix.woo)
         ae('yay2', c.prefix.woo2)
+
+    def test_starvoid(self):
+        c = Config.blank()
+        c.printf('a = A')
+        c.printf('b = B')
+        c.printf('profile * a = $(void)')
+        c.printf('profile * b = $(void)')
+        c.printf('profile p x = y')
+        # These should not behave differently:
+        self.assertEqual('A', c.profile.p.a)
+        self.assertEqual('B', c.profile.p.b)
