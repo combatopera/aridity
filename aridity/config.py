@@ -16,10 +16,10 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .context import Context
-from .directives import processtemplateimpl
+from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
-from .util import NoSuchPathException, nullcontext
+from .util import NoSuchPathException
 from functools import partial
 from importlib import import_module
 from itertools import chain
@@ -105,10 +105,16 @@ class Config(object):
                 yield k, type(self)(self._context, self._prefix + [k])
 
     def processtemplate(self, frompathorstream, topathorstream):
-        openfrom = nullcontext if getattr(frompathorstream, 'readable', lambda: False)() else open
-        opento = nullcontext if getattr(topathorstream, 'writable', lambda: False)() else lambda p: open(p, 'w')
-        with openfrom(frompathorstream) as f, opento(topathorstream) as g:
-            g.write(processtemplateimpl(self._localcontext(), f))
+        c = self._localcontext()
+        if getattr(frompathorstream, 'readable', lambda: False)():
+            text = processtemplateimpl(c, frompathorstream)
+        else:
+            text = processtemplate(c, Text(frompathorstream))
+        if getattr(topathorstream, 'writable', lambda: False)():
+            topathorstream.write(text)
+        else:
+            with open(topathorstream, 'w') as g:
+                g.write(text)
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self._prefix
