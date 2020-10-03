@@ -47,8 +47,9 @@ class Config(object):
         with Repl(self._context) as repl:
             repl.printf(''.join(chain(("%s " for _ in self._prefix), [template])), *chain(self._prefix, args))
 
-    def load(self, path):
-        self._localcontext().source(Entry([]), path)
+    def load(self, pathorstream):
+        c = self._localcontext()
+        (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
