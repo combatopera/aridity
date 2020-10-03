@@ -68,14 +68,13 @@ class Resolvables:
         self.d[key] = resolvable
 
     def getornone(self, key):
-        if Star.protokey != key:
-            try:
-                return self.d[key]
-            except KeyError:
-                pass
-            obj = self._proto().get(key)
-            # FIXME LATER: Reads should be thread-safe, only create child if we're about to put something in it.
-            return self.context._putchild(key) if hasattr(obj, 'resolvables') else obj
+        try:
+            return self.d[key]
+        except KeyError:
+            pass
+        obj = self._proto().get(key)
+        # FIXME LATER: Reads should be thread-safe, only create child if we're about to put something in it.
+        return self.context._putchild(key) if hasattr(obj, 'resolvables') else obj
 
     def items(self):
         for k, v in self.d.items():

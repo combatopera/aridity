@@ -67,13 +67,26 @@ class TestDirectives(TestCase):
         ae('yay', c.prefix.woo)
         ae('yay2', c.prefix.woo2)
 
-    def test_starvoid(self):
+    def test_starmultiplechildren(self):
         c = Config.blank()
         c.printf('a = A')
         c.printf('b = B')
         c.printf('profile * a = $(void)')
         c.printf('profile * b = $(void)')
         c.printf('profile p x = y')
-        # These should not behave differently:
-        self.assertEqual('A', c.profile.p.a)
-        self.assertEqual('B', c.profile.p.b)
+        with self.assertRaises(AttributeError):
+            c.profile.p.a
+        with self.assertRaises(AttributeError):
+            c.profile.p.b
+        self.assertEqual('y', c.profile.p.x)
+
+    def test_starishidden(self):
+        c = Config.blank()
+        c.printf('x * y = z')
+        self.assertEqual({}, c.x.unravel())
+        self.assertEqual([], list(c.x.items()))
+        c.printf('x a = b')
+        self.assertEqual(dict(a = 'b'), c.x.unravel())
+        self.assertEqual([('a', 'b')], list(c.x.items()))
+        c.printf('x p q = r')
+        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), c.x.unravel())
