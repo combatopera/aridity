@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .context import Context
+from .directives import processtemplateimpl
 from .model import Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException
@@ -103,9 +104,8 @@ class Config(object):
                 yield k, type(self)(self._context, self._prefix + [k])
 
     def processtemplate(self, frompath, topath):
-        with Repl(self._localcontext()) as repl:
-            repl.printf("redirect %s", topath) # XXX: Could this modify the underlying context?
-            repl.printf("< %s", frompath)
+        with open(frompath) as f, open(topath, 'w') as g:
+            g.write(processtemplateimpl(self._localcontext(), f))
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self._prefix

@@ -107,6 +107,9 @@ def resolvepath(resolvable, context):
 
 def processtemplate(context, pathresolvable):
     path = resolvepath(pathresolvable, context)
-    static = context.staticcontext()
-    with open(path) as f, static.here.push(Text(os.path.dirname(path))), static.indent.push() as monitor:
+    with open(path) as f, context.staticcontext().here.push(Text(os.path.dirname(path))):
+        return processtemplateimpl(context, f)
+
+def processtemplateimpl(context, f):
+    with context.staticcontext().indent.push() as monitor:
         return Concat(templateparser(f.read()), monitor).resolve(context).cat()
