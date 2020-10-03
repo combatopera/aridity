@@ -17,7 +17,7 @@
 
 from .context import Context
 from .directives import processtemplateimpl
-from .model import Function, Number, Scalar, Text
+from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException, nullcontext
 from functools import partial
@@ -48,7 +48,7 @@ class Config(object):
             repl.printf(''.join(chain(("%s " for _ in self._prefix), [template])), *chain(self._prefix, args))
 
     def load(self, path):
-        self.printf(". %s", path)
+        self._localcontext().source(Entry([]), path)
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
