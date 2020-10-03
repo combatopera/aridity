@@ -19,7 +19,7 @@ from .context import Context
 from .directives import processtemplateimpl
 from .model import Function, Number, Scalar, Text
 from .repl import Repl
-from .util import NoSuchPathException
+from .util import NoSuchPathException, nullcontext
 from functools import partial
 from importlib import import_module
 from itertools import chain
@@ -103,8 +103,10 @@ class Config(object):
             except AttributeError:
                 yield k, type(self)(self._context, self._prefix + [k])
 
-    def processtemplate(self, frompath, topath):
-        with open(frompath) as f, open(topath, 'w') as g:
+    def processtemplate(self, frompathorstream, topathorstream):
+        openfrom = nullcontext if getattr(frompathorstream, 'readable', lambda: False)() else open
+        opento = nullcontext if getattr(topathorstream, 'writable', lambda: False)() else lambda p: open(p, 'w')
+        with openfrom(frompathorstream) as f, opento(topathorstream) as g:
             g.write(processtemplateimpl(self._localcontext(), f))
 
     def createchild(self): # XXX: Is _localcontext quite similar?

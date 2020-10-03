@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from contextlib import contextmanager
 import collections, inspect
 
 class NoSuchPathException(Exception): pass
@@ -95,3 +96,7 @@ def allfunctions(clazz):
         except AttributeError:
             realname = name
         yield realname, clazz.__dict__[name]
+
+@contextmanager
+def nullcontext(enter_result):
+    yield enter_result
