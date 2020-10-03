@@ -181,8 +181,12 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return c
 
     def source(self, prefix, path):
+        with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
+            self.sourceimpl(prefix, f)
+
+    def sourceimpl(self, prefix, f):
         from .repl import Repl
-        with self.staticcontext().here.push(Text(os.path.dirname(path))), Repl(self, rootprefix = prefix) as repl, open(path) as f:
+        with Repl(self, rootprefix = prefix) as repl:
             for line in f:
                 repl(line)
 
