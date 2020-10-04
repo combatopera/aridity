@@ -19,6 +19,29 @@ import collections, inspect
 
 class NoSuchPathException(Exception): pass
 
+class UnparseNoSuchPathException(NoSuchPathException):
+
+    def __str__(self):
+        from .model import Text
+        path, = self.args
+        return ' '.join(Text(word).unparse() for word in path)
+
+class TreeNoSuchPathException(NoSuchPathException):
+
+    def __str__(self):
+        from .model import Text
+        path, causes = self.args
+        causestrtocount = collections.defaultdict(int)
+        for c in causes:
+            causestrtocount[str(c)] += 1
+        lines = [' '.join(Text(word).unparse() for word in path)]
+        for causestr, count in causestrtocount.items():
+            causelines = causestr.splitlines()
+            lines.append("%sx %s" % (count, causelines[0]))
+            for l in causelines[1:]:
+                lines.append("    %s" % l)
+        return '\n'.join(lines)
+
 class UnsupportedEntryException(Exception): pass
 
 class OrderedDictWrapper:

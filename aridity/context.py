@@ -20,8 +20,7 @@ from .directives import lookup, Precedence
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import NoSuchPathException, OrderedDict, UnsupportedEntryException
-from collections import defaultdict
+from .util import NoSuchPathException, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 import collections, os, sys, threading
 
 class NotAPathException(Exception): pass
@@ -137,12 +136,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if self is None:
                 break
 
-    class UnparseNoSuchPathException(NoSuchPathException):
-
-        def __str__(self):
-            path, = self.args
-            return ' '.join(path) # TODO LATER: Unparse correctly.
-
     def _findresolvable(self, path):
         for i in range(len(path)):
             c = self._resolvedcontextornone(path[:i])
@@ -151,7 +144,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             r = c._findresolvableshallow(path[i:])
             if r is not None:
                 return r
-        raise self.UnparseNoSuchPathException(path)
+        raise UnparseNoSuchPathException(path)
 
     def _findresolvableshallow(self, path):
         for c in self._selfandparents():
@@ -160,14 +153,14 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 return r
 
     def _resolved(self, path, resolvable, kwargs):
-        errortocount = defaultdict(lambda: 0)
+        errors = []
         for i in range(len(path)):
-            obj = self._resolvedshallow(path[i:], resolvable, kwargs, errortocount)
+            obj = self._resolvedshallow(path[i:], resolvable, kwargs, errors)
             if obj is not None:
                 return obj
-        raise NoSuchPathException(path, dict(errortocount)) # TODO: Ugly.
+        raise TreeNoSuchPathException(path, errors)
 
-    def _resolvedshallow(self, path, resolvable, kwargs, errortocount):
+    def _resolvedshallow(self, path, resolvable, kwargs, errors):
         while path:
             path = path[:-1]
             for c in (c._resolvedcontextornone(path) for c in self._selfandparents()):
@@ -175,7 +168,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                     try:
                         return resolvable.resolve(c, **kwargs)
                     except NoSuchPathException as e:
-                        errortocount[str(e)] += 1
+                        errors.append(e)
 
     def unravel(self):
         d = OrderedDict([k, o.unravel()] for k, o in self.itero())
