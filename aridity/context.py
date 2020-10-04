@@ -137,6 +137,12 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if self is None:
                 break
 
+    class UnparseNoSuchPathException(NoSuchPathException):
+
+        def __str__(self):
+            path, = self.args
+            return ' '.join(path) # TODO LATER: Unparse correctly.
+
     def _findresolvable(self, path):
         for i in range(len(path)):
             c = self._resolvedcontextornone(path[:i])
@@ -145,7 +151,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             r = c._findresolvableshallow(path[i:])
             if r is not None:
                 return r
-        raise NoSuchPathException(path)
+        raise self.UnparseNoSuchPathException(path)
 
     def _findresolvableshallow(self, path):
         for c in self._selfandparents():
