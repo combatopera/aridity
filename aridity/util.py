@@ -30,7 +30,7 @@ class TreeNoSuchPathException(NoSuchPathException):
 
     def __str__(self):
         from .model import Text
-        path, causes = self.args
+        path, causes = self.args # XXX: Also collect (and show) where in the tree the causes happened?
         causestrtocount = collections.OrderedDict()
         for causestr in map(str, causes):
             try:
