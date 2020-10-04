@@ -31,9 +31,12 @@ class TreeNoSuchPathException(NoSuchPathException):
     def __str__(self):
         from .model import Text
         path, causes = self.args
-        causestrtocount = collections.defaultdict(int)
-        for c in causes:
-            causestrtocount[str(c)] += 1
+        causestrtocount = collections.OrderedDict()
+        for causestr in map(str, causes):
+            try:
+                causestrtocount[causestr] += 1
+            except KeyError:
+                causestrtocount[causestr] = 1
         lines = [' '.join(Text(word).unparse() for word in path)]
         for causestr, count in causestrtocount.items():
             causelines = causestr.splitlines()

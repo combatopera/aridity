@@ -15,10 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from .util import OrderedSet
+from .config import Config
+from .context import Context
+from .repl import Repl
+from .util import OrderedSet, TreeNoSuchPathException
+from unittest import TestCase
+import sys
 
-class TestUtil(unittest.TestCase):
+class TestUtil(TestCase):
 
     def test_orderedset(self):
         s = OrderedSet()
@@ -30,3 +34,28 @@ class TestUtil(unittest.TestCase):
         self.assertEqual([2, 1, 0], list(s)) # Order preserved.
         s.add(1)
         self.assertEqual([2, 1, 0], list(s)) # Order unchanged.
+
+    def test_treeexceptionstr(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl.printf('broken = $(void)')
+            repl.printf('woo = $(broken)')
+        with self.assertRaises(TreeNoSuchPathException) as cm:
+            c.resolved('broken')
+        self.assertEqual('broken\n2x void', str(cm.exception))
+        with self.assertRaises(TreeNoSuchPathException) as cm:
+            c.resolved('woo')
+        self.assertEqual('woo\n1x broken\n    2x void\n1x broken', str(cm.exception))
+
+    def test_treeexceptionstr2(self):
+        if sys.version_info.major < 3:
+            return
+        c = Config.blank()
+        c.printf('broken = $(void)')
+        c.printf('woo = $(broken)')
+        with self.assertRaises(AttributeError) as cm:
+            c.broken
+        self.assertEqual('broken\n2x void', str(cm.exception.__context__))
+        with self.assertRaises(AttributeError) as cm:
+            c.woo
+        self.assertEqual('woo\n1x broken\n    2x void\n1x broken', str(cm.exception.__context__))
