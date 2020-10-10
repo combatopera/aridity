@@ -304,7 +304,7 @@ class Context(AbstractContext):
         if toplevel:
             return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
         elif self.islist:
-            return "(%s)" % ' '.join(x.resolve(self).tobash() for x in self)
+            return "(%s)" % ' '.join(x.resolve(self).tobash() for _, x in self.resolvables.items())
         else:
             return Text(self.tobash(True)).tobash()
 
