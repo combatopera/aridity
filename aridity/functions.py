@@ -17,8 +17,9 @@
 
 from __future__ import division
 from .directives import processtemplate, resolvepath
-from .model import Number, Text
+from .model import Function, Number, Text
 from .util import allfunctions, NoSuchPathException, realname
+from importlib import import_module
 import itertools, json, os, re, shlex
 
 xmlentities = dict([c, "&%s;" % w] for c, w in [['"', 'quot'], ["'", 'apos']])
@@ -182,6 +183,12 @@ class Functions:
 
     def lower(context, resolvable):
         return Text(resolvable.resolve(context).cat().lower())
+
+    def pyref(context, moduleresolvable, qualnameresolvable):
+        pyobj = import_module(moduleresolvable.resolve(context).cat())
+        for name in qualnameresolvable.resolve(context).cat().split('.'):
+            pyobj = getattr(pyobj, name)
+        return Function(pyobj) # FIXME LATER: Could be any type.
 
 class Spread:
 

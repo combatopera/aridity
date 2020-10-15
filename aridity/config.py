@@ -21,23 +21,14 @@ from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
-from importlib import import_module
 from itertools import chain
 import os
-
-def _pyref(context, moduleresolvable, qualnameresolvable):
-    pyobj = import_module(moduleresolvable.resolve(context).cat())
-    for name in qualnameresolvable.resolve(context).cat().split('.'):
-        pyobj = getattr(pyobj, name)
-    return Function(pyobj) # FIXME LATER: Could be any type.
 
 class Config(object):
 
     @classmethod
     def blank(cls):
-        c = Context()
-        c['pyref',] = Function(_pyref)
-        return cls(c, [])
+        return cls(Context(), [])
 
     def __init__(self, context, prefix):
         self._context = context
