@@ -33,6 +33,19 @@ def _context(c):
 def _prefix(c):
     return configs[c][1]
 
+class ConfigCtrl:
+
+    def __init__(self, config):
+        self.config = config
+
+    def __iter__(self):
+        self = self.config
+        for k, o in self._localcontext().itero():
+            try:
+                yield k, o.value
+            except AttributeError:
+                yield k, type(self)(_context(self), _prefix(self) + [k])
+
 class Config(object):
 
     @classmethod
@@ -93,15 +106,11 @@ class Config(object):
         return _context(self).resolved(*_prefix(self))
 
     def __iter__(self):
-        for _, o in self.items():
+        for _, o in ~self:
             yield o
 
-    def items(self):
-        for k, o in self._localcontext().itero():
-            try:
-                yield k, o.value
-            except AttributeError:
-                yield k, type(self)(_context(self), _prefix(self) + [k])
+    def __invert__(self):
+        return ConfigCtrl(self)
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
