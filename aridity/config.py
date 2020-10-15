@@ -25,26 +25,27 @@ from itertools import chain
 from weakref import WeakKeyDictionary
 import os
 
-configs = WeakKeyDictionary()
+ctrls = WeakKeyDictionary()
 
 def _context(c):
-    return configs[c][0]
+    return ctrls[c].context
 
 def _prefix(c):
-    return configs[c][1]
+    return ctrls[c].prefix
 
 class ConfigCtrl:
 
-    def __init__(self, config):
+    def __init__(self, config, context, prefix):
         self.config = config
+        self.context = context
+        self.prefix = prefix
 
     def __iter__(self):
-        self = self.config
-        for k, o in self._localcontext().itero():
+        for k, o in self.config._localcontext().itero():
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, type(self)(_context(self), _prefix(self) + [k])
+                yield k, type(self.config)(self.context, self.prefix + [k])
 
 class Config(object):
 
@@ -53,7 +54,7 @@ class Config(object):
         return cls(Context(), [])
 
     def __init__(self, context, prefix):
-        configs[self] = context, prefix
+        ctrls[self] = ConfigCtrl(self, context, prefix)
 
     def printf(self, template, *args):
         with Repl(_context(self)) as repl:
@@ -110,7 +111,7 @@ class Config(object):
             yield o
 
     def __invert__(self):
-        return ConfigCtrl(self)
+        return ctrls[self]
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
