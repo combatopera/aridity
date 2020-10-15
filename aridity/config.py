@@ -22,7 +22,16 @@ from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
 from itertools import chain
+from weakref import WeakKeyDictionary
 import os
+
+configs = WeakKeyDictionary()
+
+def _context(c):
+    return configs[c][0]
+
+def _prefix(c):
+    return configs[c][1]
 
 class Config(object):
 
@@ -31,12 +40,11 @@ class Config(object):
         return cls(Context(), [])
 
     def __init__(self, context, prefix):
-        self._context = context
-        self._prefix = prefix
+        configs[self] = context, prefix
 
     def printf(self, template, *args):
-        with Repl(self._context) as repl:
-            repl.printf(''.join(chain(("%s " for _ in self._prefix), [template])), *chain(self._prefix, args))
+        with Repl(_context(self)) as repl:
+            repl.printf(''.join(chain(("%s " for _ in _prefix(self)), [template])), *chain(_prefix(self), args))
 
     def load(self, pathorstream):
         c = self._localcontext()
@@ -46,8 +54,8 @@ class Config(object):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
 
     def repl(self):
-        assert not self._prefix # XXX: Support prefix?
-        return Repl(self._context)
+        assert not _prefix(self) # XXX: Support prefix?
+        return Repl(_context(self))
 
     def execute(self, text):
         with self.repl() as repl:
@@ -55,15 +63,15 @@ class Config(object):
                 repl(line)
 
     def __getattr__(self, name):
-        path = self._prefix + [name]
+        path = _prefix(self) + [name]
         try:
-            obj = self._context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = _context(self).resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return type(self)(self._context, path)
+            return type(self)(_context(self), path)
 
     def put(self, *path, **kwargs):
         def pairs():
@@ -79,10 +87,10 @@ class Config(object):
                     pass
         # XXX: Support combination of types e.g. slash is both function and text?
         factory, = (partial(t, v) for t, v in pairs())
-        self._context[tuple(self._prefix) + path] = factory()
+        _context(self)[tuple(_prefix(self)) + path] = factory()
 
     def _localcontext(self):
-        return self._context.resolved(*self._prefix)
+        return _context(self).resolved(*_prefix(self))
 
     def __iter__(self):
         for _, o in self.items():
@@ -93,7 +101,7 @@ class Config(object):
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, type(self)(self._context, self._prefix + [k])
+                yield k, type(self)(_context(self), _prefix(self) + [k])
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -108,8 +116,8 @@ class Config(object):
                 g.write(text)
 
     def createchild(self): # XXX: Is _localcontext quite similar?
-        assert not self._prefix
-        return type(self)(self._context.createchild(), [])
+        assert not _prefix(self)
+        return type(self)(_context(self).createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
