@@ -27,7 +27,11 @@ import os
 
 ctrls = WeakKeyDictionary()
 
-class ConfigCtrl:
+class Config:
+
+    @staticmethod
+    def blank():
+        return ConfigAccess(Context(), [])
 
     def __init__(self, config, context, prefix):
         self.config = config
@@ -99,14 +103,10 @@ class ConfigCtrl:
     def unravel(self):
         return self._localcontext().unravel()
 
-class Config(object):
-
-    @classmethod
-    def blank(cls):
-        return cls(Context(), [])
+class ConfigAccess(object):
 
     def __init__(self, context, prefix):
-        ctrls[self] = ConfigCtrl(self, context, prefix)
+        ctrls[self] = Config(self, context, prefix)
 
     def __getattr__(self, name):
         ctrl = ctrls[self]
