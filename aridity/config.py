@@ -40,6 +40,10 @@ class ConfigCtrl:
         self.context = context
         self.prefix = prefix
 
+    def printf(self, template, *args):
+        with Repl(self.context) as repl:
+            repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
+
     def __iter__(self):
         for k, o in self.config._localcontext().itero():
             try:
@@ -55,10 +59,6 @@ class Config(object):
 
     def __init__(self, context, prefix):
         ctrls[self] = ConfigCtrl(self, context, prefix)
-
-    def printf(self, template, *args):
-        with Repl(_context(self)) as repl:
-            repl.printf(''.join(chain(("%s " for _ in _prefix(self)), [template])), *chain(_prefix(self), args))
 
     def load(self, pathorstream):
         c = self._localcontext()

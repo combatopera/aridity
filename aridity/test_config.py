@@ -44,8 +44,8 @@ class TestConfig(TestCase):
 
     def test_printf(self):
         c = Config.blank()
-        c.printf('woo a = b')
-        c.woo.printf('c = d')
+        (~c).printf('woo a = b')
+        (~c.woo).printf('c = d')
         self.assertEqual(['b', 'd'], list(c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), dict(~c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), c.woo.unravel())

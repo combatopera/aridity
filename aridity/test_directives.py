@@ -69,11 +69,12 @@ class TestDirectives(TestCase):
 
     def test_starmultiplechildren(self):
         c = Config.blank()
-        c.printf('a = A')
-        c.printf('b = B')
-        c.printf('profile * a = $(void)')
-        c.printf('profile * b = $(void)')
-        c.printf('profile p x = y')
+        cc = ~c
+        cc.printf('a = A')
+        cc.printf('b = B')
+        cc.printf('profile * a = $(void)')
+        cc.printf('profile * b = $(void)')
+        cc.printf('profile p x = y')
         with self.assertRaises(AttributeError):
             c.profile.p.a
         with self.assertRaises(AttributeError):
@@ -82,11 +83,12 @@ class TestDirectives(TestCase):
 
     def test_starishidden(self):
         c = Config.blank()
-        c.printf('x * y = z')
+        cc = ~c
+        cc.printf('x * y = z')
         self.assertEqual({}, c.x.unravel())
         self.assertEqual([], list(~c.x))
-        c.printf('x a = b')
+        cc.printf('x a = b')
         self.assertEqual(dict(a = 'b'), c.x.unravel())
         self.assertEqual([('a', 'b')], list(~c.x))
-        c.printf('x p q = r')
+        cc.printf('x p q = r')
         self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), c.x.unravel())
