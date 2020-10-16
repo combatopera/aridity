@@ -110,6 +110,9 @@ class Config:
     def unravel(self):
         return self._localcontext().unravel()
 
+    def __invert__(self):
+        return self.key
+
 class ConfigKey(object):
 
     def __getattr__(self, name):
