@@ -25,13 +25,13 @@ from itertools import chain
 from weakref import WeakKeyDictionary
 import os
 
-ctrls = WeakKeyDictionary()
+configs = WeakKeyDictionary()
 
 class Config:
 
     @staticmethod
     def blank():
-        return ConfigAccess(Context(), [])
+        return ConfigKey(Context(), [])
 
     def __init__(self, config, context, prefix):
         self.config = config
@@ -103,13 +103,13 @@ class Config:
     def unravel(self):
         return self._localcontext().unravel()
 
-class ConfigAccess(object):
+class ConfigKey(object):
 
     def __init__(self, context, prefix):
-        ctrls[self] = Config(self, context, prefix)
+        configs[self] = Config(self, context, prefix)
 
     def __getattr__(self, name):
-        ctrl = ctrls[self]
+        ctrl = configs[self]
         path = ctrl.prefix + [name]
         try:
             obj = ctrl.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
@@ -121,8 +121,8 @@ class ConfigAccess(object):
             return type(self)(ctrl.context, path)
 
     def __iter__(self):
-        for _, o in ctrls[self]:
+        for _, o in configs[self]:
             yield o
 
     def __invert__(self):
-        return ctrls[self]
+        return configs[self]
