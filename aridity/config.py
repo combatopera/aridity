@@ -27,12 +27,6 @@ import os
 
 ctrls = WeakKeyDictionary()
 
-def _context(c):
-    return ctrls[c].context
-
-def _prefix(c):
-    return ctrls[c].prefix
-
 class ConfigCtrl:
 
     def __init__(self, config, context, prefix):
@@ -115,15 +109,16 @@ class Config(object):
         ctrls[self] = ConfigCtrl(self, context, prefix)
 
     def __getattr__(self, name):
-        path = _prefix(self) + [name]
+        ctrl = ctrls[self]
+        path = ctrl.prefix + [name]
         try:
-            obj = _context(self).resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = ctrl.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return type(self)(_context(self), path)
+            return type(self)(ctrl.context, path)
 
     def __iter__(self):
         for _, o in ctrls[self]:
