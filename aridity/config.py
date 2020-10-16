@@ -86,6 +86,18 @@ class ConfigCtrl:
             except AttributeError:
                 yield k, type(self.config)(self.context, self.prefix + [k])
 
+    def processtemplate(self, frompathorstream, topathorstream):
+        c = self._localcontext()
+        if getattr(frompathorstream, 'readable', lambda: False)():
+            text = processtemplateimpl(c, frompathorstream)
+        else:
+            text = processtemplate(c, Text(frompathorstream))
+        if getattr(topathorstream, 'writable', lambda: False)():
+            topathorstream.write(text)
+        else:
+            with open(topathorstream, 'w') as g:
+                g.write(text)
+
 class Config(object):
 
     @classmethod
@@ -112,18 +124,6 @@ class Config(object):
 
     def __invert__(self):
         return ctrls[self]
-
-    def processtemplate(self, frompathorstream, topathorstream):
-        c = ctrls[self]._localcontext()
-        if getattr(frompathorstream, 'readable', lambda: False)():
-            text = processtemplateimpl(c, frompathorstream)
-        else:
-            text = processtemplate(c, Text(frompathorstream))
-        if getattr(topathorstream, 'writable', lambda: False)():
-            topathorstream.write(text)
-        else:
-            with open(topathorstream, 'w') as g:
-                g.write(text)
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not _prefix(self)
