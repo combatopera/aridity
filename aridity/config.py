@@ -29,12 +29,18 @@ configs = WeakKeyDictionary()
 
 class Config:
 
-    @staticmethod
-    def blank():
-        return ConfigKey(Context(), [])
+    @classmethod
+    def blank(cls):
+        return cls._newkey(Context(), [])
 
-    def __init__(self, config, context, prefix):
-        self.config = config
+    @classmethod
+    def _newkey(cls, context, prefix):
+        k = ConfigKey()
+        c = cls(context, prefix)
+        configs[k] = c
+        return k
+
+    def __init__(self, context, prefix):
         self.context = context
         self.prefix = prefix
 
@@ -82,7 +88,7 @@ class Config:
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, type(self.config)(self.context, self.prefix + [k])
+                yield k, self._newkey(self.context, self.prefix + [k])
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -98,27 +104,24 @@ class Config:
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self.prefix
-        return type(self.config)(self.context.createchild(), [])
+        return self._newkey(self.context.createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
 
 class ConfigKey(object):
 
-    def __init__(self, context, prefix):
-        configs[self] = Config(self, context, prefix)
-
     def __getattr__(self, name):
-        ctrl = configs[self]
-        path = ctrl.prefix + [name]
+        config = configs[self]
+        path = config.prefix + [name]
         try:
-            obj = ctrl.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = config.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return type(self)(ctrl.context, path)
+            return config._newkey(config.context, path)
 
     def __iter__(self):
         for _, o in configs[self]:
