@@ -31,7 +31,7 @@ class Config:
 
     @classmethod
     def blank(cls):
-        return cls._newkey(Context(), [])
+        return configs[cls._newkey(Context(), [])]
 
     @classmethod
     def _newkey(cls, context, prefix):

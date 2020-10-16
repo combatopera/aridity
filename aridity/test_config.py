@@ -21,15 +21,14 @@ from unittest import TestCase
 class TestConfig(TestCase):
 
     def test_listdict(self):
-        c = Config.blank()
-        cc = ~c
-        cc.put('v', 'a', text = 'A')
+        c = ~Config.blank()
+        (~c).put('v', 'a', text = 'A')
         self.assertEqual(['A'], list(c.v))
         self.assertEqual(dict(a = 'A'), dict(~c.v))
-        cc.put('v', 'b', text = 'B')
+        (~c).put('v', 'b', text = 'B')
         self.assertEqual(['A', 'B'], list(c.v))
         self.assertEqual(dict(a = 'A', b = 'B'), dict(~c.v))
-        cc.put('v', 'c', 'x', text = 'X')
+        (~c).put('v', 'c', 'x', text = 'X')
         l = list(c.v)
         self.assertEqual(3, len(l))
         self.assertEqual('A', l[0])
@@ -44,7 +43,7 @@ class TestConfig(TestCase):
         self.assertEqual(dict(x = 'X'), dict(~d['c']))
 
     def test_printf(self):
-        c = Config.blank()
+        c = ~Config.blank()
         (~c).printf('woo a = b')
         (~c.woo).printf('c = d')
         self.assertEqual(['b', 'd'], list(c.woo))
