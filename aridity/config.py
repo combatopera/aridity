@@ -48,6 +48,9 @@ class ConfigCtrl:
         c = self.config._localcontext()
         (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
 
+    def loadsettings(self):
+        self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
+
     def __iter__(self):
         for k, o in self.config._localcontext().itero():
             try:
@@ -63,9 +66,6 @@ class Config(object):
 
     def __init__(self, context, prefix):
         ctrls[self] = ConfigCtrl(self, context, prefix)
-
-    def loadsettings(self):
-        ctrls[self].load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
 
     def repl(self):
         assert not _prefix(self) # XXX: Support prefix?
