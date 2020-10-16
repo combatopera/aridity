@@ -22,13 +22,14 @@ class TestConfig(TestCase):
 
     def test_listdict(self):
         c = Config.blank()
-        c.put('v', 'a', text = 'A')
+        cc = ~c
+        cc.put('v', 'a', text = 'A')
         self.assertEqual(['A'], list(c.v))
         self.assertEqual(dict(a = 'A'), dict(~c.v))
-        c.put('v', 'b', text = 'B')
+        cc.put('v', 'b', text = 'B')
         self.assertEqual(['A', 'B'], list(c.v))
         self.assertEqual(dict(a = 'A', b = 'B'), dict(~c.v))
-        c.put('v', 'c', 'x', text = 'X')
+        cc.put('v', 'c', 'x', text = 'X')
         l = list(c.v)
         self.assertEqual(3, len(l))
         self.assertEqual('A', l[0])

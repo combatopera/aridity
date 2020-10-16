@@ -60,6 +60,22 @@ class ConfigCtrl:
             for line in text.splitlines():
                 repl(line)
 
+    def put(self, *path, **kwargs):
+        def pairs():
+            for t, k in [
+                    [Function, 'function'],
+                    [Number, 'number'],
+                    [Scalar, 'scalar'],
+                    [Text, 'text'],
+                    [lambda x: x, 'resolvable']]:
+                try:
+                    yield t, kwargs[k]
+                except KeyError:
+                    pass
+        # XXX: Support combination of types e.g. slash is both function and text?
+        factory, = (partial(t, v) for t, v in pairs())
+        self.context[tuple(self.prefix) + path] = factory()
+
     def __iter__(self):
         for k, o in self.config._localcontext().itero():
             try:
@@ -86,22 +102,6 @@ class Config(object):
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
             return type(self)(_context(self), path)
-
-    def put(self, *path, **kwargs):
-        def pairs():
-            for t, k in [
-                    [Function, 'function'],
-                    [Number, 'number'],
-                    [Scalar, 'scalar'],
-                    [Text, 'text'],
-                    [lambda x: x, 'resolvable']]:
-                try:
-                    yield t, kwargs[k]
-                except KeyError:
-                    pass
-        # XXX: Support combination of types e.g. slash is both function and text?
-        factory, = (partial(t, v) for t, v in pairs())
-        _context(self)[tuple(_prefix(self)) + path] = factory()
 
     def _localcontext(self):
         return _context(self).resolved(*_prefix(self))
