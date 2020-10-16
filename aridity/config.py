@@ -107,7 +107,7 @@ class Config(object):
         return _context(self).resolved(*_prefix(self))
 
     def __iter__(self):
-        for _, o in ~self:
+        for _, o in ctrls[self]:
             yield o
 
     def __invert__(self):
