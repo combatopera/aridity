@@ -110,7 +110,7 @@ class Config:
     def unravel(self):
         return self._localcontext().unravel()
 
-    def __invert__(self):
+    def __call__(self):
         return self.key
 
 class ConfigKey(object):
@@ -131,5 +131,5 @@ class ConfigKey(object):
         for _, o in configs[self]:
             yield o
 
-    def __invert__(self):
+    def __call__(self):
         return configs[self]
