@@ -55,6 +55,11 @@ class ConfigCtrl:
         assert not self.prefix # XXX: Support prefix?
         return Repl(self.context)
 
+    def execute(self, text):
+        with self.repl() as repl:
+            for line in text.splitlines():
+                repl(line)
+
     def __iter__(self):
         for k, o in self.config._localcontext().itero():
             try:
@@ -70,11 +75,6 @@ class Config(object):
 
     def __init__(self, context, prefix):
         ctrls[self] = ConfigCtrl(self, context, prefix)
-
-    def execute(self, text):
-        with self.repl() as repl:
-            for line in text.splitlines():
-                repl(line)
 
     def __getattr__(self, name):
         path = _prefix(self) + [name]
