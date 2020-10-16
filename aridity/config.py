@@ -44,6 +44,10 @@ class ConfigCtrl:
         with Repl(self.context) as repl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
+    def load(self, pathorstream):
+        c = self.config._localcontext()
+        (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
+
     def __iter__(self):
         for k, o in self.config._localcontext().itero():
             try:
@@ -60,12 +64,8 @@ class Config(object):
     def __init__(self, context, prefix):
         ctrls[self] = ConfigCtrl(self, context, prefix)
 
-    def load(self, pathorstream):
-        c = self._localcontext()
-        (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
-
     def loadsettings(self):
-        self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
+        ctrls[self].load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
 
     def repl(self):
         assert not _prefix(self) # XXX: Support prefix?
