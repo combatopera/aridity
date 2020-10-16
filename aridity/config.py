@@ -102,6 +102,9 @@ class ConfigCtrl:
         assert not self.prefix
         return type(self.config)(self.context.createchild(), [])
 
+    def unravel(self):
+        return self._localcontext().unravel()
+
 class Config(object):
 
     @classmethod
@@ -128,6 +131,3 @@ class Config(object):
 
     def __invert__(self):
         return ctrls[self]
-
-    def unravel(self):
-        return ctrls[self]._localcontext().unravel()

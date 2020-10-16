@@ -49,4 +49,4 @@ class TestConfig(TestCase):
         (~c.woo).printf('c = d')
         self.assertEqual(['b', 'd'], list(c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), dict(~c.woo))
-        self.assertEqual(dict(a = 'b', c = 'd'), c.woo.unravel())
+        self.assertEqual(dict(a = 'b', c = 'd'), (~c.woo).unravel())

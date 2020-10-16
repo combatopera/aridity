@@ -85,10 +85,10 @@ class TestDirectives(TestCase):
         c = Config.blank()
         cc = ~c
         cc.printf('x * y = z')
-        self.assertEqual({}, c.x.unravel())
+        self.assertEqual({}, (~c.x).unravel())
         self.assertEqual([], list(~c.x))
         cc.printf('x a = b')
-        self.assertEqual(dict(a = 'b'), c.x.unravel())
+        self.assertEqual(dict(a = 'b'), (~c.x).unravel())
         self.assertEqual([('a', 'b')], list(~c.x))
         cc.printf('x p q = r')
-        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), c.x.unravel())
+        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (~c.x).unravel())
