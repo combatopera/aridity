@@ -36,11 +36,12 @@ class Config:
     @classmethod
     def _newkey(cls, context, prefix):
         k = ConfigKey()
-        c = cls(context, prefix)
+        c = cls(k, context, prefix)
         configs[k] = c
         return k
 
-    def __init__(self, context, prefix):
+    def __init__(self, key, context, prefix):
+        self.key = key # Probably a good idea to keep a strong reference.
         self.context = context
         self.prefix = prefix
 
