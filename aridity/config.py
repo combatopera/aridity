@@ -45,7 +45,7 @@ class ConfigCtrl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
     def load(self, pathorstream):
-        c = self.config._localcontext()
+        c = self._localcontext()
         (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
 
     def loadsettings(self):
@@ -76,8 +76,11 @@ class ConfigCtrl:
         factory, = (partial(t, v) for t, v in pairs())
         self.context[tuple(self.prefix) + path] = factory()
 
+    def _localcontext(self):
+        return self.context.resolved(*self.prefix)
+
     def __iter__(self):
-        for k, o in self.config._localcontext().itero():
+        for k, o in self._localcontext().itero():
             try:
                 yield k, o.value
             except AttributeError:
@@ -103,9 +106,6 @@ class Config(object):
         except AttributeError:
             return type(self)(_context(self), path)
 
-    def _localcontext(self):
-        return _context(self).resolved(*_prefix(self))
-
     def __iter__(self):
         for _, o in ctrls[self]:
             yield o
@@ -114,7 +114,7 @@ class Config(object):
         return ctrls[self]
 
     def processtemplate(self, frompathorstream, topathorstream):
-        c = self._localcontext()
+        c = ctrls[self]._localcontext()
         if getattr(frompathorstream, 'readable', lambda: False)():
             text = processtemplateimpl(c, frompathorstream)
         else:
@@ -130,4 +130,4 @@ class Config(object):
         return type(self)(_context(self).createchild(), [])
 
     def unravel(self):
-        return self._localcontext().unravel()
+        return ctrls[self]._localcontext().unravel()
