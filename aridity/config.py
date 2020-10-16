@@ -98,6 +98,10 @@ class ConfigCtrl:
             with open(topathorstream, 'w') as g:
                 g.write(text)
 
+    def createchild(self): # XXX: Is _localcontext quite similar?
+        assert not self.prefix
+        return type(self.config)(self.context.createchild(), [])
+
 class Config(object):
 
     @classmethod
@@ -124,10 +128,6 @@ class Config(object):
 
     def __invert__(self):
         return ctrls[self]
-
-    def createchild(self): # XXX: Is _localcontext quite similar?
-        assert not _prefix(self)
-        return type(self)(_context(self).createchild(), [])
 
     def unravel(self):
         return ctrls[self]._localcontext().unravel()
