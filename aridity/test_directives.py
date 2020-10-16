@@ -23,7 +23,7 @@ class TestDirectives(TestCase):
 
     def test_commentprecedence(self):
         c = Config.blank()
-        with c().repl() as repl:
+        with (~c).repl() as repl:
             repl('woo = before')
             repl('houpla3 = 3')
             repl(':')
@@ -42,7 +42,7 @@ class TestDirectives(TestCase):
 
     def test_equalsprecedence(self):
         c = Config.blank()
-        with c().repl() as repl:
+        with (~c).repl() as repl:
             repl('woo = before')
             repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
         ae = self.assertEqual
@@ -50,14 +50,14 @@ class TestDirectives(TestCase):
 
     def test_starprecedence(self):
         c = Config.blank()
-        with c().repl() as repl:
+        with (~c).repl() as repl:
             repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
         ae = self.assertEqual
         ae('yay * houpla', c.woo)
 
     def test_sourcecommentwithprefix(self):
         c = Config.blank()
-        with NamedTemporaryFile('w') as f, c().repl() as repl:
+        with NamedTemporaryFile('w') as f, (~c).repl() as repl:
             f.write('woo = yay\n')
             f.write('woo2 = yay2 : with comment\n')
             f.write(': comment only\n')
@@ -69,7 +69,7 @@ class TestDirectives(TestCase):
 
     def test_starmultiplechildren(self):
         c = Config.blank()
-        cc = c()
+        cc = ~c
         cc.printf('a = A')
         cc.printf('b = B')
         cc.printf('profile * a = $(void)')
@@ -83,12 +83,12 @@ class TestDirectives(TestCase):
 
     def test_starishidden(self):
         c = Config.blank()
-        cc = c()
+        cc = ~c
         cc.printf('x * y = z')
-        self.assertEqual({}, c.x().unravel())
-        self.assertEqual([], list(c.x()))
+        self.assertEqual({}, (~c.x).unravel())
+        self.assertEqual([], list(~c.x))
         cc.printf('x a = b')
-        self.assertEqual(dict(a = 'b'), c.x().unravel())
-        self.assertEqual([('a', 'b')], list(c.x()))
+        self.assertEqual(dict(a = 'b'), (~c.x).unravel())
+        self.assertEqual([('a', 'b')], list(~c.x))
         cc.printf('x p q = r')
-        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), c.x().unravel())
+        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (~c.x).unravel())

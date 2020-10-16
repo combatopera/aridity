@@ -51,7 +51,7 @@ class TestUtil(TestCase):
         if sys.version_info.major < 3:
             return
         c = Config.blank()
-        cc = c()
+        cc = ~c
         cc.printf('broken = $(void)')
         cc.printf('woo = $(broken)')
         with self.assertRaises(AttributeError) as cm:
