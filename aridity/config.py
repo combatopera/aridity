@@ -31,17 +31,17 @@ class Config:
 
     @classmethod
     def blank(cls):
-        return configs[cls._newkey(Context(), [])]
+        return configs[cls._node(Context(), [])]
 
     @classmethod
-    def _newkey(cls, context, prefix):
-        k = ConfigKey()
-        c = cls(k, context, prefix)
-        configs[k] = c
-        return k
+    def _node(cls, context, prefix):
+        n = Node()
+        c = cls(n, context, prefix)
+        configs[n] = c
+        return n
 
-    def __init__(self, key, context, prefix):
-        self.key = key # Probably a good idea to keep a strong reference.
+    def __init__(self, node, context, prefix):
+        self.node = node
         self.context = context
         self.prefix = prefix
 
@@ -89,7 +89,7 @@ class Config:
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, self._newkey(self.context, self.prefix + [k])
+                yield k, self._node(self.context, self.prefix + [k])
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -105,15 +105,15 @@ class Config:
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self.prefix
-        return self._newkey(self.context.createchild(), [])
+        return self._node(self.context.createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
 
-    def __invert__(self):
-        return self.key
+    def __invert__(self): # XXX: Keep?
+        return self.node
 
-class ConfigKey(object):
+class Node(object):
 
     def __getattr__(self, name):
         config = configs[self]
@@ -125,7 +125,7 @@ class ConfigKey(object):
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return config._newkey(config.context, path)
+            return config._node(config.context, path)
 
     def __iter__(self):
         for _, o in configs[self]:

@@ -33,7 +33,7 @@ class TestDirectives(TestCase):
             repl('houpla2 = 2 : houpla3 = 4 : woo = during') # Same, second colon is part of comment.
             repl('yay := $(woo)')
             repl('woo = after')
-        c = ~c
+        c = c.node
         ae = self.assertEqual
         ae('before', c.yay)
         ae('after', c.woo)
@@ -46,7 +46,7 @@ class TestDirectives(TestCase):
         with c.repl() as repl:
             repl('woo = before')
             repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
-        c = ~c
+        c = c.node
         ae = self.assertEqual
         ae('and = after', c.woo)
 
@@ -54,7 +54,7 @@ class TestDirectives(TestCase):
         c = Config.blank()
         with c.repl() as repl:
             repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
-        c = ~c
+        c = c.node
         ae = self.assertEqual
         ae('yay * houpla', c.woo)
 
@@ -66,7 +66,7 @@ class TestDirectives(TestCase):
             f.write(': comment only\n')
             f.flush()
             repl.printf("prefix . %s", f.name)
-        c = ~c
+        c = c.node
         ae = self.assertEqual
         ae('yay', c.prefix.woo)
         ae('yay2', c.prefix.woo2)
@@ -78,7 +78,7 @@ class TestDirectives(TestCase):
         c.printf('profile * a = $(void)')
         c.printf('profile * b = $(void)')
         c.printf('profile p x = y')
-        c = ~c
+        c = c.node
         with self.assertRaises(AttributeError):
             c.profile.p.a
         with self.assertRaises(AttributeError):
@@ -86,7 +86,7 @@ class TestDirectives(TestCase):
         self.assertEqual('y', c.profile.p.x)
 
     def test_starishidden(self):
-        c = ~Config.blank()
+        c = Config.blank().node
         (~c).printf('x * y = z')
         self.assertEqual({}, (~c.x).unravel())
         self.assertEqual([], list(~c.x))

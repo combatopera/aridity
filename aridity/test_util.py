@@ -53,7 +53,7 @@ class TestUtil(TestCase):
         c = Config.blank()
         c.printf('broken = $(void)')
         c.printf('woo = $(broken)')
-        c = ~c
+        c = c.node
         with self.assertRaises(AttributeError) as cm:
             c.broken
         self.assertEqual('broken\n2x void', str(cm.exception.__context__))
