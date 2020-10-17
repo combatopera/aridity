@@ -25,8 +25,9 @@ from io import TextIOWrapper
 from itertools import chain
 from pkg_resources import iter_entry_points, resource_stream
 from weakref import WeakKeyDictionary
-import os
+import errno, logging, os
 
+log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
 
 def _newnode(ctrl):
@@ -34,7 +35,7 @@ def _newnode(ctrl):
     ctrls[node] = ctrl
     return node
 
-def loadappconfig(mainfunction, moduleresource):
+def loadappconfig(mainfunction, moduleresource, settingsoptional = False):
     module_name = mainfunction.__module__
     attrs = tuple(mainfunction.__qualname__.split('.'))
     appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
@@ -43,7 +44,12 @@ def loadappconfig(mainfunction, moduleresource):
     appconfig = getattr(rootconfig.node, appname)
     with TextIOWrapper(resource_stream(module_name, moduleresource)) as f:
         (-appconfig).load(f)
-    rootconfig.loadsettings()
+    try:
+        rootconfig.loadsettings()
+    except OSError as e:
+        if not (settingsoptional and errno.ENOENT == e.errno):
+            raise
+        log.info("No such file: %s", e)
     return appconfig
 
 class ConfigCtrl:
