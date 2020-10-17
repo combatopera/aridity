@@ -21,7 +21,9 @@ from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException
 from functools import partial
+from io import TextIOWrapper
 from itertools import chain
+from pkg_resources import iter_entry_points, resource_stream
 from weakref import WeakKeyDictionary
 import os
 
@@ -31,6 +33,18 @@ def _newnode(ctrl):
     node = Config()
     ctrls[node] = ctrl
     return node
+
+def loadappconfig(mainfunction, moduleresource):
+    module_name = mainfunction.__module__
+    attrs = tuple(mainfunction.__qualname__.split('.'))
+    appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
+    rootconfig = ConfigCtrl()
+    rootconfig.printf("%s := $fork()", appname)
+    appconfig = getattr(rootconfig.node, appname)
+    with TextIOWrapper(resource_stream(module_name, moduleresource)) as f:
+        (-appconfig).load(f)
+    rootconfig.loadsettings()
+    return appconfig
 
 class ConfigCtrl:
 
