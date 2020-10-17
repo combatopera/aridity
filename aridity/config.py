@@ -27,6 +27,11 @@ import os
 
 ctrls = WeakKeyDictionary()
 
+def _newnode(ctrl):
+    node = Node()
+    ctrls[node] = ctrl
+    return node
+
 class Config:
 
     @classmethod
@@ -35,13 +40,10 @@ class Config:
 
     @classmethod
     def _node(cls, context, prefix):
-        n = Node()
-        c = cls(n, context, prefix)
-        ctrls[n] = c
-        return n
+        return cls(context, prefix).node
 
-    def __init__(self, node, context, prefix):
-        self.node = node
+    def __init__(self, context, prefix):
+        self.node = _newnode(self)
         self.context = context
         self.prefix = prefix
 
