@@ -25,19 +25,19 @@ from itertools import chain
 from weakref import WeakKeyDictionary
 import os
 
-configs = WeakKeyDictionary()
+ctrls = WeakKeyDictionary()
 
 class Config:
 
     @classmethod
     def blank(cls):
-        return configs[cls._node(Context(), [])]
+        return ctrls[cls._node(Context(), [])]
 
     @classmethod
     def _node(cls, context, prefix):
         n = Node()
         c = cls(n, context, prefix)
-        configs[n] = c
+        ctrls[n] = c
         return n
 
     def __init__(self, node, context, prefix):
@@ -117,20 +117,20 @@ class Config:
 class Node(object):
 
     def __getattr__(self, name):
-        config = configs[self]
-        path = config.prefix + [name]
+        ctrl = ctrls[self]
+        path = ctrl.prefix + [name]
         try:
-            obj = config.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = ctrl.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return config._node(config.context, path)
+            return ctrl._node(ctrl.context, path)
 
     def __iter__(self):
-        for _, o in configs[self]:
+        for _, o in ctrls[self]:
             yield o
 
     def __neg__(self):
-        return configs[self]
+        return ctrls[self]
