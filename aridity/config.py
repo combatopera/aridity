@@ -28,24 +28,26 @@ import os
 ctrls = WeakKeyDictionary()
 
 def _newnode(ctrl):
-    node = Node()
+    node = Config()
     ctrls[node] = ctrl
     return node
 
-class Config:
-
-    @classmethod
-    def blank(cls):
-        return ctrls[cls._node(Context(), [])]
+class ConfigCtrl:
 
     @classmethod
     def _node(cls, context, prefix):
-        return cls(context, prefix).node
+        def init(self):
+            self.context = context
+            self.prefix = prefix
+        return cls(init).node
 
-    def __init__(self, context, prefix):
+    def __init__(self, init = None):
         self.node = _newnode(self)
-        self.context = context
-        self.prefix = prefix
+        if init is None:
+            self.context = Context()
+            self.prefix = []
+        else:
+            init(self)
 
     def printf(self, template, *args):
         with Repl(self.context) as repl:
@@ -116,7 +118,7 @@ class Config:
         'Included for completeness, normally the node attribute should be used directly.'
         return self.node
 
-class Node(object):
+class Config(object):
 
     def __getattr__(self, name):
         ctrl = ctrls[self]

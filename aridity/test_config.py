@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .config import Config
+from .config import ConfigCtrl
 from unittest import TestCase
 
 class TestConfig(TestCase):
 
     def test_listdict(self):
-        c = Config.blank().node
+        c = ConfigCtrl().node
         (-c).put('v', 'a', text = 'A')
         self.assertEqual(['A'], list(c.v))
         self.assertEqual(dict(a = 'A'), dict(-c.v))
@@ -43,7 +43,7 @@ class TestConfig(TestCase):
         self.assertEqual(dict(x = 'X'), dict(-d['c']))
 
     def test_printf(self):
-        c = Config.blank().node
+        c = ConfigCtrl().node
         (-c).printf('woo a = b')
         (-c.woo).printf('c = d')
         self.assertEqual(['b', 'd'], list(c.woo))

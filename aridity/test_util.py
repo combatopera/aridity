@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .config import Config
+from .config import ConfigCtrl
 from .context import Context
 from .repl import Repl
 from .util import OrderedSet, TreeNoSuchPathException
@@ -50,7 +50,7 @@ class TestUtil(TestCase):
     def test_treeexceptionstr2(self):
         if sys.version_info.major < 3:
             return
-        c = Config.blank()
+        c = ConfigCtrl()
         c.printf('broken = $(void)')
         c.printf('woo = $(broken)')
         c = c.node

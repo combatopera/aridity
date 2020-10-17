@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .config import Config
+from .config import ConfigCtrl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
 class TestDirectives(TestCase):
 
     def test_commentprecedence(self):
-        c = Config.blank()
+        c = ConfigCtrl()
         with c.repl() as repl:
             repl('woo = before')
             repl('houpla3 = 3')
@@ -42,7 +42,7 @@ class TestDirectives(TestCase):
         ae(3, c.houpla3)
 
     def test_equalsprecedence(self):
-        c = Config.blank()
+        c = ConfigCtrl()
         with c.repl() as repl:
             repl('woo = before')
             repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
@@ -51,7 +51,7 @@ class TestDirectives(TestCase):
         ae('and = after', c.woo)
 
     def test_starprecedence(self):
-        c = Config.blank()
+        c = ConfigCtrl()
         with c.repl() as repl:
             repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
         c = c.node
@@ -59,7 +59,7 @@ class TestDirectives(TestCase):
         ae('yay * houpla', c.woo)
 
     def test_sourcecommentwithprefix(self):
-        c = Config.blank()
+        c = ConfigCtrl()
         with NamedTemporaryFile('w') as f, c.repl() as repl:
             f.write('woo = yay\n')
             f.write('woo2 = yay2 : with comment\n')
@@ -72,7 +72,7 @@ class TestDirectives(TestCase):
         ae('yay2', c.prefix.woo2)
 
     def test_starmultiplechildren(self):
-        c = Config.blank()
+        c = ConfigCtrl()
         c.printf('a = A')
         c.printf('b = B')
         c.printf('profile * a = $(void)')
@@ -86,7 +86,7 @@ class TestDirectives(TestCase):
         self.assertEqual('y', c.profile.p.x)
 
     def test_starishidden(self):
-        c = Config.blank().node
+        c = ConfigCtrl().node
         (-c).printf('x * y = z')
         self.assertEqual({}, (-c.x).unravel())
         self.assertEqual([], list(-c.x))
