@@ -87,11 +87,11 @@ class TestDirectives(TestCase):
 
     def test_starishidden(self):
         c = Config.blank().node
-        (~c).printf('x * y = z')
-        self.assertEqual({}, (~c.x).unravel())
-        self.assertEqual([], list(~c.x))
-        (~c).printf('x a = b')
-        self.assertEqual(dict(a = 'b'), (~c.x).unravel())
-        self.assertEqual([('a', 'b')], list(~c.x))
-        (~c).printf('x p q = r')
-        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (~c.x).unravel())
+        (-c).printf('x * y = z')
+        self.assertEqual({}, (-c.x).unravel())
+        self.assertEqual([], list(-c.x))
+        (-c).printf('x a = b')
+        self.assertEqual(dict(a = 'b'), (-c.x).unravel())
+        self.assertEqual([('a', 'b')], list(-c.x))
+        (-c).printf('x p q = r')
+        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (-c.x).unravel())

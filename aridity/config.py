@@ -110,7 +110,8 @@ class Config:
     def unravel(self):
         return self._localcontext().unravel()
 
-    def __invert__(self): # XXX: Keep?
+    def __neg__(self):
+        'Included for completeness, normally the node attribute should be used directly.'
         return self.node
 
 class Node(object):
@@ -131,5 +132,5 @@ class Node(object):
         for _, o in configs[self]:
             yield o
 
-    def __invert__(self):
+    def __neg__(self):
         return configs[self]
