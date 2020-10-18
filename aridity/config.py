@@ -38,19 +38,13 @@ def _newnode(ctrl):
 class ConfigCtrl:
 
     @classmethod
-    def _create(cls, context, prefix):
-        def init(self):
-            self.context = context
-            self.prefix = prefix
-        return cls(init)
+    def _of(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
 
-    def __init__(self, init = None):
+    def __init__(self, context = None, prefix = None):
         self.node = _newnode(self)
-        if init is None:
-            self.context = Context()
-            self.prefix = []
-        else:
-            init(self)
+        self.context = Context() if context is None else context
+        self.prefix = [] if prefix is None else prefix
 
     def loadappconfig(self, mainfunction, moduleresource, encoding = 'ascii', settingsoptional = False):
         module_name = mainfunction.__module__
@@ -112,7 +106,7 @@ class ConfigCtrl:
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, self._create(self.context, self.prefix + [k]).node
+                yield k, self._of(self.context, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -127,7 +121,7 @@ class ConfigCtrl:
                 g.write(text)
 
     def createchild(self):
-        return self._create(self._localcontext().createchild(), [])
+        return self._of(self._localcontext().createchild())
 
     def unravel(self):
         return self._localcontext().unravel()
@@ -148,7 +142,7 @@ class Config(object):
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return ctrl._create(ctrl.context, path).node
+            return ctrl._of(ctrl.context, path).node
 
     def __iter__(self):
         for _, o in ctrls[self]:
