@@ -63,3 +63,21 @@ class TestConfig(TestCase):
         h = (-c).createchild().node
         self.assertEqual([], (-h).prefix)
         self.assertEqual('<woo>', h.item.xform)
+
+    def test_triplebreak(self):
+        cc = ConfigCtrl()
+        cc.printf('A = woo')
+        cc.printf('B C := $fork()')
+        cc.printf('D E F := $fork()')
+        c = cc.node
+        self.assertEqual('woo', c.A)
+        self.assertEqual('woo', c.B.A)
+        self.assertEqual('woo', c.D.A)
+        self.assertEqual('woo', c.B.C.A)
+        self.assertEqual('woo', c.D.E.A)
+        self.assertEqual('woo', c.D.E.F.A)
+        try:
+            self.assertEqual('woo', c.D.E.F.C.A)
+            self.fail('You fixed a bug!')
+        except AttributeError:
+            pass
