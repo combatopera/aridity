@@ -56,7 +56,7 @@ class ConfigCtrl:
         module_name = mainfunction.__module__
         attrs = tuple(mainfunction.__qualname__.split('.'))
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-        self.printf("%s := $fork()", appname)
+        self.context.getorcreatesubcontext(self.prefix + [appname])
         appconfig = getattr(self.node, appname)
         with TextIOWrapper(resource_stream(module_name, moduleresource)) as f: # TODO: System encoding not appropriate here.
             (-appconfig).load(f)
