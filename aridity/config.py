@@ -38,11 +38,11 @@ def _newnode(ctrl):
 class ConfigCtrl:
 
     @classmethod
-    def _node(cls, context, prefix):
+    def _create(cls, context, prefix):
         def init(self):
             self.context = context
             self.prefix = prefix
-        return cls(init).node
+        return cls(init)
 
     def __init__(self, init = None):
         self.node = _newnode(self)
@@ -112,7 +112,7 @@ class ConfigCtrl:
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, self._node(self.context, self.prefix + [k])
+                yield k, self._create(self.context, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -128,7 +128,7 @@ class ConfigCtrl:
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self.prefix
-        return -self._node(self.context.createchild(), [])
+        return self._create(self.context.createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
@@ -149,7 +149,7 @@ class Config(object):
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return ctrl._node(ctrl.context, path)
+            return ctrl._create(ctrl.context, path).node
 
     def __iter__(self):
         for _, o in ctrls[self]:
