@@ -586,8 +586,4 @@ class TestContext(TestCase):
         self.assertEqual('YY', c.resolved('x', 'y', 'dbl').value)
         self.assertEqual('YY', c.resolved('ok').unravel())
         self.assertEqual('YY', c.resolved('wtf', 'k').unravel())
-        try:
-            self.assertEqual({'k': 'YY'}, c.resolved('wtf').unravel())
-            self.fail('You fixed a bug!')
-        except NoSuchPathException:
-            pass
+        self.assertEqual({'k': 'YY'}, c.resolved('wtf').unravel())

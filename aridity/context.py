@@ -136,9 +136,15 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if self is None:
                 break
 
+    def _findresolvedcontextornone(self, path):
+        for p in self._selfandparents():
+            c = p._resolvedcontextornone(path)
+            if c is not None:
+                return c
+
     def _findresolvable(self, path):
         for i in range(len(path)):
-            c = self._resolvedcontextornone(path[:i])
+            c = self._findresolvedcontextornone(path[:i])
             if c is None:
                 break
             r = c._findresolvableshallow(path[i:])
