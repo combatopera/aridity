@@ -49,3 +49,17 @@ class TestConfig(TestCase):
         self.assertEqual(['b', 'd'], list(c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), dict(-c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), (-c.woo).unravel())
+
+    def test_childquery(self):
+        cc = ConfigCtrl()
+        cc.printf('app xform = <$(data)>')
+        cc.printf('app item data = woo')
+        c = cc.node.app
+        self.assertEqual(['app'], (-c).prefix)
+        self.assertEqual('<woo>', c.item.xform)
+        d = (-c).detach().node
+        self.assertEqual([], (-d).prefix)
+        self.assertEqual('<woo>', d.item.xform)
+        h = (-c).createchild().node
+        self.assertEqual([], (-h).prefix)
+        self.assertEqual('<woo>', h.item.xform)
