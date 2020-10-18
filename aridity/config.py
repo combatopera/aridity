@@ -128,7 +128,7 @@ class ConfigCtrl:
 
     def createchild(self): # XXX: Is _localcontext quite similar?
         assert not self.prefix
-        return self._node(self.context.createchild(), [])
+        return -self._node(self.context.createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
