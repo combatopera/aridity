@@ -64,6 +64,16 @@ class TestConfig(TestCase):
         self.assertEqual([], (-h).prefix)
         self.assertEqual('<woo>', h.item.xform)
 
+    def test_fight(self):
+        cc = ConfigCtrl()
+        cc.printf('X Y := $fork()')
+        cc.printf('Y Z = woo')
+        cc.printf('Z = yay')
+        c = cc.node
+        self.assertEqual('woo', c.X.Y.Z)
+        d = (-c.X.Y).detach().node
+        self.assertEqual('yay', d.Z)
+
     def test_triplebreak(self):
         cc = ConfigCtrl()
         cc.printf('A = woo')
