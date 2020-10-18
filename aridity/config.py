@@ -126,9 +126,8 @@ class ConfigCtrl:
             with open(topathorstream, 'w') as g:
                 g.write(text)
 
-    def createchild(self): # XXX: Is _localcontext quite similar?
-        assert not self.prefix
-        return self._create(self.context.createchild(), [])
+    def createchild(self):
+        return self._create(self._localcontext().createchild(), [])
 
     def unravel(self):
         return self._localcontext().unravel()
