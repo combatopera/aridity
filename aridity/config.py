@@ -35,23 +35,6 @@ def _newnode(ctrl):
     ctrls[node] = ctrl
     return node
 
-def loadappconfig(mainfunction, moduleresource, settingsoptional = False):
-    module_name = mainfunction.__module__
-    attrs = tuple(mainfunction.__qualname__.split('.'))
-    appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-    rootconfig = ConfigCtrl()
-    rootconfig.printf("%s := $fork()", appname)
-    appconfig = getattr(rootconfig.node, appname)
-    with TextIOWrapper(resource_stream(module_name, moduleresource)) as f:
-        (-appconfig).load(f)
-    try:
-        rootconfig.loadsettings()
-    except OSError as e:
-        if not (settingsoptional and errno.ENOENT == e.errno):
-            raise
-        log.info("No such file: %s", e)
-    return appconfig
-
 class ConfigCtrl:
 
     @classmethod
@@ -68,6 +51,22 @@ class ConfigCtrl:
             self.prefix = []
         else:
             init(self)
+
+    def loadappconfig(self, mainfunction, moduleresource, settingsoptional = False):
+        module_name = mainfunction.__module__
+        attrs = tuple(mainfunction.__qualname__.split('.'))
+        appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
+        self.printf("%s := $fork()", appname)
+        appconfig = getattr(self.node, appname)
+        with TextIOWrapper(resource_stream(module_name, moduleresource)) as f: # TODO: System encoding not appropriate here.
+            (-appconfig).load(f)
+        try:
+            self.loadsettings()
+        except OSError as e:
+            if not (settingsoptional and errno.ENOENT == e.errno):
+                raise
+            log.info("No such file: %s", e)
+        return appconfig
 
     def printf(self, template, *args):
         with Repl(self.context) as repl:
