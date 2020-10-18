@@ -22,8 +22,8 @@ from unittest import TestCase
 class TestDirectives(TestCase):
 
     def test_commentprecedence(self):
-        c = ConfigCtrl()
-        with c.repl() as repl:
+        cc = ConfigCtrl()
+        with cc.repl() as repl:
             repl('woo = before')
             repl('houpla3 = 3')
             repl(':')
@@ -33,7 +33,7 @@ class TestDirectives(TestCase):
             repl('houpla2 = 2 : houpla3 = 4 : woo = during') # Same, second colon is part of comment.
             repl('yay := $(woo)')
             repl('woo = after')
-        c = c.node
+        c = cc.node
         ae = self.assertEqual
         ae('before', c.yay)
         ae('after', c.woo)
@@ -42,43 +42,43 @@ class TestDirectives(TestCase):
         ae(3, c.houpla3)
 
     def test_equalsprecedence(self):
-        c = ConfigCtrl()
-        with c.repl() as repl:
+        cc = ConfigCtrl()
+        with cc.repl() as repl:
             repl('woo = before')
             repl('woo = and = after') # Apply first equals less astonishing than error or applying second.
-        c = c.node
+        c = cc.node
         ae = self.assertEqual
         ae('and = after', c.woo)
 
     def test_starprecedence(self):
-        c = ConfigCtrl()
-        with c.repl() as repl:
+        cc = ConfigCtrl()
+        with cc.repl() as repl:
             repl('woo = yay * houpla') # Would be very confusing for * to have precedence here.
-        c = c.node
+        c = cc.node
         ae = self.assertEqual
         ae('yay * houpla', c.woo)
 
     def test_sourcecommentwithprefix(self):
-        c = ConfigCtrl()
-        with NamedTemporaryFile('w') as f, c.repl() as repl:
+        cc = ConfigCtrl()
+        with NamedTemporaryFile('w') as f, cc.repl() as repl:
             f.write('woo = yay\n')
             f.write('woo2 = yay2 : with comment\n')
             f.write(': comment only\n')
             f.flush()
             repl.printf("prefix . %s", f.name)
-        c = c.node
+        c = cc.node
         ae = self.assertEqual
         ae('yay', c.prefix.woo)
         ae('yay2', c.prefix.woo2)
 
     def test_starmultiplechildren(self):
-        c = ConfigCtrl()
-        c.printf('a = A')
-        c.printf('b = B')
-        c.printf('profile * a = $(void)')
-        c.printf('profile * b = $(void)')
-        c.printf('profile p x = y')
-        c = c.node
+        cc = ConfigCtrl()
+        cc.printf('a = A')
+        cc.printf('b = B')
+        cc.printf('profile * a = $(void)')
+        cc.printf('profile * b = $(void)')
+        cc.printf('profile p x = y')
+        c = cc.node
         with self.assertRaises(AttributeError):
             c.profile.p.a
         with self.assertRaises(AttributeError):

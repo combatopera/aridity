@@ -50,10 +50,10 @@ class TestUtil(TestCase):
     def test_treeexceptionstr2(self):
         if sys.version_info.major < 3:
             return
-        c = ConfigCtrl()
-        c.printf('broken = $(void)')
-        c.printf('woo = $(broken)')
-        c = c.node
+        cc = ConfigCtrl()
+        cc.printf('broken = $(void)')
+        cc.printf('woo = $(broken)')
+        c = cc.node
         with self.assertRaises(AttributeError) as cm:
             c.broken
         self.assertEqual('broken\n2x void', str(cm.exception.__context__))
