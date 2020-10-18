@@ -52,13 +52,13 @@ class ConfigCtrl:
         else:
             init(self)
 
-    def loadappconfig(self, mainfunction, moduleresource, settingsoptional = False):
+    def loadappconfig(self, mainfunction, moduleresource, encoding = 'ascii', settingsoptional = False):
         module_name = mainfunction.__module__
         attrs = tuple(mainfunction.__qualname__.split('.'))
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
         self.context.getorcreatesubcontext(self.prefix + [appname])
         appconfig = getattr(self.node, appname)
-        with TextIOWrapper(resource_stream(module_name, moduleresource)) as f: # TODO: System encoding not appropriate here.
+        with TextIOWrapper(resource_stream(module_name, moduleresource), encoding) as f:
             (-appconfig).load(f)
         try:
             self.loadsettings()
