@@ -362,7 +362,7 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('calc.single = 5')
             repl('calc.double = $mul($(calc.single) 2)')
-            repl('X = $fork()')
+            repl('X := $fork()')
             repl('A calc.single = 6')
         self.assertEqual(10, c.resolved('X', 'calc.double').value)
         self.assertEqual(12, c.resolved('A', 'calc.double').value)
@@ -370,7 +370,7 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('calc single = 5')
             repl('calc double = $mul($(single) 2)')
-            repl('X = $fork()')
+            repl('X := $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
@@ -378,7 +378,7 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('calc single = 5')
             repl('calc double = $mul($(calc single) 2)') # The calc here is redundant.
-            repl('X = $fork()')
+            repl('X := $fork()')
             repl('A calc single = 6')
         self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
         self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
