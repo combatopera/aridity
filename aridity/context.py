@@ -29,13 +29,6 @@ class NotAResolvableException(Exception): pass
 
 class Resolvables:
 
-    class Null:
-
-        def getornone(self, key):
-            pass
-
-    Null = Null()
-
     def _proto(self):
         revpath = []
         c = self.context
@@ -125,10 +118,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 return
         return c
 
-    def _subresolvables(self, path):
-        c = self._resolvedcontextornone(path)
-        return Resolvables.Null if c is None else c.resolvables
-
     def _selfandparents(self):
         while True:
             yield self
@@ -136,27 +125,25 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if self is None:
                 break
 
-    def _findresolvedcontextornone(self, path):
-        for p in self._selfandparents():
-            c = p._resolvedcontextornone(path)
-            if c is not None:
-                return c
+    def _rankresolvables(self, path):
+        assert path
+        tail = path[1:]
+        for k, c in enumerate(self._selfandparents()):
+            r = c.resolvables.getornone(path[0])
+            if r is not None:
+                if not tail:
+                    yield [k], r
+                else:
+                    r = r.resolve(c) # XXX: Wise?
+                    if hasattr(r, '_rankresolvables'):
+                        for tk, tr in r._rankresolvables(tail):
+                            yield tk + [k], tr
 
     def _findresolvable(self, path):
-        for i in range(len(path)):
-            c = self._findresolvedcontextornone(path[:i])
-            if c is None:
-                break
-            r = c._findresolvableshallow(path[i:])
-            if r is not None:
-                return r
+        v = list(self._rankresolvables(path))
+        if v:
+            return min(v)[1]
         raise UnparseNoSuchPathException(path)
-
-    def _findresolvableshallow(self, path):
-        for c in self._selfandparents():
-            r = c._subresolvables(path[:-1]).getornone(path[-1])
-            if r is not None:
-                return r
 
     def _resolved(self, path, resolvable, kwargs):
         errors = []

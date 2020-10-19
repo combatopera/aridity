@@ -394,9 +394,8 @@ class TestContext(TestCase):
             repl('A B x z = 4')
             repl('B C z = 5')
             repl('C z = 6')
-        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value) # XXX: Would 3 be more obvious?
-        with self.assertRaises(NoSuchPathException):
-            c.resolved('A', 'B', 'C', 'x', 'y') # Revisit if we find a similar use-case.
+        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value)
+        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value)
 
     def test_blanklines(self):
         context = Context()
