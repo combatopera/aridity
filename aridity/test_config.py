@@ -87,7 +87,7 @@ class TestConfig(TestCase):
         self.assertEqual('woo', c.D.E.A)
         self.assertEqual('woo', c.D.E.F.A)
         try:
-            self.assertEqual('woo', c.D.E.F.C.A)
+            self.assertEqual('woo', c.D.E.F.B.C.A)
             self.fail('You fixed a bug!')
         except AttributeError:
             pass
