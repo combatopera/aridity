@@ -50,7 +50,7 @@ class TestConfig(TestCase):
         self.assertEqual(dict(a = 'b', c = 'd'), dict(-c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), (-c.woo).unravel())
 
-    def test_childquery(self):
+    def test_crosschildresolve(self):
         cc = ConfigCtrl()
         cc.printf('app xform = <$(data)>')
         cc.printf('app item data = woo')
@@ -64,7 +64,7 @@ class TestConfig(TestCase):
         self.assertEqual([], (-h).prefix)
         self.assertEqual('<woo>', h.item.xform)
 
-    def test_fight(self):
+    def test_tailmoresignificant(self):
         cc = ConfigCtrl()
         cc.printf('X Y := $fork()')
         cc.printf('Y Z = woo')
@@ -74,7 +74,7 @@ class TestConfig(TestCase):
         f = (-c.X.Y).free().node
         self.assertEqual('yay', f.Z)
 
-    def test_triplebreak(self):
+    def test_multibacktrack(self):
         cc = ConfigCtrl()
         cc.printf('A = woo')
         cc.printf('B C := $fork()')
