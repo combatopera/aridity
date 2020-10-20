@@ -143,10 +143,15 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                     yield [k], r
 
     def _findresolvable(self, path):
-        v = list(self._scoreresolvables(path))
-        if v:
-            return min(v)[1]
-        raise UnparseNoSuchPathException(path)
+        bestscore = [float('inf')]
+        for score, resolvable in self._scoreresolvables(path):
+            if score < bestscore:
+                bestscore = score
+                bestresolvable = resolvable
+        try:
+            return bestresolvable
+        except NameError:
+            raise UnparseNoSuchPathException(path)
 
     def _resolved(self, path, resolvable, kwargs):
         errors = []
