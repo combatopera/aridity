@@ -57,9 +57,9 @@ class TestConfig(TestCase):
         c = cc.node.app
         self.assertEqual(['app'], (-c).prefix)
         self.assertEqual('<woo>', c.item.xform)
-        d = (-c).detach().node
-        self.assertEqual([], (-d).prefix)
-        self.assertEqual('<woo>', d.item.xform)
+        f = (-c).free().node
+        self.assertEqual([], (-f).prefix)
+        self.assertEqual('<woo>', f.item.xform)
         h = (-c).createchild().node
         self.assertEqual([], (-h).prefix)
         self.assertEqual('<woo>', h.item.xform)
@@ -71,8 +71,8 @@ class TestConfig(TestCase):
         cc.printf('Z = yay')
         c = cc.node
         self.assertEqual('woo', c.X.Y.Z)
-        d = (-c.X.Y).detach().node
-        self.assertEqual('yay', d.Z)
+        f = (-c.X.Y).free().node
+        self.assertEqual('yay', f.Z)
 
     def test_triplebreak(self):
         cc = ConfigCtrl()

@@ -120,7 +120,7 @@ class ConfigCtrl:
             with open(topathorstream, 'w') as g:
                 g.write(text)
 
-    def detach(self):
+    def free(self):
         return self._of(self._localcontext())
 
     def createchild(self):
