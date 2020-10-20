@@ -125,7 +125,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             if self is None:
                 break
 
-    def _rankresolvables(self, path):
+    def _scoreresolvables(self, path):
         assert path
         tail = path[1:]
         for k, c in enumerate(self._selfandparents()):
@@ -135,12 +135,12 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                     yield [k], r
                 else:
                     r = r.resolve(c) # XXX: Wise?
-                    if hasattr(r, '_rankresolvables'):
-                        for tk, tr in r._rankresolvables(tail):
+                    if hasattr(r, '_scoreresolvables'):
+                        for tk, tr in r._scoreresolvables(tail):
                             yield tk + [k], tr
 
     def _findresolvable(self, path):
-        v = list(self._rankresolvables(path))
+        v = list(self._scoreresolvables(path))
         if v:
             return min(v)[1]
         raise UnparseNoSuchPathException(path)
