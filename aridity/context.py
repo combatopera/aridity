@@ -126,18 +126,21 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 break
 
     def _scoreresolvables(self, path):
-        assert path
         tail = path[1:]
         for k, c in enumerate(self._selfandparents()):
             r = c.resolvables.getornone(path[0])
             if r is not None:
-                if not tail:
-                    yield [k], r
+                if tail:
+                    obj = r.resolve(c) # XXX: Wise?
+                    try:
+                        obj_score = obj._scoreresolvables
+                    except AttributeError:
+                        pass
+                    else:
+                        for score, rr in obj_score(tail):
+                            yield score + [k], rr
                 else:
-                    r = r.resolve(c) # XXX: Wise?
-                    if hasattr(r, '_scoreresolvables'):
-                        for tk, tr in r._scoreresolvables(tail):
-                            yield tk + [k], tr
+                    yield [k], r
 
     def _findresolvable(self, path):
         v = list(self._scoreresolvables(path))
