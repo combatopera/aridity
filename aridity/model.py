@@ -164,6 +164,9 @@ class Number(Scalar):
 
 class Boolean(Scalar):
 
+    def truth(self):
+        return self.value
+
     def tobash(self, toplevel):
         return 'true' if self.value else 'false'
 

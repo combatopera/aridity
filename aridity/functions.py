@@ -17,7 +17,7 @@
 
 from __future__ import division
 from .directives import processtemplate, resolvepath
-from .model import Function, Number, Text
+from .model import Boolean, Function, Number, Text
 from .util import allfunctions, NoSuchPathException, realname
 from importlib import import_module
 import itertools, json, os, re, shlex
@@ -189,6 +189,10 @@ class Functions:
         for name in qualnameresolvable.resolve(context).cat().split('.'):
             pyobj = getattr(pyobj, name)
         return Function(pyobj) # FIXME LATER: Could be any type.
+
+    @realname('\N{NOT SIGN}')
+    def not_(context, resolvable):
+        return Boolean(not resolvable.resolve(context).truth())
 
 class Spread:
 
