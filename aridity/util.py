@@ -16,9 +16,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from contextlib import contextmanager
-from io import TextIOWrapper
+from io import BytesIO, TextIOWrapper
 from pkg_resources import resource_stream
-import collections, inspect
+import collections, inspect, sys
 
 class NoSuchPathException(Exception): pass
 
@@ -127,5 +127,8 @@ def allfunctions(clazz):
 
 @contextmanager
 def openresource(package_or_requirement, resource_name, encoding = 'ascii'):
-    with resource_stream(package_or_requirement, resource_name) as f, TextIOWrapper(f, encoding) as g:
-        yield g
+    with resource_stream(package_or_requirement, resource_name) as f:
+        if sys.version_info.major < 3:
+            f = BytesIO(f.read())
+        with TextIOWrapper(f, encoding) as f:
+            yield f
