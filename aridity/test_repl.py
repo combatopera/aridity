@@ -110,10 +110,14 @@ class TestRepl(unittest.TestCase):
             repl.printf("one = %s", 1)
             repl.printf("f = %s", False)
             repl.printf("t = %s", True)
-        self.assertEqual(0, c.resolved('zero').value)
-        self.assertEqual(1, c.resolved('one').value)
-        self.assertEqual(False, c.resolved('f').value)
-        self.assertEqual(True, c.resolved('t').value)
+        zero = c.resolved('zero').value
+        self.assertEqual(0, zero)
+        self.assertIsNot(False, zero)
+        one =  c.resolved('one').value
+        self.assertEqual(1, one)
+        self.assertIsNot(True, one)
+        self.assertIs(False, c.resolved('f').value)
+        self.assertIs(True, c.resolved('t').value)
 
     def test_printfpath(self):
         try:
