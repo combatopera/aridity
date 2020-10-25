@@ -32,6 +32,9 @@ class Repl:
 
     @classmethod
     def _quote(cls, obj):
+        for b in map(bool, range(2)):
+            if obj is b:
+                return str(b).lower()
         try:
             from pathlib import PurePath
             if isinstance(obj, PurePath):
