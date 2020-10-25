@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from contextlib import contextmanager
+from io import TextIOWrapper
+from pkg_resources import resource_stream
 import collections, inspect
 
 class NoSuchPathException(Exception): pass
@@ -121,3 +124,8 @@ def allfunctions(clazz):
         except AttributeError:
             realname = name
         yield realname, clazz.__dict__[name]
+
+@contextmanager
+def openresource(package_or_requirement, resource_name, encoding = 'ascii'):
+    with resource_stream(package_or_requirement, resource_name) as f, TextIOWrapper(f, encoding) as g:
+        yield g

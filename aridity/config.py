@@ -19,11 +19,10 @@ from .context import Context
 from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
-from .util import NoSuchPathException
+from .util import NoSuchPathException, openresource
 from functools import partial
-from io import TextIOWrapper
 from itertools import chain
-from pkg_resources import iter_entry_points, resource_stream
+from pkg_resources import iter_entry_points
 from weakref import WeakKeyDictionary
 import errno, logging, os
 
@@ -52,7 +51,7 @@ class ConfigCtrl:
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
         self.context.getorcreatesubcontext(self.prefix + [appname])
         appconfig = getattr(self.node, appname)
-        with TextIOWrapper(resource_stream(module_name, moduleresource), encoding) as f:
+        with openresource(module_name, moduleresource, encoding) as f:
             (-appconfig).load(f)
         try:
             self.loadsettings()
