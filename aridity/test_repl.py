@@ -103,6 +103,18 @@ class TestRepl(unittest.TestCase):
         self.assertEqual('=', context.resolved('path').value)
         self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
 
+    def test_printfbool(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl.printf("zero = %s", 0)
+            repl.printf("one = %s", 1)
+            repl.printf("f = %s", False)
+            repl.printf("t = %s", True)
+        self.assertEqual(0, c.resolved('zero').value)
+        self.assertEqual(1, c.resolved('one').value)
+        self.assertEqual(False, c.resolved('f').value)
+        self.assertEqual(True, c.resolved('t').value)
+
     def test_printfpath(self):
         try:
             from pathlib import Path
