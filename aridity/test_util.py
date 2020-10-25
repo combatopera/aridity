@@ -18,7 +18,7 @@
 from .config import ConfigCtrl
 from .context import Context
 from .repl import Repl
-from .util import OrderedSet, TreeNoSuchPathException
+from .util import openresource, OrderedSet, TreeNoSuchPathException
 from unittest import TestCase
 import sys
 
@@ -60,3 +60,9 @@ class TestUtil(TestCase):
         with self.assertRaises(AttributeError) as cm:
             c.woo
         self.assertEqual('woo\n1x broken\n    2x void\n1x broken', str(cm.exception.__context__))
+
+    def test_openresource(self):
+        with openresource(__name__, 'test_util/resource.utf8', 'utf-8') as f:
+            self.assertEqual('\N{POUND SIGN}\n', f.read())
+        with openresource(__name__, 'test_util/resource.utf8') as f, self.assertRaises(UnicodeDecodeError):
+            f.read()
