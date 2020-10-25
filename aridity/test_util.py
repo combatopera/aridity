@@ -18,9 +18,8 @@
 from .config import ConfigCtrl
 from .context import Context
 from .repl import Repl
-from .util import openresource, OrderedSet, TreeNoSuchPathException
+from .util import ispy2, openresource, OrderedSet, TreeNoSuchPathException
 from unittest import TestCase
-import sys
 
 class TestUtil(TestCase):
 
@@ -48,7 +47,7 @@ class TestUtil(TestCase):
         self.assertEqual('woo\n1x broken\n    2x void\n1x broken', str(cm.exception))
 
     def test_treeexceptionstr2(self):
-        if sys.version_info.major < 3:
+        if ispy2:
             return
         cc = ConfigCtrl()
         cc.printf('broken = $(void)')

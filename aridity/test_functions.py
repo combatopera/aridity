@@ -18,10 +18,10 @@
 from .context import Context
 from .functions import _tomlquote
 from .repl import Repl
-from .util import NoSuchPathException
+from .util import ispy2, NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
-import os, sys
+import os
 
 class TestFunctions(TestCase):
 
@@ -170,7 +170,7 @@ class TestFunctions(TestCase):
         self.assertEqual(r'"\u0000\u0008\u000A\u001F\u007F"', _tomlquote('\x00\x08\x0a\x1f\x7f'))
 
     def test_urlquote(self):
-        if sys.version_info.major < 3:
+        if ispy2:
             return
         c = Context()
         with Repl(c) as repl:

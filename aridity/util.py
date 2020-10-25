@@ -20,6 +20,8 @@ from io import BytesIO, TextIOWrapper
 from pkg_resources import resource_stream
 import collections, inspect, sys
 
+ispy2 = sys.version_info.major < 3
+
 class NoSuchPathException(Exception): pass
 
 class UnparseNoSuchPathException(NoSuchPathException):
@@ -128,7 +130,7 @@ def allfunctions(clazz):
 @contextmanager
 def openresource(package_or_requirement, resource_name, encoding = 'ascii'):
     with resource_stream(package_or_requirement, resource_name) as f:
-        if sys.version_info.major < 3:
+        if ispy2:
             f = BytesIO(f.read())
         with TextIOWrapper(f, encoding) as f:
             yield f
