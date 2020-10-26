@@ -66,7 +66,7 @@ class ConfigCtrl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
     def load(self, pathorstream):
-        c = self._localcontext()
+        c = self.context()
         (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
 
     def loadsettings(self):
@@ -97,18 +97,18 @@ class ConfigCtrl:
         factory, = (partial(t, v) for t, v in pairs())
         self.basecontext[tuple(self.prefix) + path] = factory()
 
-    def _localcontext(self):
+    def context(self):
         return self.basecontext.resolvedcontextornone(self.prefix)
 
     def __iter__(self):
-        for k, o in self._localcontext().itero():
+        for k, o in self.context().itero():
             try:
                 yield k, o.value
             except AttributeError:
                 yield k, self._of(self.basecontext, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
-        c = self._localcontext()
+        c = self.context()
         if getattr(frompathorstream, 'readable', lambda: False)():
             text = processtemplateimpl(c, frompathorstream)
         else:
@@ -120,13 +120,13 @@ class ConfigCtrl:
                 g.write(text)
 
     def free(self):
-        return self._of(self._localcontext())
+        return self._of(self.context())
 
     def createchild(self):
-        return self._of(self._localcontext().createchild())
+        return self._of(self.context().createchild())
 
     def unravel(self):
-        return self._localcontext().unravel()
+        return self.context().unravel()
 
     def __neg__(self):
         'Included for completeness, normally the node attribute should be used directly.'
