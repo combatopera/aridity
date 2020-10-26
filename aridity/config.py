@@ -40,16 +40,16 @@ class ConfigCtrl:
     def _of(cls, *args, **kwargs):
         return cls(*args, **kwargs)
 
-    def __init__(self, context = None, prefix = None):
+    def __init__(self, basecontext = None, prefix = None):
         self.node = _newnode(self)
-        self.context = Context() if context is None else context
+        self.basecontext = Context() if basecontext is None else basecontext
         self.prefix = [] if prefix is None else prefix
 
     def loadappconfig(self, mainfunction, moduleresource, encoding = 'ascii', settingsoptional = False):
         module_name = mainfunction.__module__
         attrs = tuple(mainfunction.__qualname__.split('.'))
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-        self.context.getorcreatesubcontext(self.prefix + [appname])
+        self.basecontext.getorcreatesubcontext(self.prefix + [appname])
         appconfig = getattr(self.node, appname)
         with openresource(module_name, moduleresource, encoding) as f:
             (-appconfig).load(f)
@@ -62,7 +62,7 @@ class ConfigCtrl:
         return appconfig
 
     def printf(self, template, *args):
-        with Repl(self.context) as repl:
+        with Repl(self.basecontext) as repl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
     def load(self, pathorstream):
@@ -74,7 +74,7 @@ class ConfigCtrl:
 
     def repl(self):
         assert not self.prefix # XXX: Support prefix?
-        return Repl(self.context)
+        return Repl(self.basecontext)
 
     def execute(self, text):
         with self.repl() as repl:
@@ -95,17 +95,17 @@ class ConfigCtrl:
                     pass
         # XXX: Support combination of types e.g. slash is both function and text?
         factory, = (partial(t, v) for t, v in pairs())
-        self.context[tuple(self.prefix) + path] = factory()
+        self.basecontext[tuple(self.prefix) + path] = factory()
 
     def _localcontext(self):
-        return self.context.resolved(*self.prefix)
+        return self.basecontext.resolved(*self.prefix) # FIXME: Do not use algo here.
 
     def __iter__(self):
         for k, o in self._localcontext().itero():
             try:
                 yield k, o.value
             except AttributeError:
-                yield k, self._of(self.context, self.prefix + [k]).node
+                yield k, self._of(self.basecontext, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
         c = self._localcontext()
@@ -138,13 +138,13 @@ class Config(object):
         ctrl = ctrls[self]
         path = ctrl.prefix + [name]
         try:
-            obj = ctrl.context.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = ctrl.basecontext.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
             return obj.value # FIXME: Does not work for all kinds of scalar.
         except AttributeError:
-            return ctrl._of(ctrl.context, path).node
+            return ctrl._of(ctrl.basecontext, path).node
 
     def __iter__(self):
         for _, o in ctrls[self]:
