@@ -125,9 +125,6 @@ class ConfigCtrl:
     def createchild(self):
         return self._of(self.context().createchild())
 
-    def unravel(self):
-        return self.context().unravel()
-
     def __neg__(self):
         'Included for completeness, normally the node attribute should be used directly.'
         return self.node
