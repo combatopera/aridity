@@ -98,7 +98,7 @@ class ConfigCtrl:
         self.basecontext[tuple(self.prefix) + path] = factory()
 
     def _localcontext(self):
-        return self.basecontext.resolved(*self.prefix) # FIXME: Do not use algo here.
+        return self.basecontext.resolvedcontextornone(self.prefix)
 
     def __iter__(self):
         for k, o in self._localcontext().itero():
