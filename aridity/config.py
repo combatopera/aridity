@@ -49,16 +49,20 @@ class ConfigCtrl:
         module_name = mainfunction.__module__
         attrs = tuple(mainfunction.__qualname__.split('.'))
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-        self.basecontext.getorcreatesubcontext(self.prefix + [appname])
-        appconfig = getattr(self.node, appname)
         with openresource(module_name, moduleresource, encoding) as f:
-            (-appconfig).load(f)
+            appconfig = self._loadappconfig(appname, f)
         try:
             self.loadsettings()
         except OSError as e:
             if not (settingsoptional and errno.ENOENT == e.errno):
                 raise
             log.info("No such file: %s", e)
+        return appconfig
+
+    def _loadappconfig(self, appname, f):
+        self.basecontext.getorcreatesubcontext(self.prefix + [appname])
+        appconfig = getattr(self.node, appname)
+        (-appconfig).load(f)
         return appconfig
 
     def printf(self, template, *args):
