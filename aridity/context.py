@@ -156,7 +156,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 bestresolvable = resolvable
         try:
             return bestresolvable
-        except NameError:
+        except UnboundLocalError:
             raise UnparseNoSuchPathException(path)
 
     def _resolved(self, path, resolvable, kwargs):
