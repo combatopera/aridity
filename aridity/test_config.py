@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
+from .model import Boolean, Function, Number, Scalar, Text
 from io import StringIO
 from unittest import TestCase
 
@@ -93,3 +94,30 @@ class TestConfig(TestCase):
         c = ConfigCtrl()._loadappconfig('The App', StringIO(u'n := $label()\nx y = $(n)'))
         self.assertEqual('The App', c.n)
         self.assertEqual('The App', c.x.y)
+
+    def test_setattr(self):
+        cc = ConfigCtrl()
+        cc.node.p = 'yay'
+        cc.node.q = 100
+        cc.node.r = True
+        cc.node.s = False
+        cc.node.t = None
+        cc.node.u = ord
+        obj = cc.context().resolved('p')
+        self.assertEqual(Text, type(obj))
+        self.assertEqual('yay', obj.value)
+        obj = cc.context().resolved('q')
+        self.assertEqual(Number, type(obj))
+        self.assertEqual(100, obj.value)
+        obj = cc.context().resolved('r')
+        self.assertEqual(Boolean, type(obj))
+        self.assertIs(True, obj.value)
+        obj = cc.context().resolved('s')
+        self.assertEqual(Boolean, type(obj))
+        self.assertIs(False, obj.value)
+        obj = cc.context().resolved('t')
+        self.assertEqual(Scalar, type(obj))
+        self.assertIs(None, obj.value)
+        obj = cc.context().resolved('u')
+        self.assertEqual(Function, type(obj))
+        self.assertIs(ord, obj.f)
