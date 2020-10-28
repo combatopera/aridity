@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import itertools
+import itertools, numbers
 
 class Struct(object):
 
@@ -325,3 +325,15 @@ class Entry(Struct):
                 break
             indent.append(r) # XXX: Can we simply grab its value?
         return Concat.unlesssingleton(indent).resolve(None).cat()
+
+def wrap(value):
+    for b in map(bool, range(2)):
+        if value is b:
+            return Boolean(value)
+    if isinstance(value, numbers.Number):
+        return Number(value)
+    if callable(value):
+        return Function(value)
+    if hasattr(value, 'encode'):
+        return Text(value)
+    return Scalar(value) # XXX: Wise?

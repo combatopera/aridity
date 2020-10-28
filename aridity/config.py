@@ -17,14 +17,14 @@
 
 from .context import Context
 from .directives import processtemplate, processtemplateimpl
-from .model import Boolean, Entry, Function, Number, Scalar, Text
+from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
 from .util import NoSuchPathException, openresource
 from functools import partial
 from itertools import chain
 from pkg_resources import iter_entry_points
 from weakref import WeakKeyDictionary
-import errno, logging, numbers, os
+import errno, logging, os
 
 log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
@@ -156,15 +156,3 @@ class Config(object):
 
     def __setattr__(self, name, value):
         ctrls[self].context()[name,] = wrap(value)
-
-def wrap(value):
-    for b in map(bool, range(2)):
-        if value is b:
-            return Boolean(value)
-    if isinstance(value, numbers.Number):
-        return Number(value)
-    if callable(value):
-        return Function(value)
-    if hasattr(value, 'encode'):
-        return Text(value)
-    return Scalar(value) # XXX: Wise?
