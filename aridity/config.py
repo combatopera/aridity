@@ -155,15 +155,16 @@ class Config(object):
         return ctrls[self]
 
     def __setattr__(self, name, value):
-        def resolvable():
-            for b in map(bool, range(2)):
-                if value is b:
-                    return Boolean(value)
-            if isinstance(value, numbers.Number):
-                return Number(value)
-            if callable(value):
-                return Function(value)
-            if hasattr(value, 'encode'):
-                return Text(value)
-            return Scalar(value) # XXX: Wise?
-        ctrls[self].context()[name,] = resolvable()
+        ctrls[self].context()[name,] = wrap(value)
+
+def wrap(value):
+    for b in map(bool, range(2)):
+        if value is b:
+            return Boolean(value)
+    if isinstance(value, numbers.Number):
+        return Number(value)
+    if callable(value):
+        return Function(value)
+    if hasattr(value, 'encode'):
+        return Text(value)
+    return Scalar(value) # XXX: Wise?
