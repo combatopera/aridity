@@ -126,12 +126,12 @@ class TestConfig(TestCase):
 
     def test_multiscalar(self):
         cc = ConfigCtrl()
-        cc.printf('a = $(~)')
+        cc.printf('a = $(/)')
         cc.printf('b = $(*)')
         c = cc.node
-        self.assertEqual(os.path.expanduser('~'), cc.context().resolved('~').unravel())
-        self.assertEqual(os.path.expanduser('~'), c.a)
-        self.assertEqual(os.path.expanduser('~'), getattr(c, '~'))
+        self.assertEqual(os.sep, cc.context().resolved('/').unravel())
+        self.assertEqual(os.sep, c.a)
+        self.assertEqual(os.sep, getattr(c, '/'))
         self.assertEqual(Spread.of, cc.context().resolved('*').unravel())
         self.assertEqual(Spread.of, c.b)
         self.assertEqual(Spread.of, getattr(c, '*'))
