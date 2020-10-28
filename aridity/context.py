@@ -90,7 +90,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
-        if not (tuple == type(path) and set(type(name) for name in path) <= self.nametypes):
+        if not (tuple == type(path) and {type(name) for name in path} <= self.nametypes):
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
