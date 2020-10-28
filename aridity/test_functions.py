@@ -17,11 +17,12 @@
 
 from .context import Context
 from .functions import _tomlquote
+from .model import Function
 from .repl import Repl
 from .util import ispy2, NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
-import os
+import os, sys
 
 class TestFunctions(TestCase):
 
@@ -176,3 +177,11 @@ class TestFunctions(TestCase):
         with Repl(c) as repl:
             repl('a = $urlquote($.( /?&=_\N{POUND SIGN}))')
         self.assertEqual('%20%2F%3F%26%3D_%C2%A3', c.resolved('a').cat())
+
+    def test_pyref(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('f = $pyref(sys exc_info)')
+        obj = c.resolved('f')
+        self.assertIs(Function, type(obj))
+        self.assertIs(sys.exc_info, obj.unravel())
