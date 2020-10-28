@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
+from io import StringIO
 from unittest import TestCase
 
 class TestConfig(TestCase):
@@ -87,3 +88,8 @@ class TestConfig(TestCase):
         self.assertEqual('woo', c.D.E.A)
         self.assertEqual('woo', c.D.E.F.A)
         self.assertEqual('woo', c.D.E.F.B.C.A)
+
+    def test_appnamelabel(self):
+        c = ConfigCtrl()._loadappconfig('The App', StringIO(u'n := $label()\nx y = $(n)'))
+        self.assertEqual('The App', c.n)
+        self.assertEqual('The App', c.x.y)

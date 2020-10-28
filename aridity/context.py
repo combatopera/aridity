@@ -79,12 +79,18 @@ class Resolvables:
 # XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
+    nametypes = {str, type(None)}
+    try:
+        nametypes.add(unicode)
+    except NameError:
+        pass
+
     def __init__(self, parent):
         self.resolvables = Resolvables(self)
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
-        if not (tuple == type(path) and set(type(name) for name in path) <= set([str, type(None)])):
+        if not (tuple == type(path) and set(type(name) for name in path) <= self.nametypes):
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
