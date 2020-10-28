@@ -16,9 +16,11 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
+from .functions import Spread
 from .model import Boolean, Function, Number, Scalar, Text
 from io import StringIO
 from unittest import TestCase
+import os
 
 class TestConfig(TestCase):
 
@@ -121,3 +123,15 @@ class TestConfig(TestCase):
         obj = cc.context().resolved('u')
         self.assertEqual(Function, type(obj))
         self.assertIs(ord, obj.f)
+
+    def test_multiscalar(self):
+        cc = ConfigCtrl()
+        cc.printf('a = $(~)')
+        cc.printf('b = $(*)')
+        c = cc.node
+        self.assertEqual(os.path.expanduser('~'), cc.context().resolved('~').unravel())
+        self.assertEqual(os.path.expanduser('~'), c.a)
+        self.assertEqual(os.path.expanduser('~'), getattr(c, '~'))
+        self.assertEqual(Spread.of, cc.context().resolved('*').unravel())
+        self.assertEqual(Spread.of, c.b)
+        self.assertEqual(Spread.of, getattr(c, '*'))
