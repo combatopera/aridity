@@ -22,7 +22,7 @@ from .repl import Repl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
-def blockquote(context, resolvable):
+def _blockquote(context, resolvable):
     indent = context.resolved('indent').value
     return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines(True))))
 
@@ -55,7 +55,7 @@ class TestTemplate(TestCase):
 
     def test_getindentinfunction(self):
         c = Context()
-        c['"',] = Function(blockquote)
+        c['"',] = Function(_blockquote)
         with Repl(c) as repl:
             repl('block = $.(z\ny\nx\n)') # XXX: Is this sane?
         with NamedTemporaryFile('w') as f:
