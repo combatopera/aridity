@@ -84,21 +84,23 @@ class Concat(Resolvable):
 # TODO: Always throw when concatenation within a path component is attempted.
 class CatNotSupportedException(Exception): pass
 
-class SimpleValue(Resolved):
+class BaseSimpleValue(Resolved):
 
     @classmethod
     def pa(cls, s, l, t):
         value, = t
         return cls(value)
 
-    def __init__(self, value):
-        self.value = value
-
     def cat(self):
         raise CatNotSupportedException(self)
 
     def unravel(self):
         return self.value
+
+class SimpleValue(BaseSimpleValue):
+
+    def __init__(self, value):
+        self.value = value
 
 class Cat:
 
@@ -118,9 +120,12 @@ class Boundary(SimpleValue):
     ignorable = True
     boundary = True
 
-class BaseScalar(SimpleValue):
+class BaseScalar(BaseSimpleValue):
 
     ignorable = False
+
+    def __init__(self, value):
+        self.value = value
 
     def __hash__(self):
         return hash(self.value)
