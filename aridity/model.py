@@ -205,14 +205,14 @@ class Directive(Resolved):
 
 class Function(Resolved):
 
-    def __init__(self, f):
-        self.f = f
+    def __init__(self, functionvalue):
+        self.functionvalue = functionvalue
 
     def __call__(self, *args):
-        return self.f(*args)
+        return self.functionvalue(*args)
 
     def unravel(self):
-        return self.f
+        return self.functionvalue
 
 class Stream(Resolved):
 
