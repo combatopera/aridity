@@ -124,53 +124,81 @@ class BaseScalar(BaseSimpleValue):
 
     ignorable = False
 
-    def __init__(self, value):
-        self.value = value
-
     def __hash__(self):
         return hash(self.value)
 
-class Scalar(BaseScalar): pass
+class Scalar(BaseScalar):
+
+    def __init__(self, value):
+        self.value = value
 
 class Text(Cat, BaseScalar):
+
+    @property
+    def value(self):
+        return self.textvalue
+
+    def __init__(self, textvalue):
+        self.textvalue = textvalue
 
     def totext(self):
         return self
 
     def tobash(self):
-        return "'%s'" % self.value.replace("'", r"'\''")
+        return "'%s'" % self.textvalue.replace("'", r"'\''")
 
     def writeout(self, path):
         with open(path, 'w') as f:
-            f.write(self.value)
+            f.write(self.textvalue)
 
 class Binary(BaseScalar):
 
+    @property
+    def value(self):
+        return self.binaryvalue
+
+    def __init__(self, binaryvalue):
+        self.binaryvalue = binaryvalue
+
     def writeout(self, path):
         with open(path, 'wb') as f:
-            f.write(self.value)
+            f.write(self.binaryvalue)
 
 class Number(BaseScalar):
+
+    @property
+    def value(self):
+        return self.numbervalue
+
+    def __init__(self, numbervalue):
+        self.numbervalue = numbervalue
 
     def totext(self):
         return Text(self.unparse())
 
     def tobash(self):
-        return str(self.value)
+        return str(self.numbervalue)
 
     def unparse(self):
-        return str(self.value) # FIXME: Should unparse.
+        return str(self.numbervalue) # FIXME: Should unparse.
 
     def cat(self):
         return self.unparse()
 
 class Boolean(BaseScalar):
 
+    @property
+    def value(self):
+        return self.booleanvalue
+
+    def __init__(self, booleanvalue):
+        self.booleanvalue = booleanvalue
+
     def truth(self):
-        return self.value
+        return self.booleanvalue
 
     def tobash(self, toplevel):
-        return 'true' if self.value else 'false'
+        return 'true' if self.booleanvalue else 'false'
 
 class Call(Resolvable):
 
@@ -207,10 +235,18 @@ def List(objs):
 
 class Directive(Resolved):
 
+    @property
+    def value(self):
+        return self.directivevalue
+
     def __init__(self, directivevalue):
         self.directivevalue = directivevalue
 
 class Function(Resolved):
+
+    @property
+    def value(self):
+        return self.functionvalue
 
     def __init__(self, functionvalue):
         self.functionvalue = functionvalue
@@ -222,6 +258,10 @@ class Function(Resolved):
         return self.functionvalue
 
 class Stream(Resolved):
+
+    @property
+    def value(self):
+        return self.streamvalue
 
     def __init__(self, streamvalue):
         self.streamvalue = streamvalue
