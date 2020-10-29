@@ -216,12 +216,12 @@ class Function(Resolved):
 
 class Stream(Resolved):
 
-    def __init__(self, f):
-        self.f = f
+    def __init__(self, streamvalue):
+        self.streamvalue = streamvalue
 
     def flush(self, text):
-        self.f.write(text)
-        self.f.flush()
+        self.streamvalue.write(text)
+        self.streamvalue.flush()
 
 class Entry(Struct):
 
