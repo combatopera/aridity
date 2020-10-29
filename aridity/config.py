@@ -17,7 +17,7 @@
 
 from .context import Context
 from .directives import processtemplate, processtemplateimpl
-from .model import Entry, Function, Number, Printable, Text
+from .model import Entry, Function, Number, Scalar, Text
 from .repl import Repl
 from .util import NoSuchPathException, openresource
 from functools import partial
@@ -90,7 +90,7 @@ class ConfigCtrl:
             for t, k in [
                     [Function, 'function'],
                     [Number, 'number'],
-                    [Printable, 'scalar'],
+                    [Scalar, 'scalar'],
                     [Text, 'text'],
                     [lambda x: x, 'resolvable']]:
                 try:

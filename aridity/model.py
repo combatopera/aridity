@@ -118,14 +118,14 @@ class Boundary(SimpleValue):
     ignorable = True
     boundary = True
 
-class Printable(SimpleValue):
+class Scalar(SimpleValue):
 
     ignorable = False
 
     def __hash__(self):
         return hash(self.value)
 
-class Text(Cat, Printable):
+class Text(Cat, Scalar):
 
     def totext(self):
         return self
@@ -137,13 +137,13 @@ class Text(Cat, Printable):
         with open(path, 'w') as f:
             f.write(self.value)
 
-class Binary(Printable):
+class Binary(Scalar):
 
     def writeout(self, path):
         with open(path, 'wb') as f:
             f.write(self.value)
 
-class Number(Printable):
+class Number(Scalar):
 
     def totext(self):
         return Text(self.unparse())
@@ -157,7 +157,7 @@ class Number(Printable):
     def cat(self):
         return self.unparse()
 
-class Boolean(Printable):
+class Boolean(Scalar):
 
     def truth(self):
         return self.value

@@ -18,7 +18,7 @@
 from __future__ import with_statement
 from .directives import lookup, Precedence
 from .functions import getfunctions
-from .model import CatNotSupportedException, Directive, Function, Resolvable, Printable, Stream, Text
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import NoSuchPathException, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 import collections, os, sys, threading
@@ -251,7 +251,7 @@ class StaticContext(AbstractContext):
         self['stdout',] = Stream(sys.stdout)
         self['/',] = Slash()
         self['*',] = Star()
-        self['None',] = Printable(None)
+        self['None',] = Scalar(None)
         self.threadlocals = threading.local()
         for name in self.stacktypes:
             self[name,] = ThreadLocalResolvable(self.threadlocals, name)
