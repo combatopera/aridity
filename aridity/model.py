@@ -45,7 +45,7 @@ class Resolved(Resolvable):
     def resolve(self, context, aslist = False):
         return List([self]) if aslist else self
 
-    def spread(self, k): # TODO: Probably makes more sense on SimpleValue, which more things should extend.
+    def spread(self, k): # TODO: Probably makes more sense on Scalar, which more things should extend.
         yield k, self
 
 class Concat(Resolvable):
@@ -84,7 +84,7 @@ class Concat(Resolvable):
 # TODO: Always throw when concatenation within a path component is attempted.
 class CatNotSupportedException(Exception): pass
 
-class SimpleValue(Resolved):
+class Scalar(Resolved):
 
     @classmethod
     def pa(cls, s, l, t):
@@ -108,17 +108,17 @@ class Cat:
     def unparse(self):
         return self.value
 
-class Blank(Cat, SimpleValue):
+class Blank(Cat, Scalar):
 
     ignorable = True
     boundary = False
 
-class Boundary(SimpleValue):
+class Boundary(Scalar):
 
     ignorable = True
     boundary = True
 
-class Printable(SimpleValue):
+class Printable(Scalar):
 
     ignorable = False
 
