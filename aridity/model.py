@@ -127,11 +127,6 @@ class Scalar(SimpleValue):
 
 class Text(Cat, Scalar):
 
-    @classmethod
-    def pa(cls, s, l, t):
-        text, = t
-        return Text(text)
-
     def totext(self):
         return self
 
