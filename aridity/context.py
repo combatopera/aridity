@@ -106,6 +106,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _putchild(self, key):
         child = self.createchild()
+        # XXX: Deduce label to allow same Context in multiple trees?
         child.label = Text(key) # TODO: Not necessarily str.
         self.resolvables.put(key, child)
         return child
