@@ -196,6 +196,10 @@ class Functions:
 
 class Spread:
 
+    @classmethod
+    def of(cls, context, resolvable):
+        return cls(resolvable.resolve(context))
+
     def __init__(self, context):
         self.context = context
 

@@ -285,10 +285,8 @@ class Star(Function, Directive):
     protokey = object()
 
     def __init__(self):
-        def spread(context, resolvable):
-            from .functions import Spread
-            return Spread(resolvable.resolve(context))
-        Function.__init__(self, spread)
+        from .functions import Spread
+        Function.__init__(self, Spread.of)
         Directive.__init__(self, self.star)
 
     def star(self, prefix, suffix, context):
