@@ -31,7 +31,7 @@ class Repl:
     quotablebysquare = re.compile('[$)]+')
 
     @classmethod
-    def _quote(cls, obj):
+    def _quote(cls, obj): # TODO: Duplicates some wrap logic.
         for b in map(bool, range(2)):
             if obj is b:
                 return str(b).lower()
