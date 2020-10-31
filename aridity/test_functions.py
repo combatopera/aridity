@@ -184,4 +184,6 @@ class TestFunctions(TestCase):
             repl('f = $pyref(sys exc_info)')
         obj = c.resolved('f')
         self.assertIs(Function, type(obj))
+        self.assertIs(sys.exc_info, obj.functionvalue)
+        self.assertIs(sys.exc_info, obj.value)
         self.assertIs(sys.exc_info, obj.unravel())
