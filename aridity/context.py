@@ -115,7 +115,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def resolved(self, *path, **kwargs):
         return self._resolved(path, self._findresolvable(path), kwargs) if path else self
 
-    def resolvedcontextornone(self, path):
+    def _resolvedcontextornone(self, path):
         c = self # Assume we are resolved.
         for name in path:
             r = c.resolvables.getornone(name)
@@ -172,7 +172,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def _resolvedshallow(self, path, resolvable, kwargs, errors):
         while path:
             path = path[:-1]
-            for c in (c.resolvedcontextornone(path) for c in self._selfandparents()):
+            for c in (c._resolvedcontextornone(path) for c in self._selfandparents()):
                 if c is not None:
                     try:
                         return resolvable.resolve(c, **kwargs)
