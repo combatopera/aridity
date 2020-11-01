@@ -143,7 +143,7 @@ class Config(object):
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
-            return obj.value # FIXME: Does not work for all kinds of scalar.
+            return obj.value
         except AttributeError:
             return ctrl._of(ctrl.basecontext, path).node
 
