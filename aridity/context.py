@@ -160,7 +160,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         except UnboundLocalError:
             raise UnparseNoSuchPathException(path)
 
-    def _resolved(self, path, resolvable, kwargs):
+    def _resolved(self, path, resolvable, kwargs): # TODO: Review this algo.
         errors = []
         for i in range(len(path)):
             obj = self._resolvedshallow(path[i:], resolvable, kwargs, errors)
