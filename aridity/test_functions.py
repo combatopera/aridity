@@ -185,5 +185,5 @@ class TestFunctions(TestCase):
         obj = c.resolved('f')
         self.assertIs(Function, type(obj))
         self.assertIs(sys.exc_info, obj.functionvalue)
-        self.assertIs(sys.exc_info, obj.value)
+        self.assertIs(sys.exc_info, obj.scalar)
         self.assertIs(sys.exc_info, obj.unravel())
