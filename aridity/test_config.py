@@ -137,8 +137,7 @@ class TestConfig(TestCase):
 
     def test_multiscalar(self):
         cc = ConfigCtrl()
-        cc.printf('a = $(/)')
-        cc.printf('b = $(*)')
+        cc.execute('a = $(/)\nb = $(*)')
         c = cc.node
         self.assertEqual(os.sep, c.a)
         self.assertEqual(os.sep, getattr(c, '/'))
