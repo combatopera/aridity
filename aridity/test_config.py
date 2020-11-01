@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .config import ConfigCtrl
+from .config import Config, ConfigCtrl
 from .functions import Spread
 from .model import Boolean, Function, Number, Scalar, Text
 from io import StringIO
@@ -153,3 +153,21 @@ class TestConfig(TestCase):
         self.assertEqual(Spread.of, obj.scalar)
         self.assertEqual(Spread.of, obj.unravel())
         self.assertNotEqual(Spread.of, obj.directivevalue)
+
+    def test_badmap(self):
+        cc = ConfigCtrl()
+        cc.execute('boot dirs = $map($list(x y) d $/($(d) $(name)))')
+        cc.node.boot.dirs
+
+    def test_resolvecontext(self):
+        cc = ConfigCtrl()
+        cc.execute('boot name = leaf')
+        cc.execute('boot dirs = $map($list(x y) d $/($(d) $(name)))')
+        cc.execute('boot common name = com')
+        c = cc.node
+        obj = c.boot.dirs
+        self.assertIs(Config, type(obj))
+        self.assertEqual(['x/leaf', 'y/leaf'], list(obj))
+        obj = c.boot.common.dirs
+        self.assertIs(Config, type(obj))
+        self.assertEqual(['x', 'y'], list(obj))
