@@ -95,20 +95,20 @@ class BaseSimpleValue(Resolved):
         raise CatNotSupportedException(self)
 
     def unravel(self):
-        return self.value
+        return self.scalar
 
 class SimpleValue(BaseSimpleValue):
 
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, scalar):
+        self.scalar = scalar
 
 class Cat:
 
     def cat(self):
-        return self.value
+        return self.scalar
 
     def unparse(self):
-        return self.value
+        return self.scalar
 
 class Blank(Cat, SimpleValue):
 
@@ -125,17 +125,17 @@ class BaseScalar(BaseSimpleValue):
     ignorable = False
 
     def __hash__(self):
-        return hash(self.value)
+        return hash(self.scalar)
 
 class Scalar(BaseScalar):
 
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, scalar):
+        self.scalar = scalar
 
 class Text(Cat, BaseScalar):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.textvalue
 
     def __init__(self, textvalue):
@@ -154,7 +154,7 @@ class Text(Cat, BaseScalar):
 class Binary(BaseScalar):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.binaryvalue
 
     def __init__(self, binaryvalue):
@@ -167,7 +167,7 @@ class Binary(BaseScalar):
 class Number(BaseScalar):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.numbervalue
 
     def __init__(self, numbervalue):
@@ -188,7 +188,7 @@ class Number(BaseScalar):
 class Boolean(BaseScalar):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.booleanvalue
 
     def __init__(self, booleanvalue):
@@ -236,7 +236,7 @@ def List(objs):
 class Directive(Resolved):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.directivevalue
 
     def __init__(self, directivevalue):
@@ -245,7 +245,7 @@ class Directive(Resolved):
 class Function(Resolved):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.functionvalue
 
     def __init__(self, functionvalue):
@@ -260,7 +260,7 @@ class Function(Resolved):
 class Stream(Resolved):
 
     @property
-    def value(self):
+    def scalar(self):
         return self.streamvalue
 
     def __init__(self, streamvalue):

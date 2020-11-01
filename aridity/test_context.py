@@ -364,24 +364,24 @@ class TestContext(TestCase):
             repl('calc.double = $mul($(calc.single) 2)')
             repl('X = $fork()')
             repl('A calc.single = 6')
-        self.assertEqual(10, c.resolved('X', 'calc.double').value)
-        self.assertEqual(12, c.resolved('A', 'calc.double').value)
+        self.assertEqual(10, c.resolved('X', 'calc.double').scalar)
+        self.assertEqual(12, c.resolved('A', 'calc.double').scalar)
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
             repl('calc double = $mul($(single) 2)')
             repl('X = $fork()')
             repl('A calc single = 6')
-        self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(10, c.resolved('X', 'calc' ,'double').scalar)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').scalar)
         c = Context()
         with Repl(c) as repl:
             repl('calc single = 5')
             repl('calc double = $mul($(calc single) 2)') # The calc here is redundant.
             repl('X = $fork()')
             repl('A calc single = 6')
-        self.assertEqual(10, c.resolved('X', 'calc' ,'double').value)
-        self.assertEqual(12, c.resolved('A', 'calc', 'double').value)
+        self.assertEqual(10, c.resolved('X', 'calc' ,'double').scalar)
+        self.assertEqual(12, c.resolved('A', 'calc', 'double').scalar)
 
     def test_resolvepathincontext(self):
         c = Context()
@@ -394,8 +394,8 @@ class TestContext(TestCase):
             repl('A B x z = 4')
             repl('B C z = 5')
             repl('C z = 6')
-        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').value)
-        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').value)
+        self.assertEqual(4, c.resolved('A', 'B', 'x', 'y').scalar)
+        self.assertEqual(3, c.resolved('A', 'B', 'C', 'x', 'y').scalar)
 
     def test_blanklines(self):
         context = Context()
@@ -441,7 +441,7 @@ class TestContext(TestCase):
             repl('config')
             repl('  quotedname = "NO!!"')
             repl('  item = $(reference myaccount quotedname)')
-        self.assertEqual('"YES!"', c.resolved('config', 'item').value)
+        self.assertEqual('"YES!"', c.resolved('config', 'item').scalar)
 
     def test_hereandindentfailure(self):
         c = Context()
@@ -478,10 +478,10 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('woo = yay')
         d = c.createchild()
-        self.assertEqual('yay', d.resolved('woo').value)
+        self.assertEqual('yay', d.resolved('woo').scalar)
         with Repl(d) as repl:
             repl('woo = $(void)')
-        self.assertEqual('yay', c.resolved('woo').value)
+        self.assertEqual('yay', c.resolved('woo').scalar)
         with self.assertRaises(NoSuchPathException):
             d.resolved('woo')
 
@@ -490,10 +490,10 @@ class TestContext(TestCase):
         with Repl(c) as repl:
             repl('u woo = yay')
         d = c.createchild()
-        self.assertEqual('yay', d.resolved('u', 'woo').value)
+        self.assertEqual('yay', d.resolved('u', 'woo').scalar)
         with Repl(d) as repl:
             repl('u woo = $(void)')
-        self.assertEqual('yay', c.resolved('u', 'woo').value)
+        self.assertEqual('yay', c.resolved('u', 'woo').scalar)
         with self.assertRaises(NoSuchPathException):
             d.resolved('u', 'woo')
 
@@ -506,7 +506,7 @@ class TestContext(TestCase):
             repl('\t$*$(z)')
             repl('z = $list(a b)')
             repl('j = $join($(v) ,)')
-        self.assertEqual('x,y,a,b', c.resolved('j').value)
+        self.assertEqual('x,y,a,b', c.resolved('j').scalar)
         self.assertEqual(dict(x='x', y='y', a='a', b='b'), c.resolved('v').unravel())
 
     def test_spread2(self):
@@ -555,7 +555,7 @@ class TestContext(TestCase):
             repl('full_path = $/($(base path) $(path))')
             repl('base path = opt')
             repl('icon path = icon.png')
-        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full_path').value)
+        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full_path').scalar)
 
     def test_fullpathtrick2(self):
         c = Context()
@@ -563,7 +563,7 @@ class TestContext(TestCase):
             repl('full path = $/($(base path) $(path))') # XXX: Surprising that this works?
             repl('base path = opt')
             repl('icon path = icon.png')
-        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full', 'path').value)
+        self.assertEqual(os.path.join('opt', 'icon.png'), c.resolved('icon', 'full', 'path').scalar)
 
     def test_bake(self):
         c = Context()
@@ -582,7 +582,7 @@ class TestContext(TestCase):
             repl('x y name = Y')
             repl('ok = $(x y dbl)')
             repl('wtf k = $(x y dbl)')
-        self.assertEqual('YY', c.resolved('x', 'y', 'dbl').value)
+        self.assertEqual('YY', c.resolved('x', 'y', 'dbl').scalar)
         self.assertEqual('YY', c.resolved('ok').unravel())
         self.assertEqual('YY', c.resolved('wtf', 'k').unravel())
         self.assertEqual({'k': 'YY'}, c.resolved('wtf').unravel())

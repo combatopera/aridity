@@ -50,14 +50,14 @@ class Functions:
         return Text("'%s'" % text.replace('\\', '\\\\').replace('\n', '\\n').replace("'", "\\'"))
 
     def pystr(context, resolvable):
-        return Text(repr(resolvable.resolve(context).value))
+        return Text(repr(resolvable.resolve(context).scalar))
 
     def shstr(context, resolvable):
         return Text(shlex.quote(resolvable.resolve(context).cat()))
 
     def jsonquote(context, resolvable):
         'Also suitable for YAML.'
-        return Text(json.dumps(resolvable.resolve(context).value))
+        return Text(json.dumps(resolvable.resolve(context).scalar))
 
     def xmlattr(context, resolvable):
         from xml.sax.saxutils import quoteattr
@@ -158,13 +158,13 @@ class Functions:
     def mul(context, *resolvables):
         x = 1
         for r in resolvables:
-            x *= r.resolve(context).value
+            x *= r.resolve(context).scalar
         return Number(x)
 
     def div(context, r, *resolvables):
-        x = r.resolve(context).value
+        x = r.resolve(context).scalar
         for r in resolvables:
-            x /= r.resolve(context).value
+            x /= r.resolve(context).scalar
         return Number(x)
 
     def repr(context, resolvable):

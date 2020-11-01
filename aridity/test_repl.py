@@ -94,13 +94,13 @@ class TestRepl(unittest.TestCase):
             repl.printf("dot = %s", '.')
             repl.printf("eq 0 als = %s", '=')
             repl.printf("path = $(eq %s %s)", 0, 'als')
-        self.assertEqual(100, context.resolved('val').value)
-        self.assertEqual(Decimal('.34'), context.resolved('val2').value)
-        self.assertEqual('hello', context.resolved('text').value)
-        self.assertEqual('', context.resolved('empty').value)
-        self.assertEqual('.', context.resolved('dot').value)
-        self.assertEqual('=', context.resolved('eq', '0', 'als').value)
-        self.assertEqual('=', context.resolved('path').value)
+        self.assertEqual(100, context.resolved('val').scalar)
+        self.assertEqual(Decimal('.34'), context.resolved('val2').scalar)
+        self.assertEqual('hello', context.resolved('text').scalar)
+        self.assertEqual('', context.resolved('empty').scalar)
+        self.assertEqual('.', context.resolved('dot').scalar)
+        self.assertEqual('=', context.resolved('eq', '0', 'als').scalar)
+        self.assertEqual('=', context.resolved('path').scalar)
         self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
 
     def test_printfbool(self):
@@ -110,14 +110,14 @@ class TestRepl(unittest.TestCase):
             repl.printf("one = %s", 1)
             repl.printf("f = %s", False)
             repl.printf("t = %s", True)
-        zero = c.resolved('zero').value
+        zero = c.resolved('zero').scalar
         self.assertEqual(0, zero)
         self.assertIsNot(False, zero)
-        one =  c.resolved('one').value
+        one =  c.resolved('one').scalar
         self.assertEqual(1, one)
         self.assertIsNot(True, one)
-        self.assertIs(False, c.resolved('f').value)
-        self.assertIs(True, c.resolved('t').value)
+        self.assertIs(False, c.resolved('f').scalar)
+        self.assertIs(True, c.resolved('t').scalar)
 
     def test_printfpath(self):
         try:
@@ -129,8 +129,8 @@ class TestRepl(unittest.TestCase):
             repl.printf("ddot = %s", Path('..'))
             repl.printf("dot = %s", Path('.'))
         # XXX: Preserve type?
-        self.assertEqual('..', context.resolved('ddot').value)
-        self.assertEqual('.', context.resolved('dot').value)
+        self.assertEqual('..', context.resolved('ddot').scalar)
+        self.assertEqual('.', context.resolved('dot').scalar)
 
     def test_printf2(self):
         a = ' hello\nthere\ragain\t'
@@ -139,16 +139,16 @@ class TestRepl(unittest.TestCase):
         with Repl(context) as repl:
             repl.printf("a = %s", a)
             repl.printf("b = %s", b)
-        self.assertEqual(a, context.resolved('a').value)
-        self.assertEqual(b, context.resolved('b').value)
+        self.assertEqual(a, context.resolved('a').scalar)
+        self.assertEqual(b, context.resolved('b').scalar)
 
     def test_printf3(self):
         context = Context()
         with Repl(context) as repl:
             repl.printf("a = %s", 'x)y')
             repl.printf("b = %s", 'x]y')
-        self.assertEqual('x)y', context.resolved('a').value)
-        self.assertEqual('x]y', context.resolved('b').value)
+        self.assertEqual('x)y', context.resolved('a').scalar)
+        self.assertEqual('x]y', context.resolved('b').scalar)
 
     def test_printfbadliteral(self):
         c = Context()
@@ -156,4 +156,4 @@ class TestRepl(unittest.TestCase):
             repl.printf('template = %s')
         with Repl(c) as repl:
             repl.printf('template = %%s')
-        self.assertEqual('%s', c.resolved('template').value)
+        self.assertEqual('%s', c.resolved('template').scalar)

@@ -23,8 +23,8 @@ from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
 def _blockquote(context, resolvable):
-    indent = context.resolved('indent').value
-    return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).value.splitlines(True))))
+    indent = context.resolved('indent').scalar
+    return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).scalar.splitlines(True))))
 
 class TestTemplate(TestCase):
 

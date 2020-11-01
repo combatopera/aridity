@@ -38,13 +38,13 @@ class TestFunctions(TestCase):
         ae = self.assertEqual
         with self.assertRaises(TypeError):
             c.resolved('empty')
-        ae('woo', c.resolved('simplerel').value)
-        ae('/woo', c.resolved('simpleabs').value)
-        ae('woo/yay', c.resolved('joinrel').value)
-        ae('/woo/yay', c.resolved('joinabs').value)
+        ae('woo', c.resolved('simplerel').scalar)
+        ae('/woo', c.resolved('simpleabs').scalar)
+        ae('woo/yay', c.resolved('joinrel').scalar)
+        ae('/woo/yay', c.resolved('joinabs').scalar)
         with self.assertRaises(NoSuchPathException):
             c.resolved('lazyfail')
-        ae('/woo/yay', c.resolved('lazyok').value)
+        ae('/woo/yay', c.resolved('lazyok').scalar)
 
     def test_hereisavailableduringinclude(self):
         with NamedTemporaryFile('w') as f:
@@ -55,9 +55,9 @@ class TestFunctions(TestCase):
             c = Context()
             with Repl(c) as repl:
                 repl.printf(". %s", f.name)
-            self.assertEqual(os.path.dirname(f.name), c.resolved('hereval').value)
-            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sibling'), c.resolved('sibpath').value)
-            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sib', 'child'), c.resolved('sibpath2').value)
+            self.assertEqual(os.path.dirname(f.name), c.resolved('hereval').scalar)
+            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sibling'), c.resolved('sibpath').scalar)
+            self.assertEqual(os.path.join(os.path.dirname(f.name), 'sib', 'child'), c.resolved('sibpath2').scalar)
 
     def test_hereisavailableduringprocesstemplate(self):
         with NamedTemporaryFile('w') as f, NamedTemporaryFile('r') as g:
@@ -70,7 +70,7 @@ class TestFunctions(TestCase):
                 repl.printf("< %s", f.name)
             d = os.path.dirname(f.name)
             expected = "%s %s %s" % (d, os.path.join(d, 'sibling'), os.path.join(d, 'sib', 'child'))
-            self.assertEqual(expected, c.resolved('text').value)
+            self.assertEqual(expected, c.resolved('text').scalar)
             self.assertEqual(expected, g.read())
 
     def test_concatinlist(self):
@@ -80,7 +80,7 @@ class TestFunctions(TestCase):
             repl('b = y')
             repl('c = z')
             repl('j = $join($list($(a)$(b) $(b)$(c)) -)')
-        self.assertEqual('xy-yz', c.resolved('j').value)
+        self.assertEqual('xy-yz', c.resolved('j').scalar)
 
     def test_listandmapincontext(self):
         c = Context()
@@ -95,14 +95,14 @@ class TestFunctions(TestCase):
             repl('map1a = $join($map($(my) $.($"$(eranu) & $"$(uvavu))) $.(; ))')
             repl('sub1 " = $(pystr)')
             repl('sub2 " = $(screenstr)')
-        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'duped').value)
-        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'duped').value)
-        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'jlist').value)
-        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'jlist').value)
-        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'map2a').value)
-        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map2a').value)
-        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'map1a').value)
-        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map1a').value)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'duped').scalar)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'duped').scalar)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'jlist').scalar)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'jlist').scalar)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'map2a').scalar)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map2a').scalar)
+        self.assertEqual("'x' & 'X'; 'y' & 'Y'", c.resolved('sub1', 'map1a').scalar)
+        self.assertEqual('"x" & "X"; "y" & "Y"', c.resolved('sub2', 'map1a').scalar)
 
     def test_joinlistwithinternalref(self):
         c = Context()
@@ -110,7 +110,7 @@ class TestFunctions(TestCase):
             repl('v a = x')
             repl('v b = r$(a)')
             repl('j = $join($(v) ,)')
-        self.assertEqual('x,rx', c.resolved('j').value)
+        self.assertEqual('x,rx', c.resolved('j').scalar)
 
     def test_mapcommafunction(self):
         c = Context()
@@ -118,7 +118,7 @@ class TestFunctions(TestCase):
             repl('command = git rev-parse --abbrev-ref @{u}')
             repl('" = $(pystr)')
             repl('text = $join($map($,(command) w $"$(w)) $.( ))')
-        self.assertEqual("'git' 'rev-parse' '--abbrev-ref' '@{u}'", c.resolved('text').value)
+        self.assertEqual("'git' 'rev-parse' '--abbrev-ref' '@{u}'", c.resolved('text').scalar)
 
     def test_mapreceiver(self):
         c = Context()
@@ -128,7 +128,7 @@ class TestFunctions(TestCase):
             repl('v += two')
             repl('" = $(jsonquote)')
         try:
-            self.assertEqual('"one","two"', c.resolved('x').value)
+            self.assertEqual('"one","two"', c.resolved('x').scalar)
             self.fail('You fixed a bug!')
         except AttributeError:
             pass

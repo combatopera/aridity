@@ -107,7 +107,7 @@ class ConfigCtrl:
     def __iter__(self):
         for k, o in self.context().itero():
             try:
-                yield k, o.value
+                yield k, o.scalar
             except AttributeError:
                 yield k, self._of(self.basecontext, self.prefix + [k]).node
 
@@ -143,7 +143,7 @@ class Config(object):
         except NoSuchPathException:
             raise AttributeError(' '.join(path))
         try:
-            return obj.value
+            return obj.scalar
         except AttributeError:
             return ctrl._of(ctrl.basecontext, path).node
 

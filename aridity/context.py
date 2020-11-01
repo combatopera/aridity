@@ -48,7 +48,7 @@ class Resolvables:
                 keyobj = c.label
             except AttributeError:
                 break
-            revpath.append(keyobj.value)
+            revpath.append(keyobj.scalar)
             c = c.parent
         return {}
 
