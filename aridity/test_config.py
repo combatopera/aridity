@@ -170,4 +170,4 @@ class TestConfig(TestCase):
         self.assertEqual([os.path.join('x', 'leaf'), os.path.join('y', 'leaf')], list(obj))
         obj = c.boot.common.dirs
         self.assertIs(Config, type(obj))
-        self.assertEqual(['x', 'y'], list(obj))
+        self.assertEqual([os.path.join('x', 'com'), os.path.join('y', 'com')], list(obj))
