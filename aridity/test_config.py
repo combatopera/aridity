@@ -156,8 +156,8 @@ class TestConfig(TestCase):
 
     def test_badmap(self):
         cc = ConfigCtrl()
-        cc.execute('boot dirs = $map($list(x y) d $/($(d) $(name)))')
-        cc.node.boot.dirs
+        cc.execute('badmap = $map($list(x y) base $/($(base) $(void)))')
+        cc.node.badmap
 
     def test_resolvecontext(self):
         cc = ConfigCtrl()
