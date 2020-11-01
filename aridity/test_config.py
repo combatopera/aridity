@@ -167,7 +167,7 @@ class TestConfig(TestCase):
         c = cc.node
         obj = c.boot.dirs
         self.assertIs(Config, type(obj))
-        self.assertEqual(['x/leaf', 'y/leaf'], list(obj))
+        self.assertEqual([os.path.join('x', 'leaf'), os.path.join('y', 'leaf')], list(obj))
         obj = c.boot.common.dirs
         self.assertIs(Config, type(obj))
         self.assertEqual(['x', 'y'], list(obj))
