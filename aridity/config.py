@@ -102,7 +102,7 @@ class ConfigCtrl:
         self.basecontext[tuple(self.prefix) + path] = factory()
 
     def context(self):
-        return self.basecontext.resolvedcontextornone(self.prefix)
+        return self.basecontext.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
     def __iter__(self):
         for k, o in self.context().itero():
