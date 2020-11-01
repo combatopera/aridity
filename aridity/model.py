@@ -336,4 +336,4 @@ def wrap(value):
         return Function(value)
     if hasattr(value, 'encode'):
         return Text(value)
-    return Scalar(value) # XXX: Transform mappings and sequences?
+    return Scalar(value) # XXX: Interpret mappings and sequences?
