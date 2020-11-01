@@ -61,7 +61,7 @@ class Functions:
 
     def xmlattr(context, resolvable):
         from xml.sax.saxutils import quoteattr
-        return Text(quoteattr(resolvable.resolve(context).cat()))
+        return Text(quoteattr(resolvable.resolve(context).cat())) # TODO: Support booleans.
 
     def xmltext(context, resolvable):
         'Suggest assigning this to & with xmlattr assigned to " as is convention.'
