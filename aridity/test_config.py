@@ -156,8 +156,13 @@ class TestConfig(TestCase):
 
     def test_badmap(self):
         cc = ConfigCtrl()
-        cc.execute('badmap = $map($list(x y) base $/($(base) $(void)))')
-        cc.node.badmap
+        cc.execute('badmap = $map($list(x y) base $(base)-$(name))')
+        c = cc.node
+        with self.assertRaises(AttributeError) as cm:
+            c.badmap
+        self.assertEqual(('badmap',), cm.exception.args)
+        cc.execute('name = woo')
+        self.assertEqual(['x-woo', 'y-woo'], list(c.badmap))
 
     def test_resolvecontext(self):
         cc = ConfigCtrl()

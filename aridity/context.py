@@ -266,6 +266,9 @@ class StaticContext(AbstractContext):
             setattr(threadlocals, name, stack)
             return stack
 
+    def createchild(self, **kwargs):
+        return Context(self, **kwargs)
+
 class Slash(Text, Function):
 
     def __init__(self):
