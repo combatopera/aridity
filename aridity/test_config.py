@@ -176,3 +176,18 @@ class TestConfig(TestCase):
         obj = c.boot.common.dirs
         self.assertIs(Config, type(obj))
         self.assertEqual([os.path.join('x', 'com'), os.path.join('y', 'com')], list(obj))
+
+    def test_cliref(self):
+        from argparse import ArgumentParser
+        cc = ConfigCtrl()
+        cc.execute('app ago = $(cli ago)')
+        cc.execute('app cli := $fork()')
+        c = cc.node.app
+        ap = ArgumentParser()
+        ap.add_argument('ago')
+        try:
+            ap.parse_args(['1 day'], c.cli)
+            self.fail('You fixed a bug!')
+        except RuntimeError:
+            return
+        self.assertEqual('1 day', c.ago)
