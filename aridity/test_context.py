@@ -594,10 +594,13 @@ class TestContext(TestCase):
             repl('a = $(b)')
             repl('b = $(a)')
             repl('y z = $(y)')
-        with self.assertRaises(CycleException):
+        with self.assertRaises(CycleException) as cm:
             c.resolved('x')
-        with self.assertRaises(CycleException):
+        self.assertEqual((('x',),), cm.exception.args)
+        with self.assertRaises(CycleException) as cm:
             c.resolved('a')
-        with self.assertRaises(CycleException):
+        self.assertEqual((('a',),), cm.exception.args)
+        with self.assertRaises(CycleException) as cm:
             c.resolved('b')
+        self.assertEqual((('b',),), cm.exception.args)
         self.assertIs(c.resolved('y'), c.resolved('y', 'z'))
