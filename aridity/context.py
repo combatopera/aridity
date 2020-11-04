@@ -87,6 +87,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def __init__(self, parent):
         self.resolvables = Resolvables(self)
+        self.threadlocals = threading.local()
         self.parent = parent
 
     def __setitem__(self, path, resolvable):
@@ -253,7 +254,6 @@ class StaticContext(AbstractContext):
         self['/',] = Slash()
         self['*',] = Star()
         self['None',] = Scalar(None)
-        self.threadlocals = threading.local()
         for name in self.stacktypes:
             self[name,] = ThreadLocalResolvable(self.threadlocals, name)
 
