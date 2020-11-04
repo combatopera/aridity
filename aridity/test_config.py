@@ -191,10 +191,10 @@ class TestConfig(TestCase):
     def _cliref(self):
         from argparse import ArgumentParser
         cc = ConfigCtrl()
-        cc.execute('app ago = $(cli ago)')
+        cc.execute('app ago = $(cli ago)s')
         cc.execute('app cli := $fork()')
         c = cc.node.app
         ap = ArgumentParser()
         ap.add_argument('ago')
         ap.parse_args(['1 day'], c.cli)
-        self.assertEqual('1 day', c.ago)
+        self.assertEqual('1 days', c.ago)
