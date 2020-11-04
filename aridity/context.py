@@ -20,7 +20,7 @@ from .directives import lookup, Precedence
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import NoSuchPathException, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
+from .util import CycleException, NoSuchPathException, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 import collections, os, sys, threading
 
 class NotAPathException(Exception): pass
@@ -114,7 +114,17 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         return child
 
     def resolved(self, *path, **kwargs):
-        return self._resolved(path, self._findresolvable(path), kwargs) if path else self
+        try:
+            resolving = self.threadlocals.resolving
+        except AttributeError:
+            self.threadlocals.resolving = resolving = set()
+        if path in resolving:
+            raise CycleException(path)
+        resolving.add(path)
+        try:
+            return self._resolved(path, self._findresolvable(path), kwargs) if path else self
+        finally:
+            resolving.remove(path)
 
     def _resolvedcontextornone(self, path):
         c = self # Assume we are resolved.

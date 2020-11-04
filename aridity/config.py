@@ -19,7 +19,7 @@ from .context import Context
 from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
-from .util import NoSuchPathException, openresource
+from .util import CycleException, NoSuchPathException, openresource
 from functools import partial
 from itertools import chain
 from pkg_resources import iter_entry_points
@@ -140,7 +140,7 @@ class Config(object):
         path = ctrl.prefix + [name]
         try:
             obj = ctrl.basecontext.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
-        except NoSuchPathException:
+        except (CycleException, NoSuchPathException):
             raise AttributeError(' '.join(path))
         try:
             return obj.scalar

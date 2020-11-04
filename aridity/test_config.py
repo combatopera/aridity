@@ -18,7 +18,6 @@
 from .config import Config, ConfigCtrl
 from .functions import Spread
 from .model import Boolean, Function, Number, Scalar, Text
-from .util import ispy2
 from io import StringIO
 from unittest import TestCase
 import os
@@ -179,16 +178,6 @@ class TestConfig(TestCase):
         self.assertEqual([os.path.join('x', 'com'), os.path.join('y', 'com')], list(obj))
 
     def test_cliref(self):
-        if ispy2:
-            self._cliref()
-        else:
-            try:
-                self._cliref()
-                self.fail('You fixed a bug!')
-            except RuntimeError:
-                pass
-
-    def _cliref(self):
         from argparse import ArgumentParser
         cc = ConfigCtrl()
         cc.execute('app ago = $(cli ago)s')
