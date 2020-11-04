@@ -50,6 +50,8 @@ class TreeNoSuchPathException(NoSuchPathException):
                 lines.append("    %s" % l)
         return '\n'.join(lines)
 
+class CycleException(Exception): pass
+
 class UnsupportedEntryException(Exception): pass
 
 class OrderedDictWrapper:

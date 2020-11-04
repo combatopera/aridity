@@ -19,7 +19,7 @@ from .context import Context, StaticContext
 from .grammar import loader as l
 from .model import Directive, Function, Stream, Text
 from .repl import Repl
-from .util import NoSuchPathException
+from .util import CycleException, NoSuchPathException
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
@@ -586,3 +586,21 @@ class TestContext(TestCase):
         self.assertEqual('YY', c.resolved('ok').unravel())
         self.assertEqual('YY', c.resolved('wtf', 'k').unravel())
         self.assertEqual({'k': 'YY'}, c.resolved('wtf').unravel())
+
+    def test_detectcycle(self):
+        c = Context()
+        with Repl(c) as repl:
+            repl('x = $(x)')
+            repl('y z = $(y)')
+            repl('a = $(b)')
+            repl('b = $(a)')
+        with self.assertRaises(CycleException):
+            c.resolved('x')
+        with self.assertRaises(CycleException):
+            c.resolved('y', 'z')
+        with self.assertRaises(CycleException):
+            c.resolved('y')
+        with self.assertRaises(CycleException):
+            c.resolved('a')
+        with self.assertRaises(CycleException):
+            c.resolved('b')
