@@ -254,15 +254,16 @@ class Resource:
     def _of(cls, *args):
         return cls(*args)
 
-    def __init__(self, package_or_requirement, resource_name):
+    def __init__(self, package_or_requirement, resource_name, encoding = 'ascii'):
         self.package_or_requirement = package_or_requirement
         self.resource_name = resource_name
+        self.encoding = encoding
 
     def open(self):
-        return openresource(self.package_or_requirement, self.resource_name) # TODO: Support non-ascii encoding.
+        return openresource(self.package_or_requirement, self.resource_name, self.encoding)
 
     def slash(self, words):
-        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)))
+        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)), self.encoding)
 
     def source(self, context, prefix):
         with context.staticcontext().here.push(self), self.open() as f:
