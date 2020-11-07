@@ -76,7 +76,7 @@ class TestFunctions(TestCase):
 
     def test_dotslashinresource(self):
         c = Context()
-        c.sourceres(Entry([]), __name__, 'test_functions/stream.arid')
+        c.sourceresource(Entry([]), __name__, 'test_functions/stream.arid')
 
     def test_concatinlist(self):
         c = Context()
