@@ -59,7 +59,7 @@ class Write:
 class Source:
     name = '.'
     def __call__(self, prefix, suffix, context):
-        context.source(prefix, resolvepath(suffix.tophrase(), context))
+        suffix.tophrase().resolve(context).source(context, prefix)
 
 @directive
 class CD:
@@ -102,8 +102,7 @@ class Cat:
         context.resolved('stdout').flush(processtemplate(context, suffix.tophrase()))
 
 def resolvepath(resolvable, context):
-    path = resolvable.resolve(context).cat()
-    return path if os.path.isabs(path) else os.path.join(context.resolved('cwd').cat(), path)
+    return resolvable.resolve(context).resolvepath(context)
 
 def processtemplate(context, pathresolvable):
     path = resolvepath(pathresolvable, context)

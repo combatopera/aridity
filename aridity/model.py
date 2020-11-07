@@ -158,6 +158,12 @@ class Text(Cat, BaseScalar):
     def slash(self, words):
         return self._of(os.path.join(self.textvalue, *words))
 
+    def resolvepath(self, context):
+        return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(context.resolved('cwd').cat(), self.textvalue)
+
+    def source(self, context, prefix):
+        context.source(prefix, self.resolvepath(context))
+
 class Binary(BaseScalar):
 
     @property

@@ -220,10 +220,12 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         def slash(self, words):
             return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)))
 
+        def source(self, context, prefix):
+            with context.staticcontext().here.push(self), self.open() as f:
+                context.sourceimpl(prefix, f)
+
     def sourceresource(self, prefix, package_or_requirement, resource_name):
-        resource = self.Resource(package_or_requirement, resource_name)
-        with self.staticcontext().here.push(resource), resource.open() as f:
-            self.sourceimpl(prefix, f)
+        self.Resource(package_or_requirement, resource_name).source(self, prefix)
 
     def sourceimpl(self, prefix, f):
         from .repl import Repl

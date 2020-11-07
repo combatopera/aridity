@@ -77,6 +77,9 @@ class TestFunctions(TestCase):
     def test_dotslashinresource(self):
         c = Context()
         c.sourceresource(Entry([]), __name__, 'test_functions/stream.arid')
+        self.assertEqual('yay', c.resolved('data1', 'woo').textvalue)
+        self.assertEqual('yay2', c.resolved('data2', 'woo2').textvalue)
+        self.assertEqual('yay3', c.resolved('data2', 'woo3').textvalue)
 
     def test_concatinlist(self):
         c = Context()
