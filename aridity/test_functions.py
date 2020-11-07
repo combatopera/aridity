@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context
+from .context import Context, Resource
 from .functions import _tomlquote
 from .model import Entry, Function
 from .repl import Repl
@@ -76,7 +76,7 @@ class TestFunctions(TestCase):
 
     def test_dotslashinresource(self):
         c = Context()
-        c.sourceresource(Entry([]), __name__, 'test_functions/stream.arid')
+        Resource(__name__, 'test_functions/stream.arid').source(c, Entry([]))
         self.assertEqual('yay', c.resolved('data1', 'woo').textvalue)
         self.assertEqual('yay2', c.resolved('data2', 'woo2').textvalue)
         self.assertEqual('yay3', c.resolved('data2', 'woo3').textvalue)

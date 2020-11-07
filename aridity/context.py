@@ -204,9 +204,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
             self.sourceimpl(prefix, f)
 
-    def sourceresource(self, prefix, package_or_requirement, resource_name):
-        Resource(package_or_requirement, resource_name).source(self, prefix)
-
     def sourceimpl(self, prefix, f):
         from .repl import Repl
         with Repl(self, rootprefix = prefix) as repl:
