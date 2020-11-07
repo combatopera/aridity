@@ -102,7 +102,7 @@ class Cat:
         context.resolved('stdout').flush(processtemplate(context, suffix.tophrase()))
 
 def resolvepath(resolvable, context):
-    return resolvable.resolve(context).resolvepath(context)
+    return resolvable.resolve(context).topath(context)
 
 def processtemplate(context, pathresolvable):
     path = resolvepath(pathresolvable, context)
