@@ -70,7 +70,7 @@ class ConfigCtrl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
     def load(self, pathorstream):
-        c = self.context()
+        c = self.context(True)
         (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
 
     def loadsettings(self):
@@ -101,7 +101,11 @@ class ConfigCtrl:
         factory, = (partial(t, v) for t, v in pairs())
         self.basecontext[tuple(self.prefix) + path] = factory()
 
-    def context(self):
+    def context(self, strict = False):
+        if strict:
+            c = self.basecontext.resolvedcontextornone(self.prefix)
+            assert c is not None
+            return c
         return self.basecontext.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
     def __iter__(self):
@@ -124,10 +128,10 @@ class ConfigCtrl:
                 g.write(text)
 
     def free(self):
-        return self._of(self.context())
+        return self._of(self.context()) # XXX: Strict?
 
     def createchild(self):
-        return self._of(self.context().createchild())
+        return self._of(self.context(True).createchild())
 
     def __neg__(self):
         'Included for completeness, normally the node attribute should be used directly.'
@@ -155,4 +159,4 @@ class Config(object):
         return ctrls[self]
 
     def __setattr__(self, name, value):
-        ctrls[self].context()[name,] = wrap(value)
+        ctrls[self].context(True)[name,] = wrap(value)
