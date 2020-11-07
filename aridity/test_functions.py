@@ -17,9 +17,9 @@
 
 from .context import Context
 from .functions import _tomlquote
-from .model import Function
+from .model import Entry, Function
 from .repl import Repl
-from .util import ispy2, NoSuchPathException
+from .util import ispy2, NoSuchPathException, openresource
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 import os, sys
@@ -73,6 +73,11 @@ class TestFunctions(TestCase):
             expected = "%s %s %s" % (d, os.path.join(d, 'sibling'), os.path.join(d, 'sib', 'child'))
             self.assertEqual(expected, c.resolved('text').scalar)
             self.assertEqual(expected, g.read())
+
+    def test_dotslashinresource(self):
+        c = Context()
+        with openresource(__name__, 'test_functions/stream.arid') as f:
+            c.sourceimpl(Entry([]), f)
 
     def test_concatinlist(self):
         c = Context()
