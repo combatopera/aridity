@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import itertools, numbers
+import itertools, numbers, os
 
 class Struct(object):
 
@@ -134,6 +134,10 @@ class Scalar(BaseScalar):
 
 class Text(Cat, BaseScalar):
 
+    @classmethod
+    def _of(cls, textvalue):
+        return cls(textvalue)
+
     @property
     def scalar(self):
         return self.textvalue
@@ -150,6 +154,9 @@ class Text(Cat, BaseScalar):
     def writeout(self, path):
         with open(path, 'w') as f:
             f.write(self.textvalue)
+
+    def slash(self, words):
+        return self._of(os.path.join(self.textvalue, *words))
 
 class Binary(BaseScalar):
 

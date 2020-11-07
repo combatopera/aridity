@@ -20,7 +20,7 @@ from .directives import processtemplate, resolvepath
 from .model import Boolean, Number, Text, wrap
 from .util import allfunctions, NoSuchPathException, realname
 from importlib import import_module
-import itertools, json, os, re, shlex
+import itertools, json, re, shlex
 
 xmlentities = dict([c, "&%s;" % w] for c, w in [['"', 'quot'], ["'", 'apos']])
 tomlbasicbadchars = re.compile('[%s]+' % re.escape(r'\"' + ''.join(chr(x) for x in itertools.chain(range(0x08 + 1), range(0x0A, 0x1F + 1), [0x7F]))))
@@ -172,7 +172,7 @@ class Functions:
 
     @realname('./')
     def hereslash(context, *resolvables):
-        return Text(os.path.join(context.resolved('here').cat(), *(r.resolve(context).cat() for r in resolvables)))
+        return context.resolved('here').slash(r.resolve(context).cat() for r in resolvables)
 
     def readfile(context, resolvable):
         with open(resolvepath(resolvable, context)) as f:

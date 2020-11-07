@@ -19,7 +19,7 @@ from .context import Context
 from .functions import _tomlquote
 from .model import Entry, Function
 from .repl import Repl
-from .util import ispy2, NoSuchPathException, openresource
+from .util import ispy2, NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 import os, sys
@@ -76,8 +76,7 @@ class TestFunctions(TestCase):
 
     def test_dotslashinresource(self):
         c = Context()
-        with openresource(__name__, 'test_functions/stream.arid') as f:
-            c.sourceimpl(Entry([]), f)
+        c.sourceres(Entry([]), __name__, 'test_functions/stream.arid')
 
     def test_concatinlist(self):
         c = Context()

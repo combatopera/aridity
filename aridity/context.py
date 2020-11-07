@@ -20,7 +20,8 @@ from .directives import lookup, Precedence
 from .functions import getfunctions
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import CycleException, NoSuchPathException, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
+from .util import CycleException, NoSuchPathException, openresource, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
+from itertools import chain
 import collections, os, sys, threading
 
 class NotAPathException(Exception): pass
@@ -201,6 +202,27 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def source(self, prefix, path):
         with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
+            self.sourceimpl(prefix, f)
+
+    class Resource:
+
+        @classmethod
+        def _of(cls, *args):
+            return cls(*args)
+
+        def __init__(self, package_or_requirement, resource_name):
+            self.package_or_requirement = package_or_requirement
+            self.resource_name = resource_name
+
+        def open(self):
+            return openresource(self.package_or_requirement, self.resource_name) # TODO: Support non-ascii encoding.
+
+        def slash(self, words):
+            return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)))
+
+    def sourceres(self, prefix, package_or_requirement, resource_name):
+        resource = self.Resource(package_or_requirement, resource_name)
+        with self.staticcontext().here.push(resource), resource.open() as f:
             self.sourceimpl(prefix, f)
 
     def sourceimpl(self, prefix, f):
