@@ -158,11 +158,11 @@ class Text(Cat, BaseScalar):
     def slash(self, words):
         return self._of(os.path.join(self.textvalue, *words))
 
-    def topath(self, context):
+    def pathvalue(self, context):
         return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(context.resolved('cwd').cat(), self.textvalue)
 
     def source(self, context, prefix):
-        context.source(prefix, self.topath(context))
+        context.source(prefix, self.pathvalue(context))
 
 class Binary(BaseScalar):
 
