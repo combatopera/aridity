@@ -204,28 +204,8 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
             self.sourceimpl(prefix, f)
 
-    class Resource:
-
-        @classmethod
-        def _of(cls, *args):
-            return cls(*args)
-
-        def __init__(self, package_or_requirement, resource_name):
-            self.package_or_requirement = package_or_requirement
-            self.resource_name = resource_name
-
-        def open(self):
-            return openresource(self.package_or_requirement, self.resource_name) # TODO: Support non-ascii encoding.
-
-        def slash(self, words):
-            return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)))
-
-        def source(self, context, prefix):
-            with context.staticcontext().here.push(self), self.open() as f:
-                context.sourceimpl(prefix, f)
-
     def sourceresource(self, prefix, package_or_requirement, resource_name):
-        self.Resource(package_or_requirement, resource_name).source(self, prefix)
+        Resource(package_or_requirement, resource_name).source(self, prefix)
 
     def sourceimpl(self, prefix, f):
         from .repl import Repl
@@ -270,6 +250,26 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def spread(self, k):
         yield k, self
+
+class Resource:
+
+    @classmethod
+    def _of(cls, *args):
+        return cls(*args)
+
+    def __init__(self, package_or_requirement, resource_name):
+        self.package_or_requirement = package_or_requirement
+        self.resource_name = resource_name
+
+    def open(self):
+        return openresource(self.package_or_requirement, self.resource_name) # TODO: Support non-ascii encoding.
+
+    def slash(self, words):
+        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)))
+
+    def source(self, context, prefix):
+        with context.staticcontext().here.push(self), self.open() as f:
+            context.sourceimpl(prefix, f)
 
 class StaticContext(AbstractContext):
 
