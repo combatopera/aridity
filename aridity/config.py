@@ -22,7 +22,7 @@ from .repl import Repl
 from .util import CycleException, NoSuchPathException, openresource
 from functools import partial
 from itertools import chain
-from pkg_resources import iter_entry_points
+from pkg_resources import iter_entry_points # TODO: Port to new API.
 from weakref import WeakKeyDictionary
 import errno, logging, os
 

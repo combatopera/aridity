@@ -17,7 +17,7 @@
 
 from contextlib import contextmanager
 from io import BytesIO, TextIOWrapper
-from pkg_resources import resource_stream
+from pkg_resources import resource_stream # TODO: Port to new API.
 import collections, inspect, sys
 
 ispy2 = sys.version_info.major < 3
