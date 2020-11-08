@@ -18,7 +18,7 @@
 from __future__ import with_statement
 from .directives import lookup, Precedence
 from .functions import getfunctions
-from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, Stream, Text
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import CycleException, NoSuchPathException, openresource, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 from itertools import chain
@@ -248,7 +248,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
     def spread(self, k):
         yield k, self
 
-class Resource:
+class Resource(Resolved):
 
     @classmethod
     def _of(cls, *args):
