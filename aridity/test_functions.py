@@ -80,6 +80,7 @@ class TestFunctions(TestCase):
         self.assertEqual('yay', c.resolved('data1', 'woo').textvalue)
         self.assertEqual('yay2', c.resolved('data2', 'woo2').textvalue)
         self.assertEqual('yay3', c.resolved('data2', 'woo3').textvalue)
+        self.assertEqual('sibval', c.resolved('data3', 'sibkey').textvalue)
 
     def test_concatinlist(self):
         c = Context()
