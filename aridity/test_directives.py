@@ -16,6 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
+from .context import Context
+from .repl import Repl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
@@ -95,3 +97,12 @@ class TestDirectives(TestCase):
         self.assertEqual([('a', 'b')], list(-c.x))
         (-c).printf('x p q = r')
         self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (-c.x).context().unravel())
+
+    def test_dynamicinclude(self):
+        c = Context()
+        with NamedTemporaryFile('w') as f, Repl(c) as repl:
+            f.write('woo = yay')
+            f.flush()
+            repl.printf("app confpath = %s", f.name)
+            repl('app . $(confpath)')
+        self.assertEqual('yay', c.resolved('app', 'woo').textvalue)
