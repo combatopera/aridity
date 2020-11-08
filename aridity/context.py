@@ -200,7 +200,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
             pass
         return c
 
-    def source(self, prefix, path):
+    def source(self, prefix, path): # XXX: Migrate to Text?
         with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
             self.sourceimpl(prefix, f)
 
@@ -260,7 +260,7 @@ class Resource:
         self.encoding = encoding
 
     def open(self):
-        return openresource(self.package_or_requirement, self.resource_name, self.encoding)
+        return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
 
     def slash(self, words):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1], words)), self.encoding)
