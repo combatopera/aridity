@@ -98,7 +98,7 @@ class TestDirectives(TestCase):
         (-c).printf('x p q = r')
         self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (-c.x).context().unravel())
 
-    def test_dynamicinclude(self):
+    def test_nesteddynamicinclude(self):
         c = Context()
         with NamedTemporaryFile('w') as f, Repl(c) as repl:
             f.write('woo = yay')
