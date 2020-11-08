@@ -59,6 +59,7 @@ class Write:
 class Source:
     name = '.'
     def __call__(self, prefix, suffix, context):
+        # XXX: Use full algo to get phrasecontext?
         phrasecontext = context
         for word in prefix.topath(context):
             c = phrasecontext.resolvedcontextornone([word])
