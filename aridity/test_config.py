@@ -92,8 +92,12 @@ class TestConfig(TestCase):
         self.assertEqual('woo', c.D.E.F.A)
         self.assertEqual('woo', c.D.E.F.B.C.A)
 
+    def source(self, context, prefix):
+        context.sourceimpl(prefix, StringIO(self.sourcetext))
+
     def test_appnamelabel(self):
-        c = ConfigCtrl()._loadappconfig('The App', StringIO(u'n := $label()\nx y = $(n)'))
+        self.sourcetext = u'n := $label()\nx y = $(n)'
+        c = ConfigCtrl()._loadappconfig('The App', self)
         self.assertEqual('The App', c.n)
         self.assertEqual('The App', c.x.y)
 

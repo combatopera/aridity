@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context
+from .context import Context, Resource
 from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
-from .util import CycleException, NoSuchPathException, openresource
+from .util import CycleException, NoSuchPathException
 from functools import partial
 from itertools import chain
 from pkg_resources import iter_entry_points # TODO: Port to new API.
@@ -49,8 +49,7 @@ class ConfigCtrl:
         module_name = mainfunction.__module__
         attrs = tuple(mainfunction.__qualname__.split('.'))
         appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-        with openresource(module_name, moduleresource, encoding) as f:
-            appconfig = self._loadappconfig(appname, f)
+        appconfig = self._loadappconfig(appname, Resource(module_name, moduleresource, encoding))
         try:
             self.loadsettings()
         except OSError as e:
@@ -59,11 +58,9 @@ class ConfigCtrl:
             log.info("No such file: %s", e)
         return appconfig
 
-    def _loadappconfig(self, appname, f):
-        self.basecontext.getorcreatesubcontext(self.prefix + [appname])
-        appconfig = getattr(self.node, appname)
-        (-appconfig).load(f)
-        return appconfig
+    def _loadappconfig(self, appname, resource):
+        resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
+        return getattr(self.node, appname)
 
     def printf(self, template, *args):
         with Repl(self.basecontext) as repl:
