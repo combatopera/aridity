@@ -59,7 +59,13 @@ class Write:
 class Source:
     name = '.'
     def __call__(self, prefix, suffix, context):
-        suffix.tophrase().resolve(context).source(context, prefix)
+        phrasecontext = context
+        for word in prefix.topath(context):
+            c = phrasecontext.resolvedcontextornone([word])
+            if c is None:
+                break
+            phrasecontext = c
+        suffix.tophrase().resolve(phrasecontext).source(context, prefix)
 
 @directive
 class CD:
