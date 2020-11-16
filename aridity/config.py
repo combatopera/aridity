@@ -46,9 +46,12 @@ class ConfigCtrl:
         self.prefix = [] if prefix is None else prefix
 
     def loadappconfig(self, mainfunction, moduleresource, encoding = 'ascii', settingsoptional = False):
-        module_name = mainfunction.__module__
-        attrs = tuple(mainfunction.__qualname__.split('.'))
-        appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
+        try:
+            module_name, appname = mainfunction
+        except TypeError:
+            module_name = mainfunction.__module__
+            attrs = tuple(mainfunction.__qualname__.split('.'))
+            appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
         appconfig = self._loadappconfig(appname, Resource(module_name, moduleresource, encoding))
         try:
             self.loadsettings()
