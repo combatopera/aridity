@@ -18,9 +18,9 @@
 from .config import ConfigCtrl
 from .context import Context
 from .repl import Repl
-from tempfile import mkdtemp, NamedTemporaryFile
+from .util import openresource
+from tempfile import NamedTemporaryFile
 from unittest import TestCase
-import os, shutil
 
 class TestDirectives(TestCase):
 
@@ -109,34 +109,27 @@ class TestDirectives(TestCase):
         self.assertEqual('yay', c.resolved('app', 'woo').textvalue)
 
     def test_merge(self):
-        tempdir = mkdtemp()
-        try:
-            settingspath = os.path.join(tempdir, 'settings.arid')
-            with open(settingspath, 'w') as f:
-                f.write('alt optional two = altopt2\n')
-                f.write('alt required two = altreq2\n')
-                f.write('app optional one = appopt1\n')
-                f.write('app required one = appreq1\n')
-            cc = ConfigCtrl()
-            cc.loadsettings = lambda: cc.load(settingspath)
-            c = cc.loadappconfig((__name__, 'app'), 'test_directives/merge/appconf.arid')
-            self.assertEqual('default0', c.optional.zero)
-            self.assertEqual('appopt1', c.optional.one)
-            self.assertEqual('default2', c.optional.two)
-            with self.assertRaises(AttributeError):
-                c.required.zero
-            self.assertEqual('appreq1', c.required.one)
-            with self.assertRaises(AttributeError):
-                c.required.two
-            cc = ConfigCtrl()
-            cc.loadsettings = lambda: cc.load(settingspath)
-            c = cc.loadappconfig((__name__, 'alt'), 'test_directives/merge/altconf.arid')
-            self.assertEqual('default0', c.optional.zero)
-            self.assertEqual('appopt1', c.optional.one)
-            self.assertEqual('altopt2', c.optional.two)
-            with self.assertRaises(AttributeError):
-                c.required.zero
-            self.assertEqual('appreq1', c.required.one)
-            self.assertEqual('altreq2', c.required.two)
-        finally:
-            shutil.rmtree(tempdir)
+        def loadsettings():
+            with openresource(__name__, 'test_directives/merge/settings.arid') as f:
+                cc.load(f)
+        cc = ConfigCtrl()
+        cc.loadsettings = loadsettings
+        c = cc.loadappconfig((__name__, 'app'), 'test_directives/merge/appconf.arid')
+        self.assertEqual('default0', c.optional.zero)
+        self.assertEqual('appopt1', c.optional.one)
+        self.assertEqual('default2', c.optional.two)
+        with self.assertRaises(AttributeError):
+            c.required.zero
+        self.assertEqual('appreq1', c.required.one)
+        with self.assertRaises(AttributeError):
+            c.required.two
+        cc = ConfigCtrl()
+        cc.loadsettings = loadsettings
+        c = cc.loadappconfig((__name__, 'alt'), 'test_directives/merge/altconf.arid')
+        self.assertEqual('default0', c.optional.zero)
+        self.assertEqual('appopt1', c.optional.one)
+        self.assertEqual('altopt2', c.optional.two)
+        with self.assertRaises(AttributeError):
+            c.required.zero
+        self.assertEqual('appreq1', c.required.one)
+        self.assertEqual('altreq2', c.required.two)
