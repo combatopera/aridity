@@ -18,8 +18,9 @@
 from .config import ConfigCtrl
 from .context import Context
 from .repl import Repl
-from tempfile import NamedTemporaryFile
+from tempfile import mkdtemp, NamedTemporaryFile
 from unittest import TestCase
+import os, shutil
 
 class TestDirectives(TestCase):
 
@@ -106,3 +107,56 @@ class TestDirectives(TestCase):
             repl.printf("app confpath = %s", f.name)
             repl('app . $(confpath)')
         self.assertEqual('yay', c.resolved('app', 'woo').textvalue)
+
+    def test_merge(self):
+        tempdir = mkdtemp()
+        try:
+            appconfpath = os.path.join(tempdir, 'appconf.arid')
+            altconfpath = os.path.join(tempdir, 'altconf.arid')
+            settingspath = os.path.join(tempdir, 'settings.arid')
+            with open(appconfpath, 'w') as f:
+                f.write('optional zero = default0\n')
+                f.write('optional one = default1\n')
+                f.write('optional two = default2\n')
+                f.write('required zero = $(void)\n')
+                f.write('required one = $(void)\n')
+                f.write('required two = $(void)\n')
+            with open(altconfpath, 'w') as f:
+                f.write('. $./(appconf.arid)\n')
+                # TODO: DRY way to steal app settings.
+                f.write('optional one = $(app optional one)\n')
+                f.write('optional two = $(app optional two)\n')
+                f.write('required one = $(app required one)\n')
+                f.write('required two = $(app required two)\n')
+            with open(settingspath, 'w') as f:
+                f.write('app optional one = appopt1\n')
+                f.write('app required one = appreq1\n')
+                f.write('alt optional two = altopt2\n')
+                f.write('alt required two = altreq2\n')
+            cc = ConfigCtrl()
+            cc.execute('app := $fork()')
+            c = cc.node.app
+            (-c).load(appconfpath)
+            cc.load(settingspath)
+            self.assertEqual('default0', c.optional.zero)
+            self.assertEqual('appopt1', c.optional.one)
+            self.assertEqual('default2', c.optional.two)
+            with self.assertRaises(AttributeError):
+                c.required.zero
+            self.assertEqual('appreq1', c.required.one)
+            with self.assertRaises(AttributeError):
+                c.required.two
+            cc = ConfigCtrl()
+            cc.execute('alt := $fork()')
+            c = cc.node.alt
+            (-c).load(altconfpath)
+            cc.load(settingspath)
+            self.assertEqual('default0', c.optional.zero)
+            self.assertEqual('appopt1', c.optional.one)
+            self.assertEqual('altopt2', c.optional.two)
+            with self.assertRaises(AttributeError):
+                c.required.zero
+            self.assertEqual('appreq1', c.required.one)
+            self.assertEqual('altreq2', c.required.two)
+        finally:
+            shutil.rmtree(tempdir)
