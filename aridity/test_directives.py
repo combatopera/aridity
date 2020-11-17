@@ -129,10 +129,10 @@ class TestDirectives(TestCase):
                 f.write('required one = $(app required one)\n')
                 f.write('required two = $(app required two)\n')
             with open(settingspath, 'w') as f:
-                f.write('app optional one = appopt1\n')
-                f.write('app required one = appreq1\n')
                 f.write('alt optional two = altopt2\n')
                 f.write('alt required two = altreq2\n')
+                f.write('app optional one = appopt1\n')
+                f.write('app required one = appreq1\n')
             cc = ConfigCtrl()
             cc.execute('app := $fork()')
             c = cc.node.app
