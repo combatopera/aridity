@@ -111,33 +111,15 @@ class TestDirectives(TestCase):
     def test_merge(self):
         tempdir = mkdtemp()
         try:
-            appconfpath = os.path.join(tempdir, 'appconf.arid')
-            altconfpath = os.path.join(tempdir, 'altconf.arid')
             settingspath = os.path.join(tempdir, 'settings.arid')
-            with open(appconfpath, 'w') as f:
-                f.write('optional zero = default0\n')
-                f.write('optional one = default1\n')
-                f.write('optional two = default2\n')
-                f.write('required zero = $(void)\n')
-                f.write('required one = $(void)\n')
-                f.write('required two = $(void)\n')
-            with open(altconfpath, 'w') as f:
-                f.write('. $./(appconf.arid)\n')
-                # TODO: DRY way to steal app settings.
-                f.write('optional one = $(app optional one)\n')
-                f.write('optional two = $(app optional two)\n')
-                f.write('required one = $(app required one)\n')
-                f.write('required two = $(app required two)\n')
             with open(settingspath, 'w') as f:
                 f.write('alt optional two = altopt2\n')
                 f.write('alt required two = altreq2\n')
                 f.write('app optional one = appopt1\n')
                 f.write('app required one = appreq1\n')
             cc = ConfigCtrl()
-            cc.execute('app := $fork()')
-            c = cc.node.app
-            (-c).load(appconfpath)
-            cc.load(settingspath)
+            cc.loadsettings = lambda: cc.load(settingspath)
+            c = cc.loadappconfig((__name__, 'app'), 'test_directives/merge/appconf.arid')
             self.assertEqual('default0', c.optional.zero)
             self.assertEqual('appopt1', c.optional.one)
             self.assertEqual('default2', c.optional.two)
@@ -147,10 +129,8 @@ class TestDirectives(TestCase):
             with self.assertRaises(AttributeError):
                 c.required.two
             cc = ConfigCtrl()
-            cc.execute('alt := $fork()')
-            c = cc.node.alt
-            (-c).load(altconfpath)
-            cc.load(settingspath)
+            cc.loadsettings = lambda: cc.load(settingspath)
+            c = cc.loadappconfig((__name__, 'alt'), 'test_directives/merge/altconf.arid')
             self.assertEqual('default0', c.optional.zero)
             self.assertEqual('appopt1', c.optional.one)
             self.assertEqual('altopt2', c.optional.two)
