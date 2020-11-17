@@ -123,6 +123,7 @@ class TestDirectives(TestCase):
         self.assertEqual('appreq1', c.required.one)
         with self.assertRaises(AttributeError):
             c.required.two
+        self.assertEqual('app', (-c).context().label.scalar)
         cc = ConfigCtrl()
         cc.loadsettings = loadsettings
         cc.loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')
