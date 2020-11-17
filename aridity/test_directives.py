@@ -125,7 +125,10 @@ class TestDirectives(TestCase):
             c.required.two
         cc = ConfigCtrl()
         cc.loadsettings = loadsettings
-        c = cc.loadappconfig((__name__, 'alt'), 'test_directives/merge/altconf.arid')
+        cc.loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')
+        cc.context()['alt',] = cc.context().resolved('app') # TODO: Move it.
+        cc.loadsettings()
+        c = cc.node.alt
         self.assertEqual('default0', c.optional.zero)
         self.assertEqual('appopt1', c.optional.one)
         self.assertEqual('altopt2', c.optional.two)
@@ -133,3 +136,4 @@ class TestDirectives(TestCase):
             c.required.zero
         self.assertEqual('appreq1', c.required.one)
         self.assertEqual('altreq2', c.required.two)
+        self.assertEqual('alt', (-c).context().label.scalar)

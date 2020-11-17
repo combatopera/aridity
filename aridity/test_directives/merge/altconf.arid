@@ -16,10 +16,3 @@
 : along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 . $./(appconf.arid)
-: TODO: DRY way to steal app settings.
-optional
-    one = $(app optional one)
-    two = $(app optional two)
-required
-    one = $(app required one)
-    two = $(app required two)
