@@ -114,11 +114,22 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         self.resolvables.put(key, child)
         return child
 
+    def _duplicate(self):
+        c = self.parent.createchild()
+        c.label = self.label
+        for k, v in self.resolvables.items():
+            try:
+                d = v._duplicate
+            except AttributeError:
+                pass
+            else:
+                v = d()
+            c.resolvables.put(k, v)
+        return c
+
     def copychild(self, fromkey, tokey):
-        child = self.createchild()
+        child = self.resolvables.getornone(fromkey)._duplicate()
         child.label = Text(tokey)
-        for i in self.resolvables.getornone(fromkey).resolvables.items():
-            child.resolvables.put(*i)
         self.resolvables.put(tokey, child)
 
     def resolved(self, *path, **kwargs):
