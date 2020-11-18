@@ -16,3 +16,5 @@
 : along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 . $./(appconf.arid)
+relreftarget = 60
+absreftarget = 110
