@@ -68,7 +68,7 @@ class ConfigCtrl:
     def reapplysettings(self, appname):
         c = self.context(True)
         parent = self._of(c.parent)
-        parent.context(True).renamechild(c.label.scalar, appname)
+        parent.context(True).copychild(c.label.scalar, appname)
         parent.loadsettings()
         return getattr(parent.node, appname)
 

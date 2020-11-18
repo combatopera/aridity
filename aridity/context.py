@@ -77,9 +77,6 @@ class Resolvables:
             if Star.protokey != k and k not in self.d:
                 yield k, v
 
-    def pop(self, key):
-        return self.d.pop(key) # XXX: What if it exists via prototype?
-
 # XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
@@ -117,10 +114,12 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
         self.resolvables.put(key, child)
         return child
 
-    def renamechild(self, fromkey, tokey):
-        r = self.resolvables.pop(fromkey)
-        r.label = Text(tokey)
-        self.resolvables.put(tokey, r)
+    def copychild(self, fromkey, tokey):
+        child = self.createchild()
+        child.label = Text(tokey)
+        for i in self.resolvables.getornone(fromkey).resolvables.items():
+            child.resolvables.put(*i)
+        self.resolvables.put(tokey, child)
 
     def resolved(self, *path, **kwargs):
         try:
