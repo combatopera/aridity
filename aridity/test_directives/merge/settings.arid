@@ -21,4 +21,5 @@ alt
 app
     optional one = appopt1
     required one = appreq1
+    relref = $(relreftarget)
     absref = $(app absreftarget)

@@ -23,4 +23,5 @@ required
     zero = $(void)
     one = $(void)
     two = $(void)
+relreftarget = 50
 absreftarget = 100
