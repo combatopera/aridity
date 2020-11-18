@@ -127,7 +127,7 @@ class TestDirectives(TestCase):
         cc = ConfigCtrl()
         cc.loadsettings = loadsettings
         cc.loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')
-        cc.context()['alt',] = cc.context().resolved('app') # TODO: Move it.
+        cc.context().renamechild('app', 'alt')
         cc.loadsettings()
         c = cc.node.alt
         self.assertEqual('default0', c.optional.zero)
