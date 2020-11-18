@@ -116,7 +116,6 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _duplicate(self):
         c = self.parent.createchild()
-        c.label = self.label
         for k, v in self.resolvables.items():
             try:
                 d = v._duplicate
@@ -124,6 +123,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
                 pass
             else:
                 v = d()
+                v.label = Text(k)
             c.resolvables.put(k, v)
         return c
 
