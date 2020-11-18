@@ -109,12 +109,11 @@ class TestDirectives(TestCase):
         self.assertEqual('yay', c.resolved('app', 'woo').textvalue)
 
     def test_merge(self):
-        def loadsettings():
-            with openresource(__name__, 'test_directives/merge/settings.arid') as f:
-                cc.load(f)
-        cc = ConfigCtrl()
-        cc.loadsettings = loadsettings
-        c = cc.loadappconfig((__name__, 'app'), 'test_directives/merge/appconf.arid')
+        class Ctrl(ConfigCtrl):
+            def loadsettings(self):
+                with openresource(__name__, 'test_directives/merge/settings.arid') as f:
+                    self.load(f)
+        c = Ctrl().loadappconfig((__name__, 'app'), 'test_directives/merge/appconf.arid')
         self.assertEqual('default0', c.optional.zero)
         self.assertEqual('appopt1', c.optional.one)
         self.assertEqual('default2', c.optional.two)
@@ -124,8 +123,7 @@ class TestDirectives(TestCase):
         with self.assertRaises(AttributeError):
             c.required.two
         self.assertEqual('app', (-c).context().label.scalar)
-        cc = ConfigCtrl()
-        cc.loadsettings = loadsettings
+        cc = Ctrl()
         cc.loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')
         cc.context().renamechild('app', 'alt')
         cc.loadsettings()
