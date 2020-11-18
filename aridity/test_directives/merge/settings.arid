@@ -18,6 +18,8 @@
 alt
     optional two = altopt2
     required two = altreq2
+    relreftarget = 70
+    absreftarget = 120
 app
     optional one = appopt1
     required one = appreq1

@@ -134,5 +134,5 @@ class TestDirectives(TestCase):
         self.assertEqual('appreq1', c.required.one)
         self.assertEqual('altreq2', c.required.two)
         self.assertEqual('alt', (-c).context().label.scalar)
-        self.assertEqual(60, c.relref)
+        self.assertEqual(70, c.relref)
         self.assertEqual(110, c.absref)
