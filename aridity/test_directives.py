@@ -123,6 +123,7 @@ class TestDirectives(TestCase):
         with self.assertRaises(AttributeError):
             c.required.two
         self.assertEqual('app', (-c).context().label.scalar)
+        self.assertEqual(100, c.absref)
         c = (-Ctrl().loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')).reapplysettings('alt')
         self.assertEqual('default0', c.optional.zero)
         self.assertEqual('appopt1', c.optional.one)
@@ -132,3 +133,4 @@ class TestDirectives(TestCase):
         self.assertEqual('appreq1', c.required.one)
         self.assertEqual('altreq2', c.required.two)
         self.assertEqual('alt', (-c).context().label.scalar)
+        self.assertEqual(100, c.absref)

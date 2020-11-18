@@ -21,3 +21,4 @@ alt
 app
     optional one = appopt1
     required one = appreq1
+    absref = $(app absreftarget)
