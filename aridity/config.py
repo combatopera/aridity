@@ -65,6 +65,13 @@ class ConfigCtrl:
         resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
+    def reapplysettings(self, appname):
+        c = self.context()
+        c.parent.renamechild(c.label.scalar, appname)
+        parent = self._of(c.parent)
+        parent.loadsettings()
+        return getattr(parent.node, appname)
+
     def printf(self, template, *args):
         with Repl(self.basecontext) as repl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
