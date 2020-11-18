@@ -65,7 +65,7 @@ class ConfigCtrl:
         resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
-    def reapplysettings(self, appname):
+    def reapplysettings(self, appname): # TODO: Also accept a mainfunction.
         c = self.context(True).duplicate()
         c.label = Text(appname)
         c.parent[appname,] = c
