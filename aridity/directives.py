@@ -109,7 +109,7 @@ class Cat:
         context.resolved('stdout').flush(processtemplate(context, suffix.tophrase()))
 
 def resolvepath(resolvable, context):
-    return resolvable.resolve(context).pathvalue(context) # XXX: Could this be more OO?
+    return resolvable.resolve(context).pathvalue(context) # TODO: Support resources.
 
 def processtemplate(context, pathresolvable):
     path = resolvepath(pathresolvable, context)
