@@ -34,6 +34,12 @@ def _newnode(ctrl):
     ctrls[node] = ctrl
     return node
 
+def _processmainfunction(mainfunction):
+    module_name = mainfunction.__module__
+    attrs = tuple(mainfunction.__qualname__.split('.'))
+    appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
+    return module_name, appname
+
 class ConfigCtrl:
 
     @classmethod
@@ -49,9 +55,7 @@ class ConfigCtrl:
         try:
             module_name, appname = mainfunction
         except TypeError:
-            module_name = mainfunction.__module__
-            attrs = tuple(mainfunction.__qualname__.split('.'))
-            appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
+            module_name, appname = _processmainfunction(mainfunction)
         appconfig = self._loadappconfig(appname, Resource(module_name, moduleresource, encoding))
         try:
             self.loadsettings()
@@ -65,7 +69,11 @@ class ConfigCtrl:
         resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
-    def reapplysettings(self, appname): # TODO: Also accept a mainfunction.
+    def reapplysettings(self, appname):
+        try:
+            _, appname = _processmainfunction(appname)
+        except AttributeError:
+            pass
         c = self.context(True).duplicate()
         c.label = Text(appname)
         c.parent[appname,] = c
