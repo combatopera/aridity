@@ -162,7 +162,10 @@ class Text(Cat, BaseScalar):
         return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(context.resolved('cwd').cat(), self.textvalue)
 
     def source(self, context, prefix):
-        context.source(prefix, self.pathvalue(context))
+        if os.path.isabs(self.textvalue):
+            context.source(prefix, self.textvalue)
+        else:
+            context.resolved('cwd').slash([self.textvalue], asdir = True).source(context, prefix)
 
 class Binary(BaseScalar):
 
