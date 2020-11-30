@@ -196,3 +196,10 @@ class TestConfig(TestCase):
         ap.add_argument('ago')
         ap.parse_args(['1 day'], c.cli)
         self.assertEqual('1 days', c.ago)
+
+    def test_resourcecwd(self):
+        from pkg_resources import resource_filename
+        cc = ConfigCtrl()
+        cc.node.cwd = resource_filename(__name__, 'test_config')
+        cc.execute('. chess.arid')
+        self.assertEqual('gambit', cc.node.queen)
