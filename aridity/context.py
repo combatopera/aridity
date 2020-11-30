@@ -275,11 +275,11 @@ class Resource(Resolved):
     def open(self):
         return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
 
-    def slash(self, words, asdir):
-        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:None if asdir else -1], words)), self.encoding)
+    def slash(self, words, rstrip):
+        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
 
     def source(self, context, prefix):
-        with context.staticcontext().here.push(self.slash([], False)), self.open() as f:
+        with context.staticcontext().here.push(self.slash([], True)), self.open() as f:
             context.sourceimpl(prefix, f)
 
 class StaticContext(AbstractContext):

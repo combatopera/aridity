@@ -172,7 +172,7 @@ class Functions:
 
     @realname('./')
     def hereslash(context, *resolvables):
-        return context.resolved('here').slash((r.resolve(context).cat() for r in resolvables), True)
+        return context.resolved('here').slash((r.resolve(context).cat() for r in resolvables), False)
 
     def readfile(context, resolvable):
         with open(resolvepath(resolvable, context)) as f:
