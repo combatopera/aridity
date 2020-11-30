@@ -203,3 +203,10 @@ class TestConfig(TestCase):
         cc.context()['cwd',] = Resource(__name__, 'test_config')
         cc.execute('. chess.arid')
         self.assertEqual('gambit', cc.node.queen)
+
+    def test_textcwd(self):
+        from pkg_resources import resource_filename
+        cc = ConfigCtrl()
+        cc.node.cwd = resource_filename(__name__, 'test_config')
+        cc.execute('. chess.arid')
+        self.assertEqual('gambit', cc.node.queen)

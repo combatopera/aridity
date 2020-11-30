@@ -155,8 +155,8 @@ class Text(Cat, BaseScalar):
         with open(path, 'w') as f:
             f.write(self.textvalue)
 
-    def slash(self, words):
-        return self._of(os.path.join(self.textvalue, *words))
+    def slash(self, words, asdir):
+        return self._of(os.path.join(self.textvalue if asdir else os.path.dirname(self.textvalue), *words))
 
     def pathvalue(self, context):
         return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(context.resolved('cwd').cat(), self.textvalue)
@@ -165,7 +165,7 @@ class Text(Cat, BaseScalar):
         if os.path.isabs(self.textvalue):
             context.source(prefix, self.textvalue)
         else:
-            context.resolved('cwd').slash([self.textvalue], asdir = True).source(context, prefix)
+            context.resolved('cwd').slash([self.textvalue], True).source(context, prefix)
 
 class Binary(BaseScalar):
 
