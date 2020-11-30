@@ -69,11 +69,11 @@ class ConfigCtrl:
         resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
-    def reapplysettings(self, appname):
-        try:
-            _, appname = _processmainfunction(appname)
-        except AttributeError:
-            pass
+    def reapplysettings(self, mainfunction):
+        if hasattr(mainfunction, 'encode'):
+            appname = mainfunction
+        else:
+            _, appname = _processmainfunction(mainfunction)
         c = self.context(True).duplicate()
         c.label = Text(appname)
         c.parent[appname,] = c
