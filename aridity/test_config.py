@@ -211,7 +211,7 @@ class TestConfig(TestCase):
         cc.execute('. chess.arid')
         self.assertEqual('gambit', cc.node.queen)
 
-    def test_assignpath(self):
+    def test_assigntopath(self):
         config = ConfigCtrl().node
         try:
             config.foo.bar = 'yay'
