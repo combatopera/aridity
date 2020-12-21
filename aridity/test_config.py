@@ -102,7 +102,7 @@ class TestConfig(TestCase):
         self.assertEqual('The App', c.x.y)
 
     def test_loadlibconfig(self):
-        c = ConfigCtrl().loadappconfig((__name__, 'CDEFGAB'), 'test_config/libconf.arid')
+        c = ConfigCtrl().loadappconfig((__name__, 'CDEFGAB'), 'test_config/libconf.arid', settingsoptional = True)
         self.assertEqual('response', c.music)
         self.assertEqual('CDEFGAB', (-c).context().label.scalar)
 
