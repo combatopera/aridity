@@ -59,7 +59,7 @@ class ConfigCtrl:
         appconfig = self._loadappconfig(appname, Resource(module_name, moduleresource, encoding))
         try:
             self.loadsettings()
-        except OSError as e:
+        except (IOError, OSError) as e:
             if not (settingsoptional and errno.ENOENT == e.errno):
                 raise
             log.info("No such file: %s", e)
