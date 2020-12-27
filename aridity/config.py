@@ -40,6 +40,8 @@ def _processmainfunction(mainfunction):
     appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
     return module_name, appname
 
+class ForeignScopeException(Exception): pass
+
 class ConfigCtrl:
 
     @classmethod
@@ -120,7 +122,8 @@ class ConfigCtrl:
     def context(self, strict = False):
         if strict:
             c = self.basecontext.resolvedcontextornone(self.prefix)
-            assert c is not None
+            if c is None:
+                raise ForeignScopeException
             return c
         return self.basecontext.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
