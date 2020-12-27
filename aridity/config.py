@@ -143,8 +143,8 @@ class ConfigCtrl:
             with open(topathorstream, 'w') as g:
                 g.write(text)
 
-    def free(self): # XXX: Return node?
-        return self._of(self.context()) # XXX: Strict?
+    def free(self):
+        return self._of(self.context()).node # XXX: Strict?
 
     def createchild(self):
         return self._of(self.context(True).createchild()).node
