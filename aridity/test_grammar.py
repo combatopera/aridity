@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, pyparsing
 from .grammar import expressionparser as p, loader as l
 from .model import Text, Call, Blank, Concat, Number, Boolean, Entry, Boundary
 from decimal import Decimal
+from pyparsing import ParseException
+from unittest import TestCase
 
-class TestGrammar(unittest.TestCase):
+class TestGrammar(TestCase):
 
     def test_expressionparser(self):
         ae = self.assertEqual
@@ -72,7 +73,7 @@ class TestGrammar(unittest.TestCase):
         for name in "'", '.':
             for text in (' $ %s( x ) ' % name,
                          ' $%s ( x ) ' % name):
-                with self.assertRaises(pyparsing.ParseException):
+                with self.assertRaises(ParseException):
                     p(text)
 
     def test_pass(self):
