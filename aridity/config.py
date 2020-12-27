@@ -124,7 +124,7 @@ class ConfigCtrl:
             return c
         return self.basecontext.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
-    def __iter__(self):
+    def __iter__(self): # TODO: Add API to get keys without resolving values.
         for k, o in self.context().itero():
             try:
                 yield k, o.scalar
