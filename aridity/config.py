@@ -149,10 +149,6 @@ class ConfigCtrl:
     def createchild(self):
         return self._of(self.context(True).createchild())
 
-    def __neg__(self):
-        'Included for completeness, normally the node attribute should be used directly.'
-        return self.node
-
 class Config(object):
 
     def __getattr__(self, name):
@@ -160,7 +156,7 @@ class Config(object):
         path = ctrl.prefix + [name]
         try:
             obj = ctrl.basecontext.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
-        except (CycleException, NoSuchPathException):
+        except (CycleException, NoSuchPathException): # XXX: Should this really translate CycleException?
             raise AttributeError(' '.join(path))
         try:
             return obj.scalar
