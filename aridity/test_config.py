@@ -64,7 +64,7 @@ class TestConfig(TestCase):
         f = (-c).free()
         self.assertEqual([], (-f).prefix)
         self.assertEqual('<woo>', f.item.xform)
-        h = (-c).createchild()
+        h = (-c).childctrl().node
         self.assertEqual([], (-h).prefix)
         self.assertEqual('<woo>', h.item.xform)
 

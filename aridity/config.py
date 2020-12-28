@@ -149,8 +149,8 @@ class ConfigCtrl:
     def free(self):
         return self._of(self.context()).node # XXX: Strict?
 
-    def createchild(self):
-        return self._of(self.context(True).createchild()).node
+    def childctrl(self):
+        return self._of(self.context(True).createchild())
 
 class Config(object):
 
