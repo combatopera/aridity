@@ -61,7 +61,7 @@ class TestConfig(TestCase):
         c = cc.node.app
         self.assertEqual(['app'], (-c).prefix)
         self.assertEqual('<woo>', c.item.xform)
-        f = (-c).free()
+        f = (-c).freectrl().node
         self.assertEqual([], (-f).prefix)
         self.assertEqual('<woo>', f.item.xform)
         h = (-c).childctrl().node
@@ -75,7 +75,7 @@ class TestConfig(TestCase):
         cc.printf('Z = yay')
         c = cc.node
         self.assertEqual('woo', c.X.Y.Z)
-        f = (-c.X.Y).free()
+        f = (-c.X.Y).freectrl().node
         self.assertEqual('yay', f.Z)
 
     def test_multibacktrack(self):
