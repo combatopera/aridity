@@ -1,5 +1,5 @@
 # aridity
-[![Build Status](https://travis-ci.org/combatopera/aridity.svg?branch=master)](https://travis-ci.org/combatopera/aridity)
+DRY config and template system, easily extensible with Python
 
 ## The Arid Manifesto
 * Keys are paths to avoid concatenation
@@ -15,6 +15,40 @@
 * Many applications can share one user config
 * Principle of least astonishment driven design
 * Don't make users jump through hoops
+
+## Install
+These are generic installation instructions.
+
+### To use, permanently
+The quickest way to get started is to install the current release from PyPI:
+```
+pip3 install --user aridity
+```
+
+### To use, temporarily
+If you prefer to keep .local clean, install to a virtualenv:
+```
+python3 -m venv venvname
+venvname/bin/pip install aridity
+. venvname/bin/activate
+```
+
+### To develop
+First clone the repo using HTTP or SSH:
+```
+git clone https://github.com/combatopera/aridity.git
+git clone git@github.com:combatopera/aridity.git
+```
+Now use pyven's pipify to create a setup.py, which pip can then use to install the project editably:
+```
+python3 -m venv pyvenvenv
+pyvenvenv/bin/pip install pyven
+pyvenvenv/bin/pipify aridity
+
+python3 -m venv venvname
+venvname/bin/pip install -e aridity
+. venvname/bin/activate
+```
 
 ## Config file syntax
 ```
