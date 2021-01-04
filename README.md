@@ -130,13 +130,14 @@ person
 summary = Person of the Year was $join($map($(person) $.($label() in $(year))) $.(, )).
 : Here the predefined label function gives you access to the last path component of a list element.
 ```
+
 ## Templates
 * A template is simply an expression in a file, that may be quite large
 * These are typically used to create config files for other languages e.g. YAML, HCL
-  * Note that literal dollar signs must be quoted as above, everything else is safe
+    * Note that literal dollar signs must be quoted as above, everything else is safe
 * A processtemplate script is provided for basic processing
 ```
 processtemplate app.json.aridt <config.arid >app.json
 ```
 * Conventionally the `"` path is set to the most useful escape function for the target format
-  * Brackets can be elided in function composition e.g. `$"$(key)` is the same as `$"($(key))`
+    * Brackets can be elided in function composition e.g. `$"$(key)` is the same as `$"($(key))`
