@@ -175,3 +175,14 @@ processtemplate app.json.aridt <config.arid >app.json
 ```
 * Conventionally the `"` path is set to the most useful escape function for the target format
     * Brackets can be elided in function composition e.g. `$"$(key)` is the same as `$"($(key))`
+
+## Commands
+
+### arid-config
+Print given config (with optional path in config) as shell snippet.
+
+### aridity
+Interactive REPL.
+
+### processtemplate
+Process the given template to stdout using config from stdin.

@@ -19,6 +19,7 @@ from .repl import Repl
 import os, sys
 
 def main_processtemplate():
+    'Process the given template to stdout using config from stdin.'
     templatepath, = sys.argv[1:]
     with Repl() as repl:
         for line in sys.stdin:

@@ -29,6 +29,7 @@ def _configpath(configname):
     raise Exception("Not found: %s" % configname)
 
 def main_arid_config():
+    'Print given config (with optional path in config) as shell snippet.'
     context = Context()
     context.source(Entry([]), _configpath(sys.argv[1]))
     sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))

@@ -25,6 +25,7 @@ import sys
 assert NoSuchPathException
 
 def main_aridity():
+    'Interactive REPL.'
     context = Context()
     context['stdout',] = Stream(sys.stdout)
     with Repl(context, True) as repl:
