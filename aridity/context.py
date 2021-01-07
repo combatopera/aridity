@@ -17,7 +17,7 @@
 
 from __future__ import with_statement
 from .directives import lookup, Precedence
-from .functions import getfunctions
+from .functions import getfunctions, OpaqueKey
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import CycleException, NoSuchPathException, openresource, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
@@ -80,7 +80,7 @@ class Resolvables:
 # XXX: Isn't this Resolved rather than Resolvable?
 class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
 
-    nametypes = {str, type(None)}
+    nametypes = {str, type(None), OpaqueKey} # XXX: Is None still used by anything?
     try:
         nametypes.add(unicode)
     except NameError:

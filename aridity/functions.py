@@ -30,6 +30,8 @@ def _tomlquote(text):
         return ''.join(r"\u%04X" % ord(c) for c in m.group())
     return '"%s"' % tomlbasicbadchars.sub(repl, text)
 
+class OpaqueKey: pass
+
 class Functions:
 
     def screenstr(context, resolvable):
@@ -140,7 +142,13 @@ class Functions:
     def list(context, *resolvables):
         v = context.createchild(islist = True)
         for r in resolvables:
-            v[r.unparse(),] = r # TODO LATER: Investigate using new opaque path component per element.
+            try:
+                keyfunction = r.unparse
+            except AttributeError:
+                key = OpaqueKey() # TODO: Investigate why not do this all the time.
+            else:
+                key = keyfunction()
+            v[key,] = r
         return v
 
     def fork(context):
