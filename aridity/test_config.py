@@ -220,3 +220,24 @@ class TestConfig(TestCase):
             pass
         else:
             self.fail('You fixed a bug!')
+
+    def test_listsuffixoverride(self):
+        cc = ConfigCtrl()
+        cc.execute('item suffix = default')
+        cc.execute('those items += foo-$(item suffix)')
+        cc.execute('those items += bar-$(item suffix)')
+        cc.execute('env eranu code no = 1')
+        cc.execute('env uvavu code no = 2')
+        cc.execute('env uvavu item suffix = override')
+        c = cc.node
+        eranu = c.env.eranu
+        uvavu = c.env.uvavu
+        self.assertEqual(1, eranu.code.no)
+        self.assertEqual(2, uvavu.code.no)
+        self.assertEqual(['foo-default', 'bar-default'], list(eranu.those.items))
+        try:
+            self.assertEqual(['foo-override', 'bar-override'], list(uvavu.those.items))
+        except AssertionError:
+            pass
+        else:
+            self.fail('You fixed a bug!')
