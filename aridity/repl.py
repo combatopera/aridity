@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import traceback, pyparsing, re
-from .context import Context
+from .context import Scope
 from .grammar import commandparser
 from .model import Entry, Text
+import traceback, pyparsing, re
 
 class DanglingStackException(Exception): pass
 
@@ -46,13 +46,13 @@ class Repl:
         except TypeError:
             return obj
 
-    def __init__(self, context = None, interactive = False, rootprefix = Entry([])):
+    def __init__(self, scope = None, interactive = False, rootprefix = Entry([])):
         self.stack = []
         self.indent = ''
         self.command = Entry([Text(':')])
         self.commandsize = self.command.size()
         self.partials = {'': rootprefix}
-        self.context = Context() if context is None else context
+        self.scope = Scope() if scope is None else scope
         self.interactive = interactive
 
     def __enter__(self):
@@ -88,7 +88,7 @@ class Repl:
     def fire(self):
         if self.commandsize:
             try:
-                self.context.execute(self.command)
+                self.scope.execute(self.command)
             except:
                 if not self.interactive:
                     raise

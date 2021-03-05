@@ -40,82 +40,82 @@ def directive(cls):
 class Colon:
     name = ':'
     precedence = Precedence.colon
-    def __call__(self, prefix, suffix, context):
-        context.execute(prefix, True)
+    def __call__(self, prefix, suffix, scope):
+        scope.execute(prefix, True)
 
 @directive
 class Redirect:
     name = 'redirect'
-    def __call__(self, prefix, suffix, context):
-        context['stdout',] = Stream(open(resolvepath(suffix.tophrase(), context), 'w'))
+    def __call__(self, prefix, suffix, scope):
+        scope['stdout',] = Stream(open(resolvepath(suffix.tophrase(), scope), 'w'))
 
 @directive
 class Write:
     name = 'write'
-    def __call__(self, prefix, suffix, context):
-        context.resolved('stdout').flush(suffix.tophrase().resolve(context).cat())
+    def __call__(self, prefix, suffix, scope):
+        scope.resolved('stdout').flush(suffix.tophrase().resolve(scope).cat())
 
 @directive
 class Source:
     name = '.'
-    def __call__(self, prefix, suffix, context):
-        # XXX: Use full algo to get phrasecontext?
-        phrasecontext = context
-        for word in prefix.topath(context):
-            c = phrasecontext.resolvedcontextornone([word])
+    def __call__(self, prefix, suffix, scope):
+        # XXX: Use full algo to get phrasescope?
+        phrasescope = scope
+        for word in prefix.topath(scope):
+            c = phrasescope.resolvedcontextornone([word])
             if c is None:
                 break
-            phrasecontext = c
-        suffix.tophrase().resolve(phrasecontext).source(context, prefix)
+            phrasescope = c
+        suffix.tophrase().resolve(phrasescope).source(scope, prefix)
 
 @directive
 class CD:
     name = 'cd'
-    def __call__(self, prefix, suffix, context):
-        context['cwd',] = Text(resolvepath(suffix.tophrase(), context))
+    def __call__(self, prefix, suffix, scope):
+        scope['cwd',] = Text(resolvepath(suffix.tophrase(), scope))
 
 @directive
 class Test:
     name = 'test'
-    def __call__(self, prefix, suffix, context):
-        sys.stderr.write(suffix.tophrase().resolve(context))
+    def __call__(self, prefix, suffix, scope):
+        sys.stderr.write(suffix.tophrase().resolve(scope))
         sys.stderr.write(os.linesep)
 
 @directive
 class Equals:
     name = '='
-    def __call__(self, prefix, suffix, context):
-        context[prefix.topath(context)] = suffix.tophrase()
+    def __call__(self, prefix, suffix, scope):
+        scope[prefix.topath(scope)] = suffix.tophrase()
 
 @directive
 class ColonEquals:
     name = ':='
-    def __call__(self, prefix, suffix, context):
-        path = prefix.topath(context)
-        context[path] = suffix.tophrase().resolve(context.getorcreatesubcontext(path[:-1]))
+    def __call__(self, prefix, suffix, scope):
+        path = prefix.topath(scope)
+        scope[path] = suffix.tophrase().resolve(scope.getorcreatesubcontext(path[:-1]))
 
 @directive
 class PlusEquals:
     name = '+='
-    def __call__(self, prefix, suffix, context):
+    def __call__(self, prefix, suffix, scope):
         phrase = suffix.tophrase()
-        context[prefix.topath(context) + (phrase.unparse(),)] = phrase
+        scope[prefix.topath(scope) + (phrase.unparse(),)] = phrase
 
 @directive
 class Cat:
     name = '<'
-    def __call__(self, prefix, suffix, context):
-        context = context.getorcreatesubcontext(prefix.topath(context))
-        context.resolved('stdout').flush(processtemplate(context, suffix.tophrase()))
+    def __call__(self, prefix, suffix, scope):
+        scope = scope.getorcreatesubcontext(prefix.topath(scope))
+        scope.resolved('stdout').flush(processtemplate(scope, suffix.tophrase()))
 
-def resolvepath(resolvable, context):
-    return resolvable.resolve(context).pathvalue(context) # TODO: Support resources.
+def resolvepath(resolvable, scope):
+    return resolvable.resolve(scope).pathvalue(scope) # TODO: Support resources.
 
-def processtemplate(context, pathresolvable):
-    path = resolvepath(pathresolvable, context)
-    with open(path) as f, context.staticcontext().here.push(Text(os.path.dirname(path))):
-        return processtemplateimpl(context, f)
+def processtemplate(scope, pathresolvable):
+    path = resolvepath(pathresolvable, scope)
+    with open(path) as f, scope.staticcontext().here.push(Text(os.path.dirname(path))):
+        return processtemplateimpl(scope, f)
 
-def processtemplateimpl(context, f):
-    with context.staticcontext().indent.push() as monitor:
-        return Concat(templateparser(f.read()), monitor).resolve(context).cat()
+def processtemplateimpl(scope, f):
+    with scope.staticcontext().indent.push() as monitor:
+        return Concat(templateparser(f.read()), monitor).resolve(scope).cat()

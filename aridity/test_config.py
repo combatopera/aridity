@@ -52,7 +52,7 @@ class TestConfig(TestCase):
         (-c.woo).printf('c = d')
         self.assertEqual(['b', 'd'], list(c.woo))
         self.assertEqual(dict(a = 'b', c = 'd'), dict(-c.woo))
-        self.assertEqual(dict(a = 'b', c = 'd'), (-c.woo).context().unravel())
+        self.assertEqual(dict(a = 'b', c = 'd'), (-c.woo).scope().unravel())
 
     def test_crosschildresolve(self):
         cc = ConfigCtrl()
@@ -92,8 +92,8 @@ class TestConfig(TestCase):
         self.assertEqual('woo', c.D.E.F.A)
         self.assertEqual('woo', c.D.E.F.B.C.A)
 
-    def source(self, context, prefix):
-        context.sourceimpl(prefix, StringIO(self.sourcetext))
+    def source(self, scope, prefix):
+        scope.sourceimpl(prefix, StringIO(self.sourcetext))
 
     def test_appnamelabel(self):
         self.sourcetext = u'n := $label()\nx y = $(n)'
@@ -104,7 +104,7 @@ class TestConfig(TestCase):
     def test_loadlibconfig(self):
         c = ConfigCtrl().loadappconfig((__name__, 'CDEFGAB'), 'test_config/libconf.arid', settingsoptional = True)
         self.assertEqual('response', c.music)
-        self.assertEqual('CDEFGAB', (-c).context().label.scalar)
+        self.assertEqual('CDEFGAB', (-c).scope().label.scalar)
 
     def test_setattr(self):
         cc = ConfigCtrl()
@@ -114,31 +114,31 @@ class TestConfig(TestCase):
         cc.node.s = False
         cc.node.t = None
         cc.node.u = ord
-        obj = cc.context().resolved('p')
+        obj = cc.scope().resolved('p')
         self.assertIs(Text, type(obj))
         self.assertEqual('yay', obj.textvalue)
         self.assertEqual('yay', obj.scalar)
         self.assertEqual('yay', obj.unravel())
-        obj = cc.context().resolved('q')
+        obj = cc.scope().resolved('q')
         self.assertIs(Number, type(obj))
         self.assertEqual(100, obj.numbervalue)
         self.assertEqual(100, obj.scalar)
         self.assertEqual(100, obj.unravel())
-        obj = cc.context().resolved('r')
+        obj = cc.scope().resolved('r')
         self.assertIs(Boolean, type(obj))
         self.assertIs(True, obj.booleanvalue)
         self.assertIs(True, obj.scalar)
         self.assertIs(True, obj.unravel())
-        obj = cc.context().resolved('s')
+        obj = cc.scope().resolved('s')
         self.assertIs(Boolean, type(obj))
         self.assertIs(False, obj.booleanvalue)
         self.assertIs(False, obj.scalar)
         self.assertIs(False, obj.unravel())
-        obj = cc.context().resolved('t')
+        obj = cc.scope().resolved('t')
         self.assertIs(Scalar, type(obj))
         self.assertIs(None, obj.scalar) # No type-specific field.
         self.assertIs(None, obj.unravel())
-        obj = cc.context().resolved('u')
+        obj = cc.scope().resolved('u')
         self.assertIs(Function, type(obj))
         self.assertIs(ord, obj.functionvalue)
         self.assertIs(ord, obj.scalar)
@@ -150,14 +150,14 @@ class TestConfig(TestCase):
         c = cc.node
         self.assertEqual(os.sep, c.a)
         self.assertEqual(os.sep, getattr(c, '/'))
-        obj = cc.context().resolved('/')
+        obj = cc.scope().resolved('/')
         self.assertEqual(os.sep, obj.textvalue)
         self.assertEqual(os.sep, obj.scalar)
         self.assertEqual(os.sep, obj.unravel())
         self.assertNotEqual(os.sep, obj.functionvalue)
         self.assertEqual(Spread.of, c.b)
         self.assertEqual(Spread.of, getattr(c, '*'))
-        obj = cc.context().resolved('*')
+        obj = cc.scope().resolved('*')
         self.assertEqual(Spread.of, obj.functionvalue)
         self.assertEqual(Spread.of, obj.scalar)
         self.assertEqual(Spread.of, obj.unravel())
@@ -200,7 +200,7 @@ class TestConfig(TestCase):
     def test_resourcecwd(self):
         from .context import Resource
         cc = ConfigCtrl()
-        cc.context()['cwd',] = Resource(__name__, 'test_config')
+        cc.scope()['cwd',] = Resource(__name__, 'test_config')
         cc.execute('. chess.arid')
         self.assertEqual('gambit', cc.node.queen)
 

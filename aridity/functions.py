@@ -34,95 +34,95 @@ class OpaqueKey: pass
 
 class Functions:
 
-    def screenstr(context, resolvable):
-        text = resolvable.resolve(context).cat()
+    def screenstr(scope, resolvable):
+        text = resolvable.resolve(scope).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-    def scstr(context, resolvable):
+    def scstr(scope, resolvable):
         'SuperCollider string literal.'
-        text = resolvable.resolve(context).cat()
+        text = resolvable.resolve(scope).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-    def hclstr(context, resolvable):
-        text = resolvable.resolve(context).cat()
+    def hclstr(scope, resolvable):
+        text = resolvable.resolve(scope).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
 
-    def groovystr(context, resolvable):
-        text = resolvable.resolve(context).cat()
+    def groovystr(scope, resolvable):
+        text = resolvable.resolve(scope).cat()
         return Text("'%s'" % text.replace('\\', '\\\\').replace('\n', '\\n').replace("'", "\\'"))
 
-    def pystr(context, resolvable):
-        return Text(repr(resolvable.resolve(context).scalar))
+    def pystr(scope, resolvable):
+        return Text(repr(resolvable.resolve(scope).scalar))
 
-    def shstr(context, resolvable):
-        return Text(shlex.quote(resolvable.resolve(context).cat()))
+    def shstr(scope, resolvable):
+        return Text(shlex.quote(resolvable.resolve(scope).cat()))
 
-    def jsonquote(context, resolvable):
+    def jsonquote(scope, resolvable):
         'Also suitable for YAML.'
-        return Text(json.dumps(resolvable.resolve(context).scalar))
+        return Text(json.dumps(resolvable.resolve(scope).scalar))
 
-    def xmlattr(context, resolvable):
+    def xmlattr(scope, resolvable):
         from xml.sax.saxutils import quoteattr
-        return Text(quoteattr(resolvable.resolve(context).cat())) # TODO: Support booleans.
+        return Text(quoteattr(resolvable.resolve(scope).cat())) # TODO: Support booleans.
 
-    def xmltext(context, resolvable):
+    def xmltext(scope, resolvable):
         'Suggest assigning this to & with xmlattr assigned to " as is convention.'
         from xml.sax.saxutils import escape
-        return Text(escape(resolvable.resolve(context).cat(), xmlentities))
+        return Text(escape(resolvable.resolve(scope).cat(), xmlentities))
 
-    def tomlquote(context, resolvable):
-        return Text(_tomlquote(resolvable.resolve(context).cat()))
+    def tomlquote(scope, resolvable):
+        return Text(_tomlquote(resolvable.resolve(scope).cat()))
 
-    def urlquote(context, resolvable):
+    def urlquote(scope, resolvable):
         from urllib.parse import quote
-        return Text(quote(resolvable.resolve(context).cat(), safe = ''))
+        return Text(quote(resolvable.resolve(scope).cat(), safe = ''))
 
-    def map(context, objsresolvable, *args):
-        objs = objsresolvable.resolve(context)
+    def map(scope, objsresolvable, *args):
+        objs = objsresolvable.resolve(scope)
         if 1 == len(args):
             resolvable, = args
             def g():
                 for k, v in objs.resolvables.items():
-                    c = context.createchild()
-                    c.label = Text(k)
+                    s = scope.createchild()
+                    s.label = Text(k)
                     for i in v.resolvables.items():
-                        c.resolvables.put(*i)
-                    yield k, resolvable.resolve(c)
+                        s.resolvables.put(*i)
+                    yield k, resolvable.resolve(s)
         elif 2 == len(args):
             vname, resolvable = args
-            vname = vname.resolve(context).cat()
+            vname = vname.resolve(scope).cat()
             def g():
                 for k, v in objs.resolvables.items():
-                    c = context.createchild()
-                    c[vname,] = v
-                    yield k, resolvable.resolve(c)
+                    s = scope.createchild()
+                    s[vname,] = v
+                    yield k, resolvable.resolve(s)
         else:
             kname, vname, resolvable = args
-            kname = kname.resolve(context).cat()
-            vname = vname.resolve(context).cat()
+            kname = kname.resolve(scope).cat()
+            vname = vname.resolve(scope).cat()
             def g():
                 for k, v in objs.resolvables.items():
-                    c = context.createchild()
-                    c[kname,] = Text(k)
-                    c[vname,] = v
-                    yield k, resolvable.resolve(c)
-        from .context import Context
-        c = Context(islist = True) # XXX: Really no parent?
+                    s = scope.createchild()
+                    s[kname,] = Text(k)
+                    s[vname,] = v
+                    yield k, resolvable.resolve(s)
+        from .context import Scope
+        s = Scope(islist = True) # XXX: Really no parent?
         for i in g():
-            c.resolvables.put(*i)
-        return c
+            s.resolvables.put(*i)
+        return s
 
-    def label(context):
-        return context.label
+    def label(scope):
+        return scope.label
 
-    def join(context, resolvables, *args):
+    def join(scope, resolvables, *args):
         if args:
             r, = args
-            separator = r.resolve(context).cat()
+            separator = r.resolve(scope).cat()
         else:
             separator = ''
-        c = resolvables.resolve(context)
-        return Text(separator.join(o.cat() for _, o in c.itero()))
+        s = resolvables.resolve(scope)
+        return Text(separator.join(o.cat() for _, o in s.itero()))
 
     def get(*args): return getimpl(*args)
 
@@ -130,17 +130,17 @@ class Functions:
     def get_(*args): return getimpl(*args)
 
     @realname(',') # XXX: Oh yeah?
-    def aslist(context, *resolvables):
-        return context.resolved(*(r.resolve(context).cat() for r in resolvables), **{'aslist': True})
+    def aslist(scope, *resolvables):
+        return scope.resolved(*(r.resolve(scope).cat() for r in resolvables), **{'aslist': True})
 
-    def str(context, resolvable):
-        return resolvable.resolve(context).totext()
+    def str(scope, resolvable):
+        return resolvable.resolve(scope).totext()
 
-    def java(context, resolvable):
-        return resolvable.resolve(context).tojava()
+    def java(scope, resolvable):
+        return resolvable.resolve(scope).tojava()
 
-    def list(context, *resolvables):
-        v = context.createchild(islist = True)
+    def list(scope, *resolvables):
+        v = scope.createchild(islist = True)
         for r in resolvables:
             try:
                 keyfunction = r.unparse
@@ -151,71 +151,71 @@ class Functions:
             v[key,] = r
         return v
 
-    def fork(context):
-        return context.createchild()
+    def fork(scope):
+        return scope.createchild()
 
     @realname('try')
-    def try_(context, *resolvables):
+    def try_(scope, *resolvables):
         for r in resolvables[:-1]:
             try:
-                return r.resolve(context)
+                return r.resolve(scope)
             except NoSuchPathException:
                 pass # XXX: Log it at a fine level?
-        return resolvables[-1].resolve(context)
+        return resolvables[-1].resolve(scope)
 
-    def mul(context, *resolvables):
+    def mul(scope, *resolvables):
         x = 1
         for r in resolvables:
-            x *= r.resolve(context).scalar
+            x *= r.resolve(scope).scalar
         return Number(x)
 
-    def div(context, r, *resolvables):
-        x = r.resolve(context).scalar
+    def div(scope, r, *resolvables):
+        x = r.resolve(scope).scalar
         for r in resolvables:
-            x /= r.resolve(context).scalar
+            x /= r.resolve(scope).scalar
         return Number(x)
 
-    def repr(context, resolvable):
-        return Text(repr(resolvable.resolve(context).unravel()))
+    def repr(scope, resolvable):
+        return Text(repr(resolvable.resolve(scope).unravel()))
 
     @realname('./')
-    def hereslash(context, *resolvables):
-        return context.resolved('here').slash((r.resolve(context).cat() for r in resolvables), False)
+    def hereslash(scope, *resolvables):
+        return scope.resolved('here').slash((r.resolve(scope).cat() for r in resolvables), False)
 
-    def readfile(context, resolvable):
-        with open(resolvepath(resolvable, context)) as f:
+    def readfile(scope, resolvable):
+        with open(resolvepath(resolvable, scope)) as f:
             return Text(f.read())
 
-    def processtemplate(context, resolvable):
-        return Text(processtemplate(context, resolvable))
+    def processtemplate(scope, resolvable):
+        return Text(processtemplate(scope, resolvable))
 
-    def lower(context, resolvable):
-        return Text(resolvable.resolve(context).cat().lower())
+    def lower(scope, resolvable):
+        return Text(resolvable.resolve(scope).cat().lower())
 
-    def pyref(context, moduleresolvable, qualnameresolvable):
-        pyobj = import_module(moduleresolvable.resolve(context).cat())
-        for name in qualnameresolvable.resolve(context).cat().split('.'):
+    def pyref(scope, moduleresolvable, qualnameresolvable):
+        pyobj = import_module(moduleresolvable.resolve(scope).cat())
+        for name in qualnameresolvable.resolve(scope).cat().split('.'):
             pyobj = getattr(pyobj, name)
         return wrap(pyobj)
 
     @realname('\N{NOT SIGN}')
-    def not_(context, resolvable):
-        return Boolean(not resolvable.resolve(context).truth())
+    def not_(scope, resolvable):
+        return Boolean(not resolvable.resolve(scope).truth())
 
 class Spread:
 
     @classmethod
-    def of(cls, context, resolvable):
-        return cls(resolvable.resolve(context))
+    def of(cls, scope, resolvable):
+        return cls(resolvable.resolve(scope))
 
-    def __init__(self, context):
-        self.context = context
+    def __init__(self, scope):
+        self.scope = scope
 
     def spread(self, _):
-        return self.context.itero() # XXX: Or just the resolvables?
+        return self.scope.itero() # XXX: Or just the resolvables?
 
-def getimpl(context, *resolvables):
-    return context.resolved(*(r.resolve(context).cat() for r in resolvables))
+def getimpl(scope, *resolvables):
+    return scope.resolved(*(r.resolve(scope).cat() for r in resolvables))
 
 def getfunctions():
     return allfunctions(Functions)

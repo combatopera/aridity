@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
-from .context import Context
+from .context import Scope
 from .repl import Repl
 from .util import openresource
 from tempfile import NamedTemporaryFile
@@ -91,22 +91,22 @@ class TestDirectives(TestCase):
     def test_starishidden(self):
         c = ConfigCtrl().node
         (-c).printf('x * y = z')
-        self.assertEqual({}, (-c.x).context().unravel())
+        self.assertEqual({}, (-c.x).scope().unravel())
         self.assertEqual([], list(-c.x))
         (-c).printf('x a = b')
-        self.assertEqual(dict(a = 'b'), (-c.x).context().unravel())
+        self.assertEqual(dict(a = 'b'), (-c.x).scope().unravel())
         self.assertEqual([('a', 'b')], list(-c.x))
         (-c).printf('x p q = r')
-        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (-c.x).context().unravel())
+        self.assertEqual(dict(a = 'b', p = dict(q = 'r', y = 'z')), (-c.x).scope().unravel())
 
     def test_nesteddynamicinclude(self):
-        c = Context()
-        with NamedTemporaryFile('w') as f, Repl(c) as repl:
+        s = Scope()
+        with NamedTemporaryFile('w') as f, Repl(s) as repl:
             f.write('woo = yay')
             f.flush()
             repl.printf("app confpath = %s", f.name)
             repl('app . $(confpath)')
-        self.assertEqual('yay', c.resolved('app', 'woo').textvalue)
+        self.assertEqual('yay', s.resolved('app', 'woo').textvalue)
 
     def test_merge(self):
         class Ctrl(ConfigCtrl):
@@ -122,7 +122,7 @@ class TestDirectives(TestCase):
         self.assertEqual('appreq1', c.required.one)
         with self.assertRaises(AttributeError):
             c.required.two
-        self.assertEqual('app', (-c).context().label.scalar)
+        self.assertEqual('app', (-c).scope().label.scalar)
         self.assertEqual(50, c.relref)
         self.assertEqual(100, c.absref)
         c = (-Ctrl().loadappconfig((__name__, 'app'), 'test_directives/merge/altconf.arid')).reapplysettings('alt')
@@ -133,6 +133,6 @@ class TestDirectives(TestCase):
             c.required.zero
         self.assertEqual('appreq1', c.required.one)
         self.assertEqual('altreq2', c.required.two)
-        self.assertEqual('alt', (-c).context().label.scalar)
+        self.assertEqual('alt', (-c).scope().label.scalar)
         self.assertEqual(70, c.relref)
         self.assertEqual(110, c.absref)

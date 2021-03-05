@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context
+from .context import Scope
 from .model import Entry
 import os, sys
 
@@ -30,6 +30,6 @@ def _configpath(configname):
 
 def main_arid_config():
     'Print given config (with optional path in config) as shell snippet.'
-    context = Context()
-    context.source(Entry([]), _configpath(sys.argv[1]))
-    sys.stdout.write(context.resolved(*sys.argv[2:]).tobash(True))
+    scope = Scope()
+    scope.source(Entry([]), _configpath(sys.argv[1]))
+    sys.stdout.write(scope.resolved(*sys.argv[2:]).tobash(True))

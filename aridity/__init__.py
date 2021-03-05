@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .context import Context
+from .context import Scope
 from .model import Stream
 from .repl import Repl
 from .util import NoSuchPathException
@@ -26,8 +26,8 @@ assert NoSuchPathException
 
 def main_aridity():
     'Interactive REPL.'
-    context = Context()
-    context['stdout',] = Stream(sys.stdout)
-    with Repl(context, True) as repl:
+    scope = Scope()
+    scope['stdout',] = Stream(sys.stdout)
+    with Repl(scope, True) as repl:
         for line in sys.stdin:
             repl(line)

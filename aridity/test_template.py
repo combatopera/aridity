@@ -15,21 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context
+from .context import Scope
 from .directives import processtemplate
 from .model import Function, Text
 from .repl import Repl
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
-def _blockquote(context, resolvable):
-    indent = context.resolved('indent').scalar
-    return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(context).scalar.splitlines(True))))
+def _blockquote(scope, resolvable):
+    indent = scope.resolved('indent').scalar
+    return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(scope).scalar.splitlines(True))))
 
 class TestTemplate(TestCase):
 
     def test_indentworks(self):
-        c = Context()
+        s = Scope()
         with NamedTemporaryFile('w') as f:
             f.write('root: .$(indent).\n')
             f.write(' sp: .$(indent).\n')
@@ -44,19 +44,19 @@ class TestTemplate(TestCase):
 \ttab: .\t.
 \t mixed: .\t .
 \t\t compound: .\t\t .
-''', processtemplate(c, Text(f.name)))
+''', processtemplate(s, Text(f.name)))
 
     def test_trivialindent(self):
-        c = Context()
+        s = Scope()
         with NamedTemporaryFile('w') as f:
             f.write('$(indent) should not fail')
             f.flush()
-            self.assertEqual(' should not fail', processtemplate(c, Text(f.name)))
+            self.assertEqual(' should not fail', processtemplate(s, Text(f.name)))
 
     def test_getindentinfunction(self):
-        c = Context()
-        c['"',] = Function(_blockquote)
-        with Repl(c) as repl:
+        s = Scope()
+        s['"',] = Function(_blockquote)
+        with Repl(s) as repl:
             repl('block = $.(z\ny\nx\n)') # XXX: Is this sane?
         with NamedTemporaryFile('w') as f:
             f.write('  hmm: $"$(block)\n')
@@ -65,4 +65,4 @@ class TestTemplate(TestCase):
   y
   x
 
-''', processtemplate(c, Text(f.name)))
+''', processtemplate(s, Text(f.name)))

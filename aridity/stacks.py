@@ -26,8 +26,8 @@ class ThreadLocalResolvable(Resolvable):
         self.threadlocals = threadlocals
         self.name = name
 
-    def resolve(self, context):
-        return getattr(self.threadlocals, self.name).resolve(context)
+    def resolve(self, scope):
+        return getattr(self.threadlocals, self.name).resolve(scope)
 
 class Stack:
 
@@ -54,7 +54,7 @@ class SimpleStack(Stack):
     def push(self, value):
         return self.pushimpl(value)
 
-    def resolve(self, context):
+    def resolve(self, scope):
         return self.head()
 
 class IndentStack(Stack):
@@ -80,5 +80,5 @@ class IndentStack(Stack):
     def push(self):
         return self.pushimpl(self.Monitor())
 
-    def resolve(self, context):
+    def resolve(self, scope):
         return self.head().indent()

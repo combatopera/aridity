@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
-from .context import Context
+from .context import Scope
 from .repl import Repl
 from .util import ispy2, openresource, OrderedSet, TreeNoSuchPathException
 from unittest import TestCase
@@ -35,15 +35,15 @@ class TestUtil(TestCase):
         self.assertEqual([2, 1, 0], list(s)) # Order unchanged.
 
     def test_treeexceptionstr(self):
-        c = Context()
-        with Repl(c) as repl:
+        s = Scope()
+        with Repl(s) as repl:
             repl.printf('broken = $(void)')
             repl.printf('woo = $(broken)')
         with self.assertRaises(TreeNoSuchPathException) as cm:
-            c.resolved('broken')
+            s.resolved('broken')
         self.assertEqual('broken\n2x void', str(cm.exception))
         with self.assertRaises(TreeNoSuchPathException) as cm:
-            c.resolved('woo')
+            s.resolved('woo')
         self.assertEqual('woo\n1x broken\n    2x void\n1x broken', str(cm.exception))
 
     def test_treeexceptionstr2(self):

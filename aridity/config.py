@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context, Resource
+from .context import Scope, Resource
 from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
@@ -48,9 +48,9 @@ class ConfigCtrl:
     def _of(cls, *args, **kwargs):
         return cls(*args, **kwargs)
 
-    def __init__(self, basecontext = None, prefix = None):
+    def __init__(self, basescope = None, prefix = None):
         self.node = _newnode(self)
-        self.basecontext = Context() if basecontext is None else basecontext
+        self.basescope = Scope() if basescope is None else basescope
         self.prefix = [] if prefix is None else prefix
 
     def loadappconfig(self, mainfunction, moduleresource, encoding = 'ascii', settingsoptional = False):
@@ -68,7 +68,7 @@ class ConfigCtrl:
         return appconfig
 
     def _loadappconfig(self, appname, resource):
-        resource.source(self.basecontext.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
+        resource.source(self.basescope.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
     def reapplysettings(self, mainfunction):
@@ -76,27 +76,27 @@ class ConfigCtrl:
             appname = mainfunction
         else:
             _, appname = _processmainfunction(mainfunction)
-        c = self.context(True).duplicate()
-        c.label = Text(appname)
-        c.parent[appname,] = c
-        parent = self._of(c.parent)
+        s = self.scope(True).duplicate()
+        s.label = Text(appname)
+        s.parent[appname,] = s
+        parent = self._of(s.parent)
         parent.loadsettings()
         return getattr(parent.node, appname)
 
     def printf(self, template, *args):
-        with Repl(self.basecontext) as repl:
+        with Repl(self.basescope) as repl:
             repl.printf(''.join(chain(("%s " for _ in self.prefix), [template])), *chain(self.prefix, args))
 
     def load(self, pathorstream):
-        c = self.context(True)
-        (c.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else c.source)(Entry([]), pathorstream)
+        s = self.scope(True)
+        (s.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else s.source)(Entry([]), pathorstream)
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
 
     def repl(self):
         assert not self.prefix # XXX: Support prefix?
-        return Repl(self.basecontext)
+        return Repl(self.basescope)
 
     def execute(self, text):
         with self.repl() as repl:
@@ -117,29 +117,29 @@ class ConfigCtrl:
                     pass
         # XXX: Support combination of types e.g. slash is both function and text?
         factory, = (partial(t, v) for t, v in pairs())
-        self.basecontext[tuple(self.prefix) + path] = factory()
+        self.basescope[tuple(self.prefix) + path] = factory()
 
-    def context(self, strict = False):
+    def scope(self, strict = False):
         if strict:
-            c = self.basecontext.resolvedcontextornone(self.prefix)
-            if c is None:
+            s = self.basescope.resolvedcontextornone(self.prefix)
+            if s is None:
                 raise ForeignScopeException
-            return c
-        return self.basecontext.resolved(*self.prefix) # TODO: Test what happens if it changes.
+            return s
+        return self.basescope.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
     def __iter__(self): # TODO: Add API to get keys without resolving values.
-        for k, o in self.context().itero():
+        for k, o in self.scope().itero():
             try:
                 yield k, o.scalar
             except AttributeError:
-                yield k, self._of(self.basecontext, self.prefix + [k]).node
+                yield k, self._of(self.basescope, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
-        c = self.context()
+        s = self.scope()
         if getattr(frompathorstream, 'readable', lambda: False)():
-            text = processtemplateimpl(c, frompathorstream)
+            text = processtemplateimpl(s, frompathorstream)
         else:
-            text = processtemplate(c, Text(frompathorstream))
+            text = processtemplate(s, Text(frompathorstream))
         if getattr(topathorstream, 'writable', lambda: False)():
             topathorstream.write(text)
         else:
@@ -147,10 +147,10 @@ class ConfigCtrl:
                 g.write(text)
 
     def freectrl(self):
-        return self._of(self.context()) # XXX: Strict?
+        return self._of(self.scope()) # XXX: Strict?
 
     def childctrl(self):
-        return self._of(self.context(True).createchild())
+        return self._of(self.scope(True).createchild())
 
 class Config(object):
 
@@ -158,13 +158,13 @@ class Config(object):
         ctrl = ctrls[self]
         path = ctrl.prefix + [name]
         try:
-            obj = ctrl.basecontext.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
+            obj = ctrl.basescope.resolved(*path) # TODO LATER: Guidance for how lazy non-scalars should be in this situation.
         except (CycleException, NoSuchPathException): # XXX: Should this really translate CycleException?
             raise AttributeError(' '.join(path))
         try:
             return obj.scalar
         except AttributeError:
-            return ctrl._of(ctrl.basecontext, path).node
+            return ctrl._of(ctrl.basescope, path).node
 
     def __iter__(self):
         for _, o in ctrls[self]:
@@ -174,4 +174,4 @@ class Config(object):
         return ctrls[self]
 
     def __setattr__(self, name, value):
-        ctrls[self].context(True)[name,] = wrap(value)
+        ctrls[self].scope(True)[name,] = wrap(value)

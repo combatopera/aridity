@@ -32,7 +32,7 @@ class Resolvables:
 
     def _proto(self):
         revpath = []
-        c = self.context
+        c = self.scope
         while c.parent is not None:
             try:
                 protoc = c.parent.resolvables.d[Star.protokey]
@@ -53,9 +53,9 @@ class Resolvables:
             c = c.parent
         return {}
 
-    def __init__(self, context):
+    def __init__(self, scope):
         self.d = collections.OrderedDict()
-        self.context = context
+        self.scope = scope
 
     def put(self, key, resolvable):
         self.d[key] = resolvable
@@ -67,7 +67,7 @@ class Resolvables:
             pass
         obj = self._proto().get(key)
         # FIXME LATER: Reads should be thread-safe, only create child if we're about to put something in it.
-        return self.context._putchild(key) if hasattr(obj, 'resolvables') else obj
+        return self.scope._putchild(key) if hasattr(obj, 'resolvables') else obj
 
     def items(self):
         for k, v in self.d.items():
@@ -78,7 +78,7 @@ class Resolvables:
                 yield k, v
 
 # XXX: Isn't this Resolved rather than Resolvable?
-class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Context.
+class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Scope.
 
     nametypes = {str, type(None), OpaqueKey} # XXX: Is None still used by anything?
     try:
@@ -109,7 +109,7 @@ class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be
 
     def _putchild(self, key):
         child = self.createchild()
-        # XXX: Deduce label to allow same Context in multiple trees?
+        # XXX: Deduce label to allow same Scope in multiple trees?
         child.label = Text(key) # TODO: Not necessarily str.
         self.resolvables.put(key, child)
         return child
@@ -278,9 +278,9 @@ class Resource(Resolved):
     def slash(self, words, rstrip):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
 
-    def source(self, context, prefix):
-        with context.staticcontext().here.push(self.slash([], True)), self.open() as f:
-            context.sourceimpl(prefix, f)
+    def source(self, scope, prefix):
+        with scope.staticcontext().here.push(self.slash([], True)), self.open() as f:
+            scope.sourceimpl(prefix, f)
 
 class StaticContext(AbstractContext):
 
@@ -312,7 +312,7 @@ class StaticContext(AbstractContext):
             return stack
 
     def createchild(self, **kwargs):
-        return Context(self, **kwargs)
+        return Scope(self, **kwargs)
 
 class Slash(Text, Function):
 
@@ -320,10 +320,10 @@ class Slash(Text, Function):
         Text.__init__(self, os.sep)
         Function.__init__(self, slashfunction)
 
-def slashfunction(context, *resolvables):
+def slashfunction(scope, *resolvables):
     path = None
     for r in reversed(resolvables):
-        component = r.resolve(context).cat()
+        component = r.resolve(scope).cat()
         path = component if path is None else os.path.join(component, path)
         if os.path.isabs(path):
             break
@@ -338,18 +338,18 @@ class Star(Function, Directive):
         Function.__init__(self, Spread.of)
         Directive.__init__(self, self.star)
 
-    def star(self, prefix, suffix, context):
-        context.getorcreatesubcontext(prefix.topath(context) + (self.protokey,)).execute(suffix)
+    def star(self, prefix, suffix, scope):
+        scope.getorcreatesubcontext(prefix.topath(scope) + (self.protokey,)).execute(suffix)
 
 StaticContext = StaticContext()
 
-class Context(AbstractContext):
+class Scope(AbstractContext):
 
     def __init__(self, parent = StaticContext, islist = False):
-        super(Context, self).__init__(parent)
+        super(Scope, self).__init__(parent)
         self.islist = islist
 
-    def resolve(self, context):
+    def resolve(self, scope):
         return self
 
     def createchild(self, **kwargs):

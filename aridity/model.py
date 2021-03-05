@@ -37,12 +37,12 @@ class Struct(object):
 
 class Resolvable(Struct):
 
-    def resolve(self, context):
+    def resolve(self, scope):
         raise NotImplementedError
 
 class Resolved(Resolvable):
 
-    def resolve(self, context, aslist = False):
+    def resolve(self, scope, aslist = False):
         return List([self]) if aslist else self
 
     def spread(self, k): # TODO: Probably makes more sense on SimpleValue, which more things should extend.
@@ -68,12 +68,12 @@ class Concat(Resolvable):
         self.parts = parts
         self.monitor = monitor
 
-    def resolve(self, context, aslist = False):
+    def resolve(self, scope, aslist = False):
         if aslist:
-            return List([part.resolve(context) for part in self.parts if not part.ignorable])
+            return List([part.resolve(scope) for part in self.parts if not part.ignorable])
         def g():
             for part in self.parts:
-                text = part.resolve(context).cat()
+                text = part.resolve(scope).cat()
                 yield text
                 self.monitor(text)
         return Text(''.join(g()))
@@ -158,14 +158,14 @@ class Text(Cat, BaseScalar):
     def slash(self, words, rstrip):
         return self._of(os.path.join(os.path.dirname(self.textvalue) if rstrip else self.textvalue, *words))
 
-    def pathvalue(self, context):
-        return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(context.resolved('cwd').cat(), self.textvalue)
+    def pathvalue(self, scope):
+        return self.textvalue if os.path.isabs(self.textvalue) else os.path.join(scope.resolved('cwd').cat(), self.textvalue)
 
-    def source(self, context, prefix):
+    def source(self, scope, prefix):
         if os.path.isabs(self.textvalue):
-            context.source(prefix, self.textvalue)
+            scope.source(prefix, self.textvalue)
         else:
-            context.resolved('cwd').slash([self.textvalue], False).source(context, prefix)
+            scope.resolved('cwd').slash([self.textvalue], False).source(scope, prefix)
 
 class Binary(BaseScalar):
 
@@ -229,10 +229,10 @@ class Call(Resolvable):
         self.args = args
         self.brackets = brackets
 
-    def resolve(self, context, aslist = False):
+    def resolve(self, scope, aslist = False):
         args = [a for a in self.args if not a.ignorable]
         for name in reversed(self.name.split('$')):
-            args = [context.resolved(name)(*[context] + args)]
+            args = [scope.resolved(name)(*[scope] + args)]
         result, = args
         return List([result]) if aslist else result
 
@@ -243,11 +243,11 @@ class Call(Resolvable):
         return self.unparse()
 
 def List(objs):
-    from .context import Context
-    c = Context(islist = True)
+    from .context import Scope
+    s = Scope(islist = True)
     for obj in objs:
-        c.resolvables.put(object(), obj)
-    return c
+        s.resolvables.put(object(), obj)
+    return s
 
 class Directive(Resolved):
 
@@ -310,8 +310,8 @@ class Entry(Struct):
     def words(self):
         return [r for r in self.resolvables if not r.ignorable]
 
-    def topath(self, context):
-        return tuple((None if self.wildcard == r else r.resolve(context).totext().cat()) for r in self.resolvables if not r.ignorable)
+    def topath(self, scope):
+        return tuple((None if self.wildcard == r else r.resolve(scope).totext().cat()) for r in self.resolvables if not r.ignorable)
 
     def subentry(self, i, j):
         v = list(self.resolvables)

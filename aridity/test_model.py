@@ -15,49 +15,49 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+from .context import Scope
 from .grammar import expressionparser as p
 from .model import Text, Call, Blank, Concat, Number, Function
-from .context import Context
 from .util import allfunctions
+from unittest import TestCase
 
 class Functions:
 
-    def a(context):
+    def a(scope):
         return Text('A')
 
-    def ac(context, x):
-        return Text('ac.' + x.resolve(context).cat())
+    def ac(scope, x):
+        return Text('ac.' + x.resolve(scope).cat())
 
-    def id(context, x):
+    def id(scope, x):
         return x
 
-    def act(context, x, y):
-        return Text('act.' + x.resolve(context).cat() + '.' + y.resolve(context).cat())
+    def act(scope, x, y):
+        return Text('act.' + x.resolve(scope).cat() + '.' + y.resolve(scope).cat())
 
-class TestModel(unittest.TestCase):
+class TestModel(TestCase):
 
     def test_resolve(self):
-        c = Context()
+        s = Scope()
         for name, f in allfunctions(Functions):
             if name in ('a', 'ac', 'act', 'id'):
-                c[name,] = Function(f)
-        c['minus124',] = Number(-124)
-        c['minus124txt',] = Text('minus124')
-        c['gett',], = p('$($.())')
+                s[name,] = Function(f)
+        s['minus124',] = Number(-124)
+        s['minus124txt',] = Text('minus124')
+        s['gett',], = p('$($.())')
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
-        ae(Text('A'), Call('a', []).resolve(c))
-        ae(Text('A'), Call('a', [Blank('   ')]).resolve(c))
-        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(c))
-        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(c))
-        ae(Number(-123), Call('id', [Number(-123)]).resolve(c))
-        ae(Number(-124), Call('', [Text('minus124')]).resolve(c))
-        ae(Number(-124), Call('gett', [Text('minus124')]).resolve(c))
-        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(c))
-        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(c))
-        ae(Number(-124), Call('', [Call('', [Text('minus124txt')])]).resolve(c))
+        ae(Text('A'), Call('a', []).resolve(s))
+        ae(Text('A'), Call('a', [Blank('   ')]).resolve(s))
+        ae(Text('ac.woo'), Call('ac', [Blank('\t'), Text('woo')]).resolve(s))
+        ae(Text('act.woo.yay'), Call('act', [Text('woo'), Blank(' '), Text('yay')]).resolve(s))
+        ae(Number(-123), Call('id', [Number(-123)]).resolve(s))
+        ae(Number(-124), Call('', [Text('minus124')]).resolve(s))
+        ae(Number(-124), Call('gett', [Text('minus124')]).resolve(s))
+        ae(Text('ac.A'), Call('ac', [Call('a', [])]).resolve(s))
+        ae(Text('xy'), Concat([Text('x'), Text('y')]).resolve(s))
+        ae(Number(-124), Call('', [Call('', [Text('minus124txt')])]).resolve(s))
 
     def test_emptyliteral(self):
         self.assertEqual([Text('')], p("$'()"))
@@ -65,18 +65,18 @@ class TestModel(unittest.TestCase):
 
     def test_passresolve(self):
         ae = self.assertEqual
-        c = Context()
+        s = Scope()
         for name, f in allfunctions(Functions):
             if name in ('act',):
-                c[name,] = Function(f)
-        ae(Text('act.x. y\t'), Concat(p('$act(x $.[ y\t])')).resolve(c))
-        ae(Text('act.x. '), Concat(p('$act(x $.( ))')).resolve(c))
-        ae(Text(' 100'), Concat(p('$.( 100)')).resolve(c))
+                s[name,] = Function(f)
+        ae(Text('act.x. y\t'), Concat(p('$act(x $.[ y\t])')).resolve(s))
+        ae(Text('act.x. '), Concat(p('$act(x $.( ))')).resolve(s))
+        ae(Text(' 100'), Concat(p('$.( 100)')).resolve(s))
 
     def test_map(self): # TODO: Also test 2-arg form.
         call, = p('$map($list(a b 0) x $(x)2)')
-        self.assertEqual([Text('a2'), Text('b2'), Text('02')], [v for _, v in call.resolve(Context()).resolvables.items()])
+        self.assertEqual([Text('a2'), Text('b2'), Text('02')], [v for _, v in call.resolve(Scope()).resolvables.items()])
 
     def test_join(self):
         call, = p('$join($list(a bb ccc) -)')
-        self.assertEqual(Text('a-bb-ccc'), call.resolve(Context()))
+        self.assertEqual(Text('a-bb-ccc'), call.resolve(Scope()))

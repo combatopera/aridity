@@ -15,17 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Context
+from .context import Scope
 from .repl import MalformedEntryException, NoSuchIndentException, Repl
 from .util import UnsupportedEntryException
 from decimal import Decimal
-import unittest
+from unittest import TestCase
 
-class TestRepl(unittest.TestCase):
+class TestRepl(TestCase):
 
     def test_indent(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl('namespace')
             repl('  woo = 1')
             repl('  yay = 2')
@@ -36,14 +36,14 @@ class TestRepl(unittest.TestCase):
             repl(' \tyay = z')
             repl(' houpla = w')
         ae = self.assertEqual
-        ae({'woo': 1, 'yay': 2}, context.resolved('namespace').unravel())
-        ae({'woo': {'yay': 'x'}}, context.resolved('ns2').unravel())
-        ae({'yay': 'z'}, context.resolved('ns3', 'woo').unravel())
-        ae({'woo': {'yay': 'z'}, 'houpla': 'w'}, context.resolved('ns3').unravel())
+        ae({'woo': 1, 'yay': 2}, scope.resolved('namespace').unravel())
+        ae({'woo': {'yay': 'x'}}, scope.resolved('ns2').unravel())
+        ae({'yay': 'z'}, scope.resolved('ns3', 'woo').unravel())
+        ae({'woo': {'yay': 'z'}, 'houpla': 'w'}, scope.resolved('ns3').unravel())
 
     def test_nosuchindent(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl('ns')
             repl('  x')
             repl('    x2 = y2')
@@ -53,22 +53,22 @@ class TestRepl(unittest.TestCase):
                 repl('  uh = oh')
 
     def test_unusedprefix(self):
-        context = Context()
+        scope = Scope()
         with self.assertRaises(UnsupportedEntryException):
-            with Repl(context) as repl:
+            with Repl(scope) as repl:
                 repl('prefix')
 
     def test_multilineprefix(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl('name$.(\n')
             repl('  space)')
             repl(' woo = yay')
-        self.assertEqual({'woo': 'yay'}, context.resolved('name\n  space').unravel())
+        self.assertEqual({'woo': 'yay'}, scope.resolved('name\n  space').unravel())
 
     def test_badindent(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl('ns')
             repl('  ns2')
             with self.assertRaises(UnsupportedEntryException):
@@ -76,8 +76,8 @@ class TestRepl(unittest.TestCase):
             repl('   woo = yay')
 
     def test_badindent2(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl('ns')
             repl('\tns2')
             with self.assertRaises(MalformedEntryException):
@@ -85,8 +85,8 @@ class TestRepl(unittest.TestCase):
             repl('\t woo = yay')
 
     def test_printf(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl.printf("val = %s", 100)
             repl.printf("val2 = %s", .34)
             repl.printf("text = %s", 'hello')
@@ -94,17 +94,17 @@ class TestRepl(unittest.TestCase):
             repl.printf("dot = %s", '.')
             repl.printf("eq 0 als = %s", '=')
             repl.printf("path = $(eq %s %s)", 0, 'als')
-        self.assertEqual(100, context.resolved('val').scalar)
-        self.assertEqual(Decimal('.34'), context.resolved('val2').scalar)
-        self.assertEqual('hello', context.resolved('text').scalar)
-        self.assertEqual('', context.resolved('empty').scalar)
-        self.assertEqual('.', context.resolved('dot').scalar)
-        self.assertEqual('=', context.resolved('eq', '0', 'als').scalar)
-        self.assertEqual('=', context.resolved('path').scalar)
-        self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, context.unravel())
+        self.assertEqual(100, scope.resolved('val').scalar)
+        self.assertEqual(Decimal('.34'), scope.resolved('val2').scalar)
+        self.assertEqual('hello', scope.resolved('text').scalar)
+        self.assertEqual('', scope.resolved('empty').scalar)
+        self.assertEqual('.', scope.resolved('dot').scalar)
+        self.assertEqual('=', scope.resolved('eq', '0', 'als').scalar)
+        self.assertEqual('=', scope.resolved('path').scalar)
+        self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, scope.unravel())
 
     def test_printfbool(self):
-        c = Context()
+        c = Scope()
         with Repl(c) as repl:
             repl.printf("zero = %s", 0)
             repl.printf("one = %s", 1)
@@ -124,34 +124,34 @@ class TestRepl(unittest.TestCase):
             from pathlib import Path
         except ImportError:
             return
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl.printf("ddot = %s", Path('..'))
             repl.printf("dot = %s", Path('.'))
         # XXX: Preserve type?
-        self.assertEqual('..', context.resolved('ddot').scalar)
-        self.assertEqual('.', context.resolved('dot').scalar)
+        self.assertEqual('..', scope.resolved('ddot').scalar)
+        self.assertEqual('.', scope.resolved('dot').scalar)
 
     def test_printf2(self):
         a = ' hello\nthere\ragain\t'
         b = ' \nhello\n\rthere\r\nagain \t'
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl.printf("a = %s", a)
             repl.printf("b = %s", b)
-        self.assertEqual(a, context.resolved('a').scalar)
-        self.assertEqual(b, context.resolved('b').scalar)
+        self.assertEqual(a, scope.resolved('a').scalar)
+        self.assertEqual(b, scope.resolved('b').scalar)
 
     def test_printf3(self):
-        context = Context()
-        with Repl(context) as repl:
+        scope = Scope()
+        with Repl(scope) as repl:
             repl.printf("a = %s", 'x)y')
             repl.printf("b = %s", 'x]y')
-        self.assertEqual('x)y', context.resolved('a').scalar)
-        self.assertEqual('x]y', context.resolved('b').scalar)
+        self.assertEqual('x)y', scope.resolved('a').scalar)
+        self.assertEqual('x]y', scope.resolved('b').scalar)
 
     def test_printfbadliteral(self):
-        c = Context()
+        c = Scope()
         with self.assertRaises(TypeError), Repl(c) as repl:
             repl.printf('template = %s')
         with Repl(c) as repl:

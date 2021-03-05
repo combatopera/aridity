@@ -121,7 +121,7 @@ no problem = $(this path will get a value later)
 : If your use-case demands it, you can force eager evaluation:
 bar even if foo changes later := $(foo)
 
-: When evaluating a path the local context is examined first, then its parents if path not found:
+: When evaluating a path the local scope is examined first, then its parents if path not found:
 host
     short path = nope
     guest short path = yep
