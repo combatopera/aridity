@@ -104,20 +104,20 @@ class TestRepl(TestCase):
         self.assertEqual({'val': 100, 'val2': Decimal('.34'), 'text': 'hello', 'empty': '', 'dot': '.', 'eq': {'0': {'als': '='}}, 'path': '='}, scope.unravel())
 
     def test_printfbool(self):
-        c = Scope()
-        with Repl(c) as repl:
+        s = Scope()
+        with Repl(s) as repl:
             repl.printf("zero = %s", 0)
             repl.printf("one = %s", 1)
             repl.printf("f = %s", False)
             repl.printf("t = %s", True)
-        zero = c.resolved('zero').scalar
+        zero = s.resolved('zero').scalar
         self.assertEqual(0, zero)
         self.assertIsNot(False, zero)
-        one =  c.resolved('one').scalar
+        one =  s.resolved('one').scalar
         self.assertEqual(1, one)
         self.assertIsNot(True, one)
-        self.assertIs(False, c.resolved('f').scalar)
-        self.assertIs(True, c.resolved('t').scalar)
+        self.assertIs(False, s.resolved('f').scalar)
+        self.assertIs(True, s.resolved('t').scalar)
 
     def test_printfpath(self):
         try:
@@ -151,9 +151,9 @@ class TestRepl(TestCase):
         self.assertEqual('x]y', scope.resolved('b').scalar)
 
     def test_printfbadliteral(self):
-        c = Scope()
-        with self.assertRaises(TypeError), Repl(c) as repl:
+        s = Scope()
+        with self.assertRaises(TypeError), Repl(s) as repl:
             repl.printf('template = %s')
-        with Repl(c) as repl:
+        with Repl(s) as repl:
             repl.printf('template = %%s')
-        self.assertEqual('%s', c.resolved('template').scalar)
+        self.assertEqual('%s', s.resolved('template').scalar)

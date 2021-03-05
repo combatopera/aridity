@@ -62,10 +62,10 @@ class Source:
         # XXX: Use full algo to get phrasescope?
         phrasescope = scope
         for word in prefix.topath(scope):
-            c = phrasescope.resolvedscopeornone([word])
-            if c is None:
+            s = phrasescope.resolvedscopeornone([word])
+            if s is None:
                 break
-            phrasescope = c
+            phrasescope = s
         suffix.tophrase().resolve(phrasescope).source(scope, prefix)
 
 @directive

@@ -32,10 +32,10 @@ class Resolvables:
 
     def _proto(self):
         revpath = []
-        c = self.scope
-        while c.parent is not None:
+        s = self.scope
+        while s.parent is not None:
             try:
-                protoc = c.parent.resolvables.d[Star.protokey]
+                protoc = s.parent.resolvables.d[Star.protokey]
             except KeyError:
                 pass
             else:
@@ -46,11 +46,11 @@ class Resolvables:
                     break
                 return protoc.resolvables.d
             try:
-                keyobj = c.label
+                keyobj = s.label
             except AttributeError:
                 break
             revpath.append(keyobj.scalar)
-            c = c.parent
+            s = s.parent
         return {}
 
     def __init__(self, scope):
@@ -115,7 +115,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return child
 
     def duplicate(self):
-        c = self.parent.createchild()
+        s = self.parent.createchild()
         for k, v in self.resolvables.items():
             try:
                 d = v.duplicate
@@ -124,8 +124,8 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             else:
                 v = d()
                 v.label = Text(k)
-            c.resolvables.put(k, v)
-        return c
+            s.resolvables.put(k, v)
+        return s
 
     def resolved(self, *path, **kwargs):
         try:
@@ -141,15 +141,15 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             resolving.remove(path)
 
     def resolvedscopeornone(self, path):
-        c = self # Assume we are resolved.
+        s = self # Assume we are resolved.
         for name in path:
-            r = c.resolvables.getornone(name)
+            r = s.resolvables.getornone(name)
             if r is None:
                 return
-            c = r.resolve(c)
-            if not hasattr(c, 'resolvables'):
+            s = r.resolve(s)
+            if not hasattr(s, 'resolvables'):
                 return
-        return c
+        return s
 
     def _selfandparents(self):
         while True:
@@ -160,11 +160,11 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
 
     def _scoreresolvables(self, path):
         tail = path[1:]
-        for k, c in enumerate(self._selfandparents()):
-            r = c.resolvables.getornone(path[0])
+        for k, s in enumerate(self._selfandparents()):
+            r = s.resolvables.getornone(path[0])
             if r is not None:
                 if tail:
-                    obj = r.resolve(c) # XXX: Wise?
+                    obj = r.resolve(s) # XXX: Wise?
                     try:
                         obj_score = obj._scoreresolvables
                     except AttributeError:
@@ -197,10 +197,10 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def _resolvedshallow(self, path, resolvable, kwargs, errors):
         while path:
             path = path[:-1]
-            for c in (c.resolvedscopeornone(path) for c in self._selfandparents()):
-                if c is not None:
+            for s in (s.resolvedscopeornone(path) for s in self._selfandparents()):
+                if s is not None:
                     try:
-                        return resolvable.resolve(c, **kwargs)
+                        return resolvable.resolve(s, **kwargs)
                     except NoSuchPathException as e:
                         errors.append(e)
 
@@ -209,9 +209,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return list(d) if self.islist else d
 
     def staticscope(self):
-        for c in self._selfandparents():
+        for s in self._selfandparents():
             pass
-        return c
+        return s
 
     def source(self, prefix, path): # XXX: Migrate to Text?
         with self.staticscope().here.push(Text(os.path.dirname(path))), open(path) as f:
@@ -245,12 +245,12 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def __str__(self):
         eol = '\n'
         def g():
-            c = self
+            s = self
             while True:
-                try: d = c.resolvables
+                try: d = s.resolvables
                 except AttributeError: break
-                yield "%s%s" % (type(c).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
-                c = c.parent
+                yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
+                s = s.parent
         return eol.join(g())
 
     def itero(self):
