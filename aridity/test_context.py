@@ -18,7 +18,7 @@
 from .grammar import loader as l
 from .model import Directive, Function, Stream, Text
 from .repl import Repl
-from .scope import Scope, StaticContext
+from .scope import Scope, StaticScope
 from .util import CycleException, NoSuchPathException
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
@@ -445,7 +445,7 @@ class TestContext(TestCase):
 
     def test_hereandindentfailure(self):
         s = Scope()
-        for name in StaticContext.stacktypes:
+        for name in StaticScope.stacktypes:
             with self.assertRaises(NoSuchPathException):
                 s.resolved(name)
 

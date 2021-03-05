@@ -282,12 +282,12 @@ class Resource(Resolved):
         with scope.staticcontext().here.push(self.slash([], True)), self.open() as f:
             scope.sourceimpl(prefix, f)
 
-class StaticContext(AbstractScope):
+class StaticScope(AbstractScope):
 
     stacktypes = dict(here = SimpleStack, indent = IndentStack)
 
     def __init__(self):
-        super(StaticContext, self).__init__(None)
+        super(StaticScope, self).__init__(None)
         for word, d in lookup.items():
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
@@ -341,11 +341,11 @@ class Star(Function, Directive):
     def star(self, prefix, suffix, scope):
         scope.getorcreatesubcontext(prefix.topath(scope) + (self.protokey,)).execute(suffix)
 
-StaticContext = StaticContext()
+StaticScope = StaticScope()
 
 class Scope(AbstractScope):
 
-    def __init__(self, parent = StaticContext, islist = False):
+    def __init__(self, parent = StaticScope, islist = False):
         super(Scope, self).__init__(parent)
         self.islist = islist
 
