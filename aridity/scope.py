@@ -208,13 +208,13 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         d = OrderedDict([k, o.unravel()] for k, o in self.itero())
         return list(d) if self.islist else d
 
-    def staticcontext(self):
+    def staticscope(self):
         for c in self._selfandparents():
             pass
         return c
 
     def source(self, prefix, path): # XXX: Migrate to Text?
-        with self.staticcontext().here.push(Text(os.path.dirname(path))), open(path) as f:
+        with self.staticscope().here.push(Text(os.path.dirname(path))), open(path) as f:
             self.sourceimpl(prefix, f)
 
     def sourceimpl(self, prefix, f):
@@ -279,7 +279,7 @@ class Resource(Resolved):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
 
     def source(self, scope, prefix):
-        with scope.staticcontext().here.push(self.slash([], True)), self.open() as f:
+        with scope.staticscope().here.push(self.slash([], True)), self.open() as f:
             scope.sourceimpl(prefix, f)
 
 class StaticScope(AbstractScope):

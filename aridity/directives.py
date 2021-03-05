@@ -113,9 +113,9 @@ def resolvepath(resolvable, scope):
 
 def processtemplate(scope, pathresolvable):
     path = resolvepath(pathresolvable, scope)
-    with open(path) as f, scope.staticcontext().here.push(Text(os.path.dirname(path))):
+    with open(path) as f, scope.staticscope().here.push(Text(os.path.dirname(path))):
         return processtemplateimpl(scope, f)
 
 def processtemplateimpl(scope, f):
-    with scope.staticcontext().indent.push() as monitor:
+    with scope.staticscope().indent.push() as monitor:
         return Concat(templateparser(f.read()), monitor).resolve(scope).cat()
