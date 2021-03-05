@@ -78,7 +78,7 @@ class Resolvables:
                 yield k, v
 
 # XXX: Isn't this Resolved rather than Resolvable?
-class AbstractContext(Resolvable): # TODO LATER: Some methods should probably be moved to Scope.
+class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be moved to Scope.
 
     nametypes = {str, type(None), OpaqueKey} # XXX: Is None still used by anything?
     try:
@@ -282,7 +282,7 @@ class Resource(Resolved):
         with scope.staticcontext().here.push(self.slash([], True)), self.open() as f:
             scope.sourceimpl(prefix, f)
 
-class StaticContext(AbstractContext):
+class StaticContext(AbstractScope):
 
     stacktypes = dict(here = SimpleStack, indent = IndentStack)
 
@@ -343,7 +343,7 @@ class Star(Function, Directive):
 
 StaticContext = StaticContext()
 
-class Scope(AbstractContext):
+class Scope(AbstractScope):
 
     def __init__(self, parent = StaticContext, islist = False):
         super(Scope, self).__init__(parent)
