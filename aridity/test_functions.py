@@ -91,7 +91,7 @@ class TestFunctions(TestCase):
             repl('j = $join($list($(a)$(b) $(b)$(c)) -)')
         self.assertEqual('xy-yz', s.resolved('j').scalar)
 
-    def test_listandmapincontext(self):
+    def test_listandmapinscope(self):
         s = Scope()
         with Repl(s) as repl:
             repl('my a eranu = x')

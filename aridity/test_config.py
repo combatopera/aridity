@@ -173,7 +173,7 @@ class TestConfig(TestCase):
         cc.execute('name = woo')
         self.assertEqual(['x-woo', 'y-woo'], list(c.badmap))
 
-    def test_resolvecontext(self):
+    def test_resolvescope(self):
         cc = ConfigCtrl()
         cc.execute('boot name = leaf')
         cc.execute('boot dirs = $map($list(x y) d $/($(d) $(name)))')

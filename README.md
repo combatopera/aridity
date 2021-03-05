@@ -157,7 +157,7 @@ years += 2020
 : A predefined join function takes a list and a separator and does what you'd expect:
 copyright = $join($(years) $.(, ))
 : Observe that functions typically take values not identifiers, so you have to 'get' explicitly.
-: Lists are just a special case of nested contexts, which are much more powerful:
+: Lists are just a special case of nested scopes, which are much more powerful:
 person
     $.(The Guardians) year = 2018
     Greta year = 2019
