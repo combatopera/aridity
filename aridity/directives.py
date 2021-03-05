@@ -62,7 +62,7 @@ class Source:
         # XXX: Use full algo to get phrasescope?
         phrasescope = scope
         for word in prefix.topath(scope):
-            c = phrasescope.resolvedcontextornone([word])
+            c = phrasescope.resolvedscopeornone([word])
             if c is None:
                 break
             phrasescope = c

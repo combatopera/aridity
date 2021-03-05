@@ -121,7 +121,7 @@ class ConfigCtrl:
 
     def scope(self, strict = False):
         if strict:
-            s = self.basescope.resolvedcontextornone(self.prefix)
+            s = self.basescope.resolvedscopeornone(self.prefix)
             if s is None:
                 raise ForeignScopeException
             return s
