@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Scope, Resource
 from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
+from .scope import Resource, Scope
 from .util import CycleException, NoSuchPathException
 from functools import partial
 from itertools import chain

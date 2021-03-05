@@ -16,8 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigCtrl
-from .context import Scope
 from .repl import Repl
+from .scope import Scope
 from .util import ispy2, openresource, OrderedSet, TreeNoSuchPathException
 from unittest import TestCase
 

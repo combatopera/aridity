@@ -198,7 +198,7 @@ class TestConfig(TestCase):
         self.assertEqual('1 days', c.ago)
 
     def test_resourcecwd(self):
-        from .context import Resource
+        from .scope import Resource
         cc = ConfigCtrl()
         cc.scope()['cwd',] = Resource(__name__, 'test_config')
         cc.execute('. chess.arid')

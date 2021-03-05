@@ -106,7 +106,7 @@ class Functions:
                     s[kname,] = Text(k)
                     s[vname,] = v
                     yield k, resolvable.resolve(s)
-        from .context import Scope
+        from .scope import Scope
         s = Scope(islist = True) # XXX: Really no parent?
         for i in g():
             s.resolvables.put(*i)

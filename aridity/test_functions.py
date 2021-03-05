@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Scope, Resource
 from .functions import _tomlquote
 from .model import Entry, Function
 from .repl import Repl
+from .scope import Resource, Scope
 from .util import ispy2, NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase

@@ -243,7 +243,7 @@ class Call(Resolvable):
         return self.unparse()
 
 def List(objs):
-    from .context import Scope
+    from .scope import Scope
     s = Scope(islist = True)
     for obj in objs:
         s.resolvables.put(object(), obj)

@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Scope
 from .grammar import commandparser
 from .model import Entry, Text
-import traceback, pyparsing, re
+from .scope import Scope
+import pyparsing, re, traceback
 
 class DanglingStackException(Exception): pass
 

@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Scope
 from .repl import MalformedEntryException, NoSuchIndentException, Repl
+from .scope import Scope
 from .util import UnsupportedEntryException
 from decimal import Decimal
 from unittest import TestCase

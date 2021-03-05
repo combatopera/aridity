@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import Scope
 from .directives import processtemplate
 from .model import Function, Text
 from .repl import Repl
+from .scope import Scope
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 

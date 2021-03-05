@@ -16,9 +16,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .context import Scope
 from .model import Stream
 from .repl import Repl
+from .scope import Scope
 from .util import NoSuchPathException
 import sys
 
