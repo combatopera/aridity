@@ -25,7 +25,7 @@ from tempfile import NamedTemporaryFile
 from unittest import TestCase
 import os
 
-class TestContext(TestCase):
+class TestScope(TestCase):
 
     def test_precedence(self):
         s = Scope()
@@ -383,7 +383,7 @@ class TestContext(TestCase):
         self.assertEqual(10, s.resolved('X', 'calc' ,'double').scalar)
         self.assertEqual(12, s.resolved('A', 'calc', 'double').scalar)
 
-    def test_resolvepathincontext(self):
+    def test_resolvepathinscope(self):
         s = Scope()
         with Repl(s) as repl:
             repl('x y = $(z)') # The resolvable.
@@ -449,7 +449,7 @@ class TestContext(TestCase):
             with self.assertRaises(NoSuchPathException):
                 s.resolved(name)
 
-    def test_appendtolistinsubcontext(self):
+    def test_appendtolistinsubscope(self):
         s = Scope()
         with Repl(s) as repl:
             repl('v := $list(x)')
@@ -461,7 +461,7 @@ class TestContext(TestCase):
         self.assertEqual(['x', 'y'], s.resolved('v').unravel()) # Good, we should not modify parent.
         self.assertEqual(['z'], list(d.resolved('v').unravel().values())) # Makes sense maybe.
 
-    def test_appendtolistinsubcontext2(self):
+    def test_appendtolistinsubscope2(self):
         s = Scope()
         with Repl(s) as repl:
             repl('u v := $list(x)')
