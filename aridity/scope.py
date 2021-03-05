@@ -97,9 +97,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             raise NotAPathException(path)
         if not isinstance(resolvable, Resolvable):
             raise NotAResolvableException(resolvable)
-        self.getorcreatesubcontext(path[:-1]).resolvables.put(path[-1], resolvable)
+        self.getorcreatesubscope(path[:-1]).resolvables.put(path[-1], resolvable)
 
-    def getorcreatesubcontext(self, path):
+    def getorcreatesubscope(self, path):
         for name in path:
             that = self.resolvables.getornone(name)
             if that is None:
@@ -339,7 +339,7 @@ class Star(Function, Directive):
         Directive.__init__(self, self.star)
 
     def star(self, prefix, suffix, scope):
-        scope.getorcreatesubcontext(prefix.topath(scope) + (self.protokey,)).execute(suffix)
+        scope.getorcreatesubscope(prefix.topath(scope) + (self.protokey,)).execute(suffix)
 
 StaticScope = StaticScope()
 

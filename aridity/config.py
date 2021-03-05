@@ -68,7 +68,7 @@ class ConfigCtrl:
         return appconfig
 
     def _loadappconfig(self, appname, resource):
-        resource.source(self.basescope.getorcreatesubcontext(self.prefix + [appname]), Entry([]))
+        resource.source(self.basescope.getorcreatesubscope(self.prefix + [appname]), Entry([]))
         return getattr(self.node, appname)
 
     def reapplysettings(self, mainfunction):

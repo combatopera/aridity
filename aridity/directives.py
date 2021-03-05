@@ -92,7 +92,7 @@ class ColonEquals:
     name = ':='
     def __call__(self, prefix, suffix, scope):
         path = prefix.topath(scope)
-        scope[path] = suffix.tophrase().resolve(scope.getorcreatesubcontext(path[:-1]))
+        scope[path] = suffix.tophrase().resolve(scope.getorcreatesubscope(path[:-1]))
 
 @directive
 class PlusEquals:
@@ -105,7 +105,7 @@ class PlusEquals:
 class Cat:
     name = '<'
     def __call__(self, prefix, suffix, scope):
-        scope = scope.getorcreatesubcontext(prefix.topath(scope))
+        scope = scope.getorcreatesubscope(prefix.topath(scope))
         scope.resolved('stdout').flush(processtemplate(scope, suffix.tophrase()))
 
 def resolvepath(resolvable, scope):
