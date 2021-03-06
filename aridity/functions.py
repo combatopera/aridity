@@ -78,6 +78,7 @@ class Functions:
         return Text(quote(resolvable.resolve(scope).cat(), safe = ''))
 
     def map(scope, objsresolvable, *args):
+        from .scope import Scope
         objs = objsresolvable.resolve(scope)
         if 1 == len(args):
             resolvable, = args
@@ -106,7 +107,6 @@ class Functions:
                     s[kname,] = Text(k)
                     s[vname,] = v
                     yield k, resolvable.resolve(s)
-        from .scope import Scope
         s = Scope(islist = True) # XXX: Really no parent?
         for i in g():
             s.resolvables.put(*i)

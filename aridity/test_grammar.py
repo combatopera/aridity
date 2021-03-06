@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .grammar import expressionparser as p, loader as l
-from .model import Text, Call, Blank, Concat, Number, Boolean, Entry, Boundary
+from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
 from decimal import Decimal
 from pyparsing import ParseException
 from unittest import TestCase

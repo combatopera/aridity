@@ -16,8 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import with_statement
-from .model import Text, Stream, Concat
 from .grammar import templateparser
+from .model import Concat, Stream, Text
 import os, sys
 
 class Precedence:

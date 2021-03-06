@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyparsing import Forward, OneOrMore, Optional, MatchFirst, Regex, Suppress, ZeroOrMore, NoMatch, Literal
+from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
 from decimal import Decimal
-from .model import Text, Boolean, Number, Blank, Call, Concat, Boundary, Entry
+from pyparsing import Forward, Literal, MatchFirst, NoMatch, OneOrMore, Optional, Regex, Suppress, ZeroOrMore
 import re
 
 class AnyScalar:
