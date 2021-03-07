@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from contextlib import contextmanager
+from importlib import import_module
 from io import BytesIO, TextIOWrapper
-from pkg_resources import resource_stream # TODO: Port to new API.
-import collections, inspect, sys
+import collections, importlib_resources, inspect, sys
 
 ispy2 = sys.version_info.major < 3
 
@@ -130,8 +131,11 @@ def allfunctions(clazz):
         yield realname, clazz.__dict__[name]
 
 @contextmanager
-def openresource(package_or_requirement, resource_name, encoding = 'ascii'):
-    with resource_stream(package_or_requirement, resource_name) as f:
+def openresource(package_or_name, resource_name, encoding = 'ascii'):
+    path = importlib_resources.files(import_module(package_or_name).__package__)
+    for name in resource_name.split('/'):
+        path /= name
+    with path.open('rb') as f:
         if ispy2:
             f = BytesIO(f.read())
         with TextIOWrapper(f, encoding) as f:
