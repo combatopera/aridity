@@ -21,8 +21,8 @@ from .repl import Repl
 from .scope import Resource, Scope
 from .util import CycleException, NoSuchPathException
 from functools import partial
+from importlib_metadata import entry_points
 from itertools import chain
-from pkg_resources import iter_entry_points # TODO: Port to new API.
 from weakref import WeakKeyDictionary
 import errno, logging, os
 
@@ -35,10 +35,10 @@ def _newnode(ctrl):
     return node
 
 def _processmainfunction(mainfunction):
-    module_name = mainfunction.__module__
-    attrs = tuple(mainfunction.__qualname__.split('.'))
-    appname, = (ep.name for ep in iter_entry_points('console_scripts') if ep.module_name == module_name and ep.attrs == attrs)
-    return module_name, appname
+    module = mainfunction.__module__
+    attr = mainfunction.__qualname__
+    appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
+    return module, appname
 
 class ForeignScopeException(Exception): pass
 
