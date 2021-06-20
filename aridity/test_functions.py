@@ -201,7 +201,11 @@ class TestFunctions(TestCase):
         with Repl(s) as repl:
             repl('c 2 := $list(a b)')
             repl('c 3 := $list(c d)')
+            repl('c 4 := $list(d e)')
             repl('c all = $flat$map($(vers) v $$(v))')
             repl('vers += 2')
             repl('vers += 3')
         self.assertEqual(['a', 'b', 'c', 'd'], s.resolved('c', 'all').unravel())
+        with Repl(s) as repl:
+            repl('vers += 4')
+        self.assertEqual(['a', 'b', 'c', 'd', 'd', 'e'], s.resolved('c', 'all').unravel())
