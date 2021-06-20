@@ -209,3 +209,14 @@ class TestFunctions(TestCase):
         with Repl(s) as repl:
             repl('vers += 4')
         self.assertEqual(['a', 'b', 'c', 'd', 'd', 'e'], s.resolved('c', 'all').unravel())
+
+    def test_emptyget(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('x = $()')
+            repl('y = $(x)')
+            repl('u v = $(x)')
+        # Empty path resolved against parent is parent:
+        self.assertIs(s, s.resolved('x'))
+        self.assertIs(s, s.resolved('y'))
+        self.assertIs(s.resolvables.d['u'], s.resolved('u', 'v'))
