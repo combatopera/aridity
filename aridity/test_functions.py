@@ -136,11 +136,7 @@ class TestFunctions(TestCase):
             repl('v += one')
             repl('v += two')
             repl('" = $(jsonquote)')
-        try:
-            self.assertEqual('"one","two"', s.resolved('x').scalar)
-            self.fail('You fixed a bug!')
-        except AttributeError:
-            pass
+        self.assertEqual('"one","two"', s.resolved('x').scalar)
 
     def test_listref(self):
         s = Scope()
@@ -202,13 +198,16 @@ class TestFunctions(TestCase):
             repl('c 2 := $list(a b)')
             repl('c 3 := $list(c d)')
             repl('c 4 := $list(d e)')
-            repl('c all = $flat$map($(vers) v $$(v))')
+            repl('c all1 = $flat$map($(vers) $$())')
+            repl('c all2 = $flat$map($(vers) v $$(v))')
             repl('vers += 2')
             repl('vers += 3')
-        self.assertEqual(['a', 'b', 'c', 'd'], s.resolved('c', 'all').unravel())
+        self.assertEqual(['a', 'b', 'c', 'd'], s.resolved('c', 'all1').unravel())
+        self.assertEqual(['a', 'b', 'c', 'd'], s.resolved('c', 'all2').unravel())
         with Repl(s) as repl:
             repl('vers += 4')
-        self.assertEqual(['a', 'b', 'c', 'd', 'd', 'e'], s.resolved('c', 'all').unravel())
+        self.assertEqual(['a', 'b', 'c', 'd', 'd', 'e'], s.resolved('c', 'all1').unravel())
+        self.assertEqual(['a', 'b', 'c', 'd', 'd', 'e'], s.resolved('c', 'all2').unravel())
 
     def test_emptyget(self):
         s = Scope()

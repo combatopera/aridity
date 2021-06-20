@@ -32,6 +32,18 @@ def _tomlquote(text):
 
 class OpaqueKey: pass
 
+class ScalarScope:
+
+    def __init__(self, scope, scalar):
+        self.scope = scope
+        self.scalar = scalar
+
+    def resolved(self, *path):
+        return self.scope.resolved(*path) if path else self
+
+    def resolve(self, scope):
+        return self.scalar
+
 class Functions:
 
     def screenstr(scope, resolvable):
@@ -84,10 +96,15 @@ class Functions:
             resolvable, = args
             def g():
                 for k, v in objs.resolvables.items():
-                    s = scope.createchild()
-                    s.label = Text(k)
-                    for i in v.resolvables.items():
-                        s.resolvables.put(*i)
+                    try:
+                        resolvables = v.resolvables
+                    except AttributeError:
+                        s = ScalarScope(scope, v)
+                    else:
+                        s = scope.createchild()
+                        s.label = Text(k)
+                        for i in resolvables.items():
+                            s.resolvables.put(*i)
                     yield k, resolvable.resolve(s)
         elif 2 == len(args):
             vname, resolvable = args
