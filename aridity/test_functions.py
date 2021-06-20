@@ -195,3 +195,13 @@ class TestFunctions(TestCase):
         self.assertIs(sys.exc_info, obj.functionvalue)
         self.assertIs(sys.exc_info, obj.scalar)
         self.assertIs(sys.exc_info, obj.unravel())
+
+    def test_flat(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('c 2 := $list(a b)')
+            repl('c 3 := $list(c d)')
+            repl('c all = $flat$map($(vers) v $$(v))')
+            repl('vers += 2')
+            repl('vers += 3')
+        self.assertEqual(['a', 'b', 'c', 'd'], s.resolved('c', 'all').unravel())

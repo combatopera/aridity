@@ -112,6 +112,14 @@ class Functions:
             s.resolvables.put(*i)
         return s
 
+    def flat(scope, listsresolvable):
+        from .scope import Scope
+        s = Scope(islist = True) # XXX: Really no parent?
+        for lk, l in listsresolvable.resolve(scope).resolvables.items():
+            for ok, obj in l.resolvables.items():
+                s.resolvables.put((lk, ok), obj)
+        return s
+
     def label(scope):
         return scope.label
 
