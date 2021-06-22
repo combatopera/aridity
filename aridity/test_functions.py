@@ -218,4 +218,4 @@ class TestFunctions(TestCase):
         # Empty path resolved against the resolvable's scope is that same scope:
         self.assertIs(s, s.resolved('x'))
         self.assertIs(s, s.resolved('y'))
-        self.assertIs(s.resolvables.d['u'], s.resolved('u', 'v'))
+        self.assertIs(s.resolvables.getornone('u'), s.resolved('u', 'v'))
