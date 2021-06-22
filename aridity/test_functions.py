@@ -215,7 +215,7 @@ class TestFunctions(TestCase):
             repl('x = $()')
             repl('y = $(x)')
             repl('u v = $(x)')
-        # Empty path resolved against parent is parent:
+        # Empty path resolved against the resolvable's scope is that same scope:
         self.assertIs(s, s.resolved('x'))
         self.assertIs(s, s.resolved('y'))
         self.assertIs(s.resolvables.d['u'], s.resolved('u', 'v'))
