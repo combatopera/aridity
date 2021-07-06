@@ -326,7 +326,7 @@ class TestScope(TestCase):
             repl('woo += $(houpla  )')
             repl('houpla = x')
         ae = self.assertEqual
-        ae({'yay': 'yay', '$(houpla  )': 'x'}, scope.resolved('woo').unravel())
+        ae(['yay', 'x'], scope.resolved('woo').unravel())
 
     def test_anonymouslistelements2(self):
         scope = Scope()
@@ -335,7 +335,7 @@ class TestScope(TestCase):
             repl('woo += yay  $[two]')
             repl('two = 2')
         ae = self.assertEqual
-        ae({'yay 1': 'yay 1', 'yay  $[two]': 'yay  2'}, scope.resolved('woo').unravel())
+        ae(['yay 1', 'yay  2'], scope.resolved('woo').unravel())
 
     def test_thisusedtowork(self):
         scope = Scope()
@@ -344,7 +344,7 @@ class TestScope(TestCase):
             repl('x paths += yay')
             repl('y paths = $(x paths)')
         ae = self.assertEqual
-        ae({'woo': 'woo', 'yay': 'yay'}, scope.resolved('y', 'paths').unravel())
+        ae(['woo', 'yay'], scope.resolved('y', 'paths').unravel())
 
     def test_commandarg(self):
         base = Scope()
@@ -459,7 +459,7 @@ class TestScope(TestCase):
         with Repl(d) as repl:
             repl('v += z')
         self.assertEqual(['x', 'y'], s.resolved('v').unravel()) # Good, we should not modify parent.
-        self.assertEqual(['z'], list(d.resolved('v').unravel().values())) # Makes sense maybe.
+        self.assertEqual(['z'], d.resolved('v').unravel()) # Makes sense maybe.
 
     def test_appendtolistinsubscope2(self):
         s = Scope()
@@ -471,7 +471,7 @@ class TestScope(TestCase):
         with Repl(d) as repl:
             repl('u v += z')
         self.assertEqual(['x', 'y'], s.resolved('u', 'v').unravel())
-        self.assertEqual(['z'], list(d.resolved('u', 'v').unravel().values()))
+        self.assertEqual(['z'], d.resolved('u', 'v').unravel())
 
     def test_poison(self):
         s = Scope()
@@ -507,7 +507,7 @@ class TestScope(TestCase):
             repl('z = $list(a b)')
             repl('j = $join($(v) ,)')
         self.assertEqual('x,y,a,b', s.resolved('j').scalar)
-        self.assertEqual(dict(x='x', y='y', a='a', b='b'), s.resolved('v').unravel())
+        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('v').unravel())
 
     def test_spread2(self):
         s = Scope()
@@ -519,8 +519,8 @@ class TestScope(TestCase):
             repl('z +=')
             repl('\tA')
             repl('\tB')
-        self.assertEqual(dict(x='x', y='y', A='a', B='b'), s.resolved('n', 'v').unravel())
-        self.assertEqual(dict(x='x', y='y', A='a', B='b'), s.resolved('n').resolved('v').unravel())
+        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('n', 'v').unravel())
+        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('n').resolved('v').unravel())
 
     def test_nestedspread(self):
         s = Scope()
@@ -530,10 +530,10 @@ class TestScope(TestCase):
             repl('b += $*$(c)')
             repl('c += y')
             repl('b += z')
-        self.assertEqual(dict(x='x', y='y', z='z'), s.resolved('a').unravel())
+        self.assertEqual(['x', 'y', 'z'], s.resolved('a').unravel())
         with Repl(s) as repl:
             repl('c = $list()')
-        self.assertEqual(dict(x='x', z='z'), s.resolved('a').unravel())
+        self.assertEqual(['x', 'z'], s.resolved('a').unravel())
 
     def test_spreadfunc(self):
         def f(): pass
@@ -572,8 +572,8 @@ class TestScope(TestCase):
             repl('v := $(v)')
             repl('a w += 2')
             repl('a w := $(w)')
-        self.assertEqual({'1': 1}, s.resolved('v').unravel())
-        self.assertEqual({'2': 2}, s.resolved('a', 'w').unravel())
+        self.assertEqual([1], s.resolved('v').unravel())
+        self.assertEqual([2], s.resolved('a', 'w').unravel())
 
     def test_longref(self):
         s = Scope()

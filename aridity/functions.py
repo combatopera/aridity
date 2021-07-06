@@ -30,7 +30,7 @@ def _tomlquote(text):
         return ''.join(r"\u%04X" % ord(c) for c in m.group())
     return '"%s"' % tomlbasicbadchars.sub(repl, text)
 
-class OpaqueKey: pass
+class OpaqueKey(object): pass
 
 class ScalarScope:
 
@@ -167,13 +167,7 @@ class Functions:
     def list(scope, *resolvables):
         v = scope.createchild(islist = True)
         for r in resolvables:
-            try:
-                keyfunction = r.unparse
-            except AttributeError:
-                key = OpaqueKey() # TODO: Investigate why not do this all the time.
-            else:
-                key = keyfunction()
-            v[key,] = r
+            v[OpaqueKey(),] = r
         return v
 
     def fork(scope):
