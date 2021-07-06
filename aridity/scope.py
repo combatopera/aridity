@@ -205,7 +205,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
 
     def unravel(self):
         d = OrderedDict([k, o.unravel()] for k, o in self.itero())
-        return list(d) if self.islist or (d and all(isinstance(k, OpaqueKey) for k in d.keys())) else d
+        return list(d) if self.islist or (d and all(OpaqueKey.isopaque(k) for k in d.keys())) else d
 
     def staticscope(self):
         for s in self._selfandparents():

@@ -30,7 +30,11 @@ def _tomlquote(text):
         return ''.join(r"\u%04X" % ord(c) for c in m.group())
     return '"%s"' % tomlbasicbadchars.sub(repl, text)
 
-class OpaqueKey(object): pass
+class OpaqueKey(object):
+
+    @classmethod
+    def isopaque(cls, key):
+        return all(cls.isopaque(k) for k in key) if isinstance(key, tuple) else isinstance(key, cls)
 
 class ScalarScope:
 
@@ -230,8 +234,9 @@ class Spread:
     def __init__(self, scope):
         self.scope = scope
 
-    def spread(self, _):
-        return self.scope.itero() # XXX: Or just the resolvables?
+    def spread(self, j):
+        for k, o in self.scope.itero(): # XXX: Or just the resolvables?
+            yield (j, k), o
 
 def getimpl(scope, *resolvables):
     return scope.resolved(*(r.resolve(scope).cat() for r in resolvables))
