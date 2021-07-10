@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .grammar import loader as l
-from .model import Directive, Function, Stream, Text
+from .model import Directive, Stream, Text
 from .repl import Repl
 from .scope import Scope, StaticScope
 from .util import CycleException, NoSuchPathException
@@ -496,58 +496,6 @@ class TestScope(TestCase):
         self.assertEqual('yay', s.resolved('u', 'woo').scalar)
         with self.assertRaises(NoSuchPathException):
             d.resolved('u', 'woo')
-
-    def test_spread(self):
-        s = Scope()
-        with Repl(s) as repl:
-            repl('v +=')
-            repl('\tx')
-            repl('\ty')
-            repl('\t$*$(z)')
-            repl('z = $list(a b)')
-            repl('j = $join($(v) ,)')
-        self.assertEqual('x,y,a,b', s.resolved('j').scalar)
-        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('v').unravel())
-
-    def test_spread2(self):
-        s = Scope()
-        with Repl(s) as repl:
-            repl('n v +=')
-            repl('\tx')
-            repl('\ty')
-            repl('\t$*$map($(z) it $lower$(it))')
-            repl('z +=')
-            repl('\tA')
-            repl('\tB')
-        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('n', 'v').unravel())
-        self.assertEqual(['x', 'y', 'a', 'b'], s.resolved('n').resolved('v').unravel())
-
-    def test_nestedspread(self):
-        s = Scope()
-        with Repl(s) as repl:
-            repl('a += x')
-            repl('a += $*$(b)')
-            repl('b += $*$(c)')
-            repl('c += y')
-            repl('b += z')
-        self.assertEqual(['x', 'y', 'z'], s.resolved('a').unravel())
-        with Repl(s) as repl:
-            repl('c = $list()')
-        self.assertEqual(['x', 'z'], s.resolved('a').unravel())
-
-    def test_spreadfunc(self):
-        def f(): pass
-        def g(): pass
-        s = Scope()
-        s['f',] = Function(f)
-        s['g',] = Function(g)
-        with Repl(s) as repl:
-            repl('v +=')
-            repl('\t$(f)')
-            repl('\t$*$(w)')
-            repl('w +=')
-            repl('\t$(g)')
-        self.assertEqual([f, g], list(s.resolved('v').unravel()))
 
     def test_fullpathtrick(self):
         s = Scope()
