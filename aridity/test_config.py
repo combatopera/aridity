@@ -266,8 +266,9 @@ z +=
 
     def test_nestedspread(self):
         c = ConfigCtrl().node
-        (-c).execute('''a += x
-a += $*$(b)
+        (-c).execute('''a +=
+    x
+    $*$(b)
 b += $*$(c)
 c += y
 b += z''')
@@ -284,6 +285,5 @@ b += z''')
         (-c).execute('''v +=
     $(f)
     $*$(w)
-w +=
-    $(g)''')
+w += $(g)''')
         self.assertEqual([f, g], list(c.v))
