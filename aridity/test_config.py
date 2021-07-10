@@ -240,3 +240,50 @@ class TestConfig(TestCase):
             pass
         else:
             self.fail('You fixed a bug!')
+
+    def test_spread(self):
+        c = ConfigCtrl().node
+        (-c).execute('''v +=
+    x
+    y
+    $*$(z)
+z = $list(a b)
+j = $join($(v) ,)''')
+        self.assertEqual('x,y,a,b', c.j)
+        self.assertEqual(['x', 'y', 'a', 'b'], list(c.v))
+
+    def test_spread2(self):
+        c = ConfigCtrl().node
+        (-c).execute('''n v +=
+    x
+    y
+    $*$map($(z) it $lower$(it))
+z +=
+    A
+    B''')
+        self.assertEqual(['x', 'y', 'a', 'b'], list(c.n.v))
+        self.assertEqual(['x', 'y', 'a', 'b'], list((-c.n).freectrl().node.v))
+
+    def test_nestedspread(self):
+        c = ConfigCtrl().node
+        (-c).execute('''a += x
+a += $*$(b)
+b += $*$(c)
+c += y
+b += z''')
+        self.assertEqual(['x', 'y', 'z'], list(c.a))
+        (-c).execute('c = $list()')
+        self.assertEqual(['x', 'z'], list(c.a))
+
+    def test_spreadfunc(self):
+        def f(): pass
+        def g(): pass
+        c = ConfigCtrl().node
+        c.f = f
+        c.g = g
+        (-c).execute('''v +=
+    $(f)
+    $*$(w)
+w +=
+    $(g)''')
+        self.assertEqual([f, g], list(c.v))
