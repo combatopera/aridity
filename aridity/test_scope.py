@@ -156,7 +156,7 @@ class TestScope(TestCase):
             repl('x y = true false')
             repl('tf = $,(x y)')
         ae = self.assertEqual
-        ae([], scope.resolved('a', aslist = True).unravel())
+        ae([], scope.resolved('a', aslist = True).unravel()) # TODO: Config API equivalent.
         ae(['yay'], scope.resolved('b', aslist = True).unravel())
         ae(['yay', 'houpla'], scope.resolved('c', aslist = True).unravel())
         ae(['yay', 'houpla'], scope.resolved('c,').unravel())

@@ -198,7 +198,7 @@ class Number(BaseScalar):
     def unparse(self):
         return str(self.numbervalue) # FIXME: Should unparse.
 
-    def cat(self):
+    def cat(self): # XXX: Should a parsed Number also be Text?
         return self.unparse()
 
 class Boolean(BaseScalar):
