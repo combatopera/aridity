@@ -231,7 +231,7 @@ class Call(Resolvable):
 
     def resolve(self, scope, aslist = False):
         args = [a for a in self.args if not a.ignorable]
-        for name in reversed(self.name.split('$')):
+        for name in reversed(self.name.split('$')): # TODO: Should be parsed upfront and Call objects nested.
             args = [scope.resolved(name)(*[scope] + args)]
         result, = args
         return List([result]) if aslist else result
