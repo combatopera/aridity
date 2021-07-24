@@ -295,8 +295,9 @@ w += $(g)''')
     stuffcalc elements +=
         foo
         bar
-    othercalc elements += "\
     stuff = $(stuffcalc lib hcllist)
-    other = $(othercalc lib hcllist)''')
+    other
+        elements += "\
+        result = $(lib hcllist)''')
         self.assertEqual('["foo", "bar"]', cc.node.tf.stuff)
-        self.assertEqual(r'["\"\\"]', cc.node.tf.other)
+        self.assertEqual(r'["\"\\"]', cc.node.tf.other.result)
