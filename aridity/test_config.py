@@ -287,3 +287,16 @@ b += z''')
     $*$(w)
 w += $(g)''')
         self.assertEqual([f, g], list(c.v))
+
+    def test_configfunction(self):
+        cc = ConfigCtrl()
+        cc.execute('lib hcllist = [$join($map($(elements) $hclstr$()) $.(, ))]')
+        cc.execute(r'''tf
+    stuffcalc elements +=
+        foo
+        bar
+    othercalc elements += "\
+    stuff = $(stuffcalc lib hcllist)
+    other = $(othercalc lib hcllist)''')
+        self.assertEqual('["foo", "bar"]', cc.node.tf.stuff)
+        self.assertEqual(r'["\"\\"]', cc.node.tf.other)
