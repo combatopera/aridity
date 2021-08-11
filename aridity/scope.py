@@ -175,14 +175,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                     yield [k], r
 
     def _findresolvable(self, path):
-        bestscore = [float('inf')]
-        for score, resolvable in self._scoreresolvables(path):
-            if score < bestscore:
-                bestscore = score
-                bestresolvable = resolvable
         try:
-            return bestresolvable
-        except UnboundLocalError:
+            return min(self._scoreresolvables(path), key = lambda t: t[0])[1]
+        except ValueError:
             raise UnparseNoSuchPathException(path)
 
     def _resolved(self, path, resolvable, kwargs): # TODO: Review this algo.
