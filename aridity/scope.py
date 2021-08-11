@@ -187,21 +187,15 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
 
     def _resolved(self, path, resolvable, kwargs): # TODO: Review this algo.
         errors = []
-        for i in range(len(path)):
-            obj = self._resolvedshallow(path[i:], resolvable, kwargs, errors)
-            if obj is not None:
-                return obj
+        for start in range(len(path)):
+            for end in range(len(path) - 1, start - 1, -1):
+                for s in (s.resolvedscopeornone(path[start:end]) for s in self._selfandparents()):
+                    if s is not None:
+                        try:
+                            return resolvable.resolve(s, **kwargs)
+                        except NoSuchPathException as e:
+                            errors.append(e)
         raise TreeNoSuchPathException(path, errors)
-
-    def _resolvedshallow(self, path, resolvable, kwargs, errors):
-        while path:
-            path = path[:-1]
-            for s in (s.resolvedscopeornone(path) for s in self._selfandparents()):
-                if s is not None:
-                    try:
-                        return resolvable.resolve(s, **kwargs)
-                    except NoSuchPathException as e:
-                        errors.append(e)
 
     def unravel(self):
         d = OrderedDict([k, o.unravel()] for k, o in self.itero())
