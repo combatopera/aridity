@@ -146,7 +146,7 @@ class TestFunctions(TestCase):
             repl('foo yyup = YYUP')
             repl('foo x = $join($map($(args) it $(it)) .)')
             repl('x = $join($map($(foo args) it $(it)) .)')
-        self.assertEqual(['yyup=YYUP', 'w/e'], list(s.resolved('foo', 'args').unravel().values()))
+        self.assertEqual(['yyup=YYUP', 'w/e'], s.resolved('foo', 'args').unravel())
         self.assertEqual('yyup=YYUP.w/e', s.resolved('foo', 'x').unravel())
         try:
             self.assertEqual('yyup=YYUP.w/e', s.resolved('x').unravel())

@@ -97,8 +97,9 @@ class ColonEquals:
 class PlusEquals:
     name = '+='
     def __call__(self, prefix, suffix, scope):
+        from .functions import OpaqueKey
         phrase = suffix.tophrase()
-        scope[prefix.topath(scope) + (phrase.unparse(),)] = phrase
+        scope[prefix.topath(scope) + (OpaqueKey(),)] = phrase
 
 @directive
 class Cat:
