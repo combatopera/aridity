@@ -28,3 +28,4 @@ pyversions +=
     3
     2
 executable = true
+buildbot enabled = true
