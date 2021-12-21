@@ -19,20 +19,23 @@ from .model import Scalar
 from functools import partial
 from getpass import getpass
 
-class Password:
+passwordbase = str
+
+class Password(passwordbase):
 
     null_exc_info = None, None, None
 
-    def __init__(self, password, setter):
-        self.password = password
-        self.setter = setter
+    def __new__(cls, password, setter):
+        p = passwordbase.__new__(cls, password)
+        p.setter = setter
+        return p
 
     def __enter__(self):
-        return self.password
+        return self
 
     def __exit__(self, *exc_info):
         if self.setter is not None and self.null_exc_info == exc_info:
-            self.setter(self.password)
+            self.setter(self)
 
 def keyring(context, serviceres, usernameres):
     from keyring import get_password, set_password
