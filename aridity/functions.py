@@ -50,6 +50,8 @@ class ScalarScope:
 
 class Functions:
 
+    from .keyring import keyring
+
     def screenstr(scope, resolvable):
         text = resolvable.resolve(scope).cat()
         return Text('"%s"' % text.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"'))
