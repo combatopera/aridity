@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .functions import _tomlquote
-from .model import Entry, Function
+from .model import Entry, Function, Text
 from .repl import Repl
 from .scope import Resource, Scope
 from .util import ispy2, NoSuchPathException
@@ -219,3 +219,23 @@ class TestFunctions(TestCase):
         self.assertIs(s, s.resolved('x'))
         self.assertIs(s, s.resolved('y'))
         self.assertIs(s.resolvables.getornone('u'), s.resolved('u', 'v'))
+
+    def test_lazy(self):
+        class Y(Exception): pass
+        def x(scope, r):
+            return Text('woo')
+        def y(scope):
+            raise Y
+        s = Scope()
+        s.resolvables.put('x', Function(x))
+        s.resolvables.put('y', Function(y))
+        with Repl(s) as repl:
+            repl('a = $x($y())')
+            repl('b = $x$y()')
+        self.assertEqual('woo', s.resolved('a').scalar)
+        try:
+            self.assertEqual('woo', s.resolved('b').scalar)
+        except Y:
+            pass
+        else:
+            self.fail('You fixed a bug!')
