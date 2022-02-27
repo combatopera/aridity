@@ -45,8 +45,8 @@ class ScalarScope:
     def resolved(self, *path):
         return self.scope.resolved(*path) if path else self
 
-    def resolve(self, scope):
-        return self.scalarobj
+    def __getattr__(self, name):
+        return getattr(self.scalarobj, name)
 
 class Functions:
 
