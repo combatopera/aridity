@@ -132,7 +132,7 @@ class TestFunctions(TestCase):
     def test_mapreceiver(self):
         s = Scope()
         with Repl(s) as repl:
-            repl('x = $join($map($(v) $"$()) ,)')
+            repl('x = $join($map($(v) $"($())) ,)')
             repl('v += one')
             repl('v += two')
             repl('" = $(jsonquote)')
@@ -198,7 +198,7 @@ class TestFunctions(TestCase):
             repl('c 2 := $list(a b)')
             repl('c 3 := $list(c d)')
             repl('c 4 := $list(d e)')
-            repl('c all1 = $flat$map($(vers) $$())')
+            repl('c all1 = $flat$map($(vers) $($()))')
             repl('c all2 = $flat$map($(vers) v $$(v))')
             repl('vers += 2')
             repl('vers += 3')
