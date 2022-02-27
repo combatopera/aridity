@@ -290,7 +290,7 @@ w += $(g)''')
 
     def test_configfunction(self):
         cc = ConfigCtrl()
-        cc.execute('lib hcllist = [$join($map($(elements) $hclstr$()) $.(, ))]')
+        cc.execute('lib hcllist = [$join($map($(elements) $hclstr($())) $.(, ))]')
         cc.execute(r'''tf
     stuffcalc elements +=
         foo
