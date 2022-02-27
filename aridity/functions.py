@@ -36,18 +36,6 @@ class OpaqueKey(object):
     def isopaque(cls, key):
         return all(cls.isopaque(k) for k in key) if isinstance(key, tuple) else isinstance(key, cls)
 
-class ScalarScope:
-
-    def __init__(self, scope, scalarobj):
-        self.scope = scope
-        self.scalarobj = scalarobj
-
-    def resolved(self, *path):
-        return self.scope.resolved(*path) if path else self
-
-    def __getattr__(self, name):
-        return getattr(self.scalarobj, name)
-
 class Functions:
 
     from .keyring import keyring
@@ -96,7 +84,7 @@ class Functions:
         return Text(quote(resolvable.resolve(scope).cat(), safe = ''))
 
     def map(scope, objsresolvable, *args):
-        from .scope import Scope
+        from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
         if 1 == len(args):
             resolvable, = args

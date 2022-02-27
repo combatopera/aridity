@@ -249,6 +249,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def spread(self, k):
         yield k, self
 
+    def createchild(self, **kwargs):
+        return Scope(self, **kwargs)
+
 class Resource(Resolved):
 
     @classmethod
@@ -299,9 +302,6 @@ class StaticScope(AbstractScope):
             setattr(threadlocals, name, stack)
             return stack
 
-    def createchild(self, **kwargs):
-        return Scope(self, **kwargs)
-
 class Slash(Text, Function):
 
     def __init__(self):
@@ -340,9 +340,6 @@ class Scope(AbstractScope):
     def resolve(self, scope):
         return self
 
-    def createchild(self, **kwargs):
-        return type(self)(self, **kwargs)
-
     def tobash(self, toplevel = False):
         if toplevel:
             return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
@@ -353,3 +350,12 @@ class Scope(AbstractScope):
 
     def tojava(self):
         return Text(''.join("%s %s\n" % (k, v.resolve(self).unravel()) for k, v in self.resolvables.items())) # TODO: Escaping.
+
+class ScalarScope(Scope):
+
+    def __init__(self, parent, scalarobj):
+        super(ScalarScope, self).__init__(parent)
+        self.scalarobj = scalarobj
+
+    def __getattr__(self, name):
+        return getattr(self.scalarobj, name)
