@@ -257,7 +257,7 @@ j = $join($(v) ,)''')
         (-c).execute('''n v +=
     x
     y
-    $*$map($(z) $lower$())
+    $*$map($(z) $lower($()))
 z +=
     A
     B''')
