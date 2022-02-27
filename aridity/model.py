@@ -224,7 +224,7 @@ class Call(Resolvable):
     def pa(cls, s, l, t):
         return cls(t[0], t[2:-1], t[1]+t[-1])
 
-    def __init__(self, name, args, brackets = None):
+    def __init__(self, name, args, brackets):
         self.name = name
         self.args = args
         self.brackets = brackets
