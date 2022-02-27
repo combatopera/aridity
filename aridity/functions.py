@@ -38,15 +38,15 @@ class OpaqueKey(object):
 
 class ScalarScope:
 
-    def __init__(self, scope, scalar):
+    def __init__(self, scope, scalarobj):
         self.scope = scope
-        self.scalar = scalar
+        self.scalarobj = scalarobj
 
     def resolved(self, *path):
         return self.scope.resolved(*path) if path else self
 
     def resolve(self, scope):
-        return self.scalar
+        return self.scalarobj
 
 class Functions:
 
