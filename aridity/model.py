@@ -222,7 +222,11 @@ class Call(Resolvable):
 
     @classmethod
     def pa(cls, s, l, t):
-        return cls(t[0], t[2:-1], t[1]+t[-1])
+        names = t[0].split('$')
+        call = cls(names[-1], t[2:-1], t[1] + t[-1])
+        for name in reversed(names[:-1]):
+            call = cls(name, [call], ['', ''])
+        return call
 
     def __init__(self, name, args, brackets):
         self.name = name
@@ -230,10 +234,7 @@ class Call(Resolvable):
         self.brackets = brackets
 
     def resolve(self, scope, aslist = False):
-        args = [a for a in self.args if not a.ignorable]
-        for name in reversed(self.name.split('$')): # TODO: Should be parsed upfront and Call objects nested.
-            args = [scope.resolved(name)(*[scope] + args)]
-        result, = args
+        result = scope.resolved(self.name)(scope, *(a for a in self.args if not a.ignorable))
         return List([result]) if aslist else result
 
     def unparse(self):

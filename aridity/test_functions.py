@@ -233,9 +233,4 @@ class TestFunctions(TestCase):
             repl('a = $x($y())')
             repl('b = $x$y()')
         self.assertEqual('woo', s.resolved('a').scalar)
-        try:
-            self.assertEqual('woo', s.resolved('b').scalar)
-        except Y:
-            pass
-        else:
-            self.fail('You fixed a bug!')
+        self.assertEqual('woo', s.resolved('b').scalar)
