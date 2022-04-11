@@ -22,6 +22,7 @@ from io import BytesIO, TextIOWrapper
 import collections, importlib_resources, inspect, sys
 
 ispy2 = sys.version_info.major < 3
+null_exc_info = None, None, None
 
 class NoSuchPathException(Exception): pass
 

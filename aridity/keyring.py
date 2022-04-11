@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .model import Scalar
+from .util import null_exc_info
 from functools import partial
 from getpass import getpass
 from threading import Semaphore
@@ -27,8 +28,6 @@ once = Semaphore()
 
 class Password(passwordbase):
 
-    null_exc_info = None, None, None
-
     def __new__(cls, password, setter):
         p = passwordbase.__new__(cls, password)
         p.setter = setter
@@ -38,7 +37,7 @@ class Password(passwordbase):
         return self
 
     def __exit__(self, *exc_info):
-        if self.setter is not None and self.null_exc_info == exc_info:
+        if self.setter is not None and null_exc_info == exc_info:
             self.setter(self)
 
 def keyring(scope, serviceres, usernameres):
