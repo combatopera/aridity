@@ -18,8 +18,12 @@
 from .model import Scalar
 from functools import partial
 from getpass import getpass
+from threading import Semaphore
+import logging, os
 
+log = logging.getLogger(__name__)
 passwordbase = str
+once = Semaphore()
 
 class Password(passwordbase):
 
@@ -38,6 +42,11 @@ class Password(passwordbase):
             self.setter(self)
 
 def keyring(scope, serviceres, usernameres):
+    if once.acquire(False) and scope.resolved('keyring_cron').scalar:
+        key = 'DBUS_SESSION_BUS_ADDRESS'
+        value = "unix:path=/run/user/%s/bus" % os.geteuid()
+        log.debug("Set %s to: %s", key, value)
+        os.environ[key] = value
     from keyring import get_password, set_password
     service = serviceres.resolve(scope).cat()
     username = usernameres.resolve(scope).cat()

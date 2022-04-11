@@ -283,6 +283,7 @@ class StaticScope(AbstractScope):
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
             self[name,] = Function(f)
+        self['keyring_cron',] = Scalar(False)
         self['~',] = Text(os.path.expanduser('~'))
         self['LF',] = Text('\n')
         self['EOL',] = Text(os.linesep)
