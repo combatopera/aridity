@@ -284,6 +284,7 @@ class StaticScope(AbstractScope):
         for name, f in getfunctions():
             self[name,] = Function(f)
         self['keyring_cron',] = Scalar(False)
+        self['keyring_force',] = Scalar(False)
         self['~',] = Text(os.path.expanduser('~'))
         self['LF',] = Text('\n')
         self['EOL',] = Text(os.linesep)

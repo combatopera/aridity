@@ -49,5 +49,5 @@ def keyring(scope, serviceres, usernameres):
     from keyring import get_password, set_password
     service = serviceres.resolve(scope).cat()
     username = usernameres.resolve(scope).cat()
-    password = get_password(service, username)
+    password = None if scope.resolved('keyring_force').scalar else get_password(service, username)
     return Scalar(Password(*[getpass(), partial(set_password, service, username)] if password is None else [password, None]))
