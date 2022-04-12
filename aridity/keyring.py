@@ -41,7 +41,7 @@ class Password(passwordbase):
             self.setter(self)
 
 def keyring(scope, serviceres, usernameres):
-    if once.acquire(False) and scope.resolved('keyring_cron').scalar:
+    if scope.resolved('keyring_cron').scalar and once.acquire(False):
         key = 'DBUS_SESSION_BUS_ADDRESS'
         value = "unix:path=/run/user/%s/bus" % os.geteuid()
         log.debug("Set %s to: %s", key, value)
