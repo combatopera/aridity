@@ -67,21 +67,6 @@ class OrderedDictWrapper:
     def __nonzero__(self):
         return self.__bool__()
 
-class OrderedSet(OrderedDictWrapper):
-
-    def add(self, x):
-        self.d[x] = None
-
-    def update(self, g):
-        for x in g:
-            self.add(x)
-
-    def __iter__(self):
-        return iter(self.d.keys())
-
-    def __repr__(self):
-        return repr(self.d.keys())
-
 class OrderedDict(OrderedDictWrapper):
 
     def __setitem__(self, k, v):

@@ -18,21 +18,10 @@
 from .config import ConfigCtrl
 from .repl import Repl
 from .scope import Scope
-from .util import ispy2, openresource, OrderedSet, TreeNoSuchPathException
+from .util import ispy2, openresource, TreeNoSuchPathException
 from unittest import TestCase
 
 class TestUtil(TestCase):
-
-    def test_orderedset(self):
-        s = OrderedSet()
-        self.assertEqual(False, bool(s))
-        s.add(2)
-        self.assertEqual(True, bool(s))
-        s.add(1)
-        s.add(0)
-        self.assertEqual([2, 1, 0], list(s)) # Order preserved.
-        s.add(1)
-        self.assertEqual([2, 1, 0], list(s)) # Order unchanged.
 
     def test_treeexceptionstr(self):
         s = Scope()
