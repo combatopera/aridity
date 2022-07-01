@@ -71,18 +71,6 @@ class Parser:
         opttext = Optional(cls.gettext(Text.pa, boundarychars))
         return (OneOrMore(opttext + action) + opttext | cls.gettext(scalarpa, boundarychars)).setParseAction(Concat.smartpa)
 
-    @classmethod
-    def create(cls, scalarpa, boundarychars):
-        optboundary = cls.getoptboundary(Boundary.pa, boundarychars)
-        optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return OneOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
-
-    @classmethod
-    def getcommand(cls, scalarpa, boundarychars):
-        optboundary = cls.getoptboundary(Boundary.pa, boundarychars)
-        optblank = cls.getoptblank(Blank.pa, boundarychars)
-        return ZeroOrMore(optblank + cls.getarg(cls.getaction(), scalarpa, boundarychars)) + optblank + optboundary
-
     def __init__(self, g, singleton = False):
         self.g = g.parseWithTabs()
         self.singleton = singleton
@@ -93,7 +81,23 @@ class Parser:
             result, = result
         return result
 
-expressionparser = Parser(Parser.create(AnyScalar.pa, '\r\n'))
-templateparser = Parser(Parser.create(Text.pa, '') | Regex('^$').setParseAction(Text.pa))
-loader = Parser(ZeroOrMore(Parser.create(AnyScalar.pa, '\r\n').setParseAction(Entry.pa)))
-commandparser = Parser(Parser.getcommand(AnyScalar.pa, '\r\n').setParseAction(Entry.pa), True)
+class Factory:
+
+    def __init__(self, scalarpa = AnyScalar.pa, boundarychars = '\r\n'):
+        self.scalarpa = scalarpa
+        self.boundarychars = boundarychars
+
+    def create(self):
+        optboundary = Parser.getoptboundary(Boundary.pa, self.boundarychars)
+        optblank = Parser.getoptblank(Blank.pa, self.boundarychars)
+        return OneOrMore(optblank + Parser.getarg(Parser.getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+
+    def getcommand(self):
+        optboundary = Parser.getoptboundary(Boundary.pa, self.boundarychars)
+        optblank = Parser.getoptblank(Blank.pa, self.boundarychars)
+        return ZeroOrMore(optblank + Parser.getarg(Parser.getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+
+expressionparser = Parser(Factory().create())
+templateparser = Parser(Factory(Text.pa, '').create() | Regex('^$').setParseAction(Text.pa))
+loader = Parser(ZeroOrMore(Factory().create().setParseAction(Entry.pa)))
+commandparser = Parser(Factory().getcommand().setParseAction(Entry.pa), True)
