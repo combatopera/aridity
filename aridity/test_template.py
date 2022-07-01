@@ -67,12 +67,9 @@ class TestTemplate(TestCase):
 
 ''', processtemplate(s, Text(f.name)))
 
-    def test_indentundermap(self):
-        s = Scope()
-        s['word', 'xx'] = Text('x')
-        s['word', 'yy'] = Text('y')
+    def test_nestedexprindent(self):
         with NamedTemporaryFile('w') as f:
-            f.write('''  $join$map($(word) $.[outer=<$(indent)>
-    inner=<$(indent)>])''')
+            f.write('''  $.[outer=<$(indent)>
+    inner=<$(indent)>]''')
             f.flush()
-            self.assertEqual('  outer=<  >\n    inner=<    >' * 2, processtemplate(s, Text(f.name)))
+            self.assertEqual('  outer=<  >\n    inner=<    >', processtemplate(Scope(), Text(f.name)))
