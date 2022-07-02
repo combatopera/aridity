@@ -41,9 +41,6 @@ identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
 
-def _gettext(pa, boundarychars):
-    return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
-
 def _getaction():
     def clauses():
         def getbrackets(blankpa, scalarpa):
@@ -58,8 +55,10 @@ def _getaction():
     return action
 
 def _getarg(action, scalarpa, boundarychars):
-    opttext = Optional(_gettext(Text.pa, boundarychars))
-    return (OneOrMore(opttext + action) + opttext | _gettext(scalarpa, boundarychars)).setParseAction(Concat.smartpa)
+    def gettext(pa):
+        return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
+    opttext = Optional(gettext(Text.pa))
+    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
 class Parser:
 
