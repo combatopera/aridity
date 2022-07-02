@@ -109,4 +109,7 @@ commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Ent
 
 def templateparser(monitor):
     concatpa = ConcatPA(monitor)
-    return Parser(Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.complete) | Regex('^$').setParseAction(Text.pa), True)
+    return Parser(reduce(operator.or_, [
+        Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.complete),
+        Regex('^$').setParseAction(Text.pa),
+    ]), True)
