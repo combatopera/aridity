@@ -49,14 +49,14 @@ class ConcatPA:
     def strict(self, s, l, t):
         return Concat(t[1:-1], self.monitor)
 
-    def _smart(self, s, l, t):
-        return Concat.unlesssingleton(t.asList())
+def _smartpa(s, l, t):
+    return Concat.unlesssingleton(t.asList())
 
-    def getarg(self, action, scalarpa, boundarychars):
-        def gettext(pa):
-            return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
-        opttext = Optional(gettext(Text.pa))
-        return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(self._smart)
+def _getarg(action, scalarpa, boundarychars):
+    def gettext(pa):
+        return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
+    opttext = Optional(gettext(Text.pa))
+    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(_smartpa)
 
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
@@ -91,7 +91,7 @@ class Factory:
         def clauses():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + self.concatpa.getarg(action, scalarpa, c)) + optblank + Literal(c)
+                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
             for o, c in bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self.concatpa.strict)
@@ -100,7 +100,7 @@ class Factory:
         action = Forward()
         action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
         return reduce(operator.add, [
-            self.ormorecls(optblank + self.concatpa.getarg(action, self.scalarpa, self.boundarychars)),
+            self.ormorecls(optblank + _getarg(action, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
