@@ -24,7 +24,7 @@ import logging, os
 
 log = logging.getLogger(__name__)
 passwordbase = str
-once = Semaphore()
+setenvonce = Semaphore()
 
 class Password(passwordbase):
 
@@ -41,7 +41,7 @@ class Password(passwordbase):
             self.setter(self)
 
 def keyring(scope, serviceres, usernameres):
-    if scope.resolved('keyring_cron').scalar and once.acquire(False):
+    if scope.resolved('keyring_cron').scalar and setenvonce.acquire(False):
         key = 'DBUS_SESSION_BUS_ADDRESS'
         value = "unix:path=/run/user/%s/bus" % os.geteuid()
         log.debug("Set %s to: %s", key, value)
