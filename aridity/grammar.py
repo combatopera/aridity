@@ -17,8 +17,9 @@
 
 from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
 from decimal import Decimal
+from functools import reduce
 from pyparsing import Forward, Literal, MatchFirst, NoMatch, OneOrMore, Optional, Regex, Suppress, ZeroOrMore
-import re
+import operator, re
 
 class AnyScalar:
 
@@ -86,9 +87,12 @@ class Factory:
         return factory._create()
 
     def _create(self):
-        optboundary = Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch())
         optblank = _getoptblank(Blank.pa, self.boundarychars)
-        return self.ormorecls(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+        return reduce(operator.add, [
+            self.ormorecls(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)),
+            optblank,
+            Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
+        ])
 
 templateparser = Parser(Factory.create(scalarpa = Text.pa, boundarychars = '') | Regex('^$').setParseAction(Text.pa))
 commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
