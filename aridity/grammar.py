@@ -43,10 +43,10 @@ class ConcatPA:
     def __init__(self, monitor):
         self.monitor = monitor
 
-    def complete(self, s, l, t):
+    def template(self, s, l, t):
         return Concat(t, self.monitor)
 
-    def strict(self, s, l, t):
+    def brackets(self, s, l, t):
         return Concat(t[1:-1], self.monitor)
 
 def _smartpa(s, l, t):
@@ -94,7 +94,7 @@ class Factory:
                 return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
             for o, c in bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self.concatpa.strict)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self.concatpa.brackets)
                 yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
@@ -110,6 +110,6 @@ commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Ent
 def templateparser(monitor):
     concatpa = ConcatPA(monitor)
     return Parser(reduce(operator.or_, [
-        Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.complete),
+        Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.template),
         Regex('^$').setParseAction(Text.pa),
     ]), True)
