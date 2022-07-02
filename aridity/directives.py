@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import parsetemplate
+from .grammar import templateparser
 from .model import Stream, Text
 import os, sys
 
@@ -118,4 +118,4 @@ def processtemplate(scope, pathresolvable):
 
 def processtemplateimpl(scope, f):
     with scope.staticscope().indent.push() as monitor:
-        return parsetemplate(monitor, f).resolve(scope).cat()
+        return templateparser(monitor)(f.read()).resolve(scope).cat()

@@ -43,6 +43,9 @@ class ConcatPA:
     def __init__(self, monitor):
         self.monitor = monitor
 
+    def complete(self, s, l, t):
+        return Concat(t, self.monitor)
+
     def strict(self, s, l, t):
         return Concat(t[1:-1], self.monitor)
 
@@ -104,5 +107,6 @@ class Factory:
 
 commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
 
-def parsetemplate(monitor, f):
-    return Concat(Parser(Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = ConcatPA(monitor)) | Regex('^$').setParseAction(Text.pa))(f.read()), monitor)
+def templateparser(monitor):
+    concatpa = ConcatPA(monitor)
+    return Parser(Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.complete) | Regex('^$').setParseAction(Text.pa), True)
