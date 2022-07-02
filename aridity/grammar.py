@@ -48,15 +48,15 @@ def _getoptboundary(pa, boundarychars):
     return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa) if boundarychars else NoMatch())
 
 def _getaction():
-    action = Forward()
     def clauses():
+        def getbrackets(blankpa, scalarpa):
+            optblank = _getoptblank(blankpa, '')
+            return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
         for o, c in bracketpairs:
             yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-            def getbrackets(blankpa, scalarpa):
-                optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
             yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
             yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
+    action = Forward()
     action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
     return action
 
