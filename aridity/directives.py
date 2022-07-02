@@ -118,4 +118,4 @@ def processtemplate(scope, pathresolvable):
 
 def processtemplateimpl(scope, f):
     with scope.staticscope().indent.push() as monitor:
-        return Concat(templateparser(f.read()), monitor).resolve(scope).cat()
+        return Concat(templateparser(monitor)(f.read()), monitor).resolve(scope).cat()

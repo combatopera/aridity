@@ -102,5 +102,7 @@ class Factory:
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
 
-templateparser = Parser(Factory.create(scalarpa = Text.pa, boundarychars = '') | Regex('^$').setParseAction(Text.pa))
+def templateparser(monitor):
+    return Parser(Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = ConcatPA(monitor)) | Regex('^$').setParseAction(Text.pa))
+
 commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
