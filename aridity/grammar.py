@@ -92,7 +92,5 @@ class Factory:
         optblank = getoptblank(Blank.pa, self.boundarychars)
         return ZeroOrMore(optblank + getarg(getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
-expressionparser = Parser(Factory().create())
 templateparser = Parser(Factory(Text.pa, '').create() | Regex('^$').setParseAction(Text.pa))
-loader = Parser(ZeroOrMore(Factory().create().setParseAction(Entry.pa)))
 commandparser = Parser(Factory().getcommand().setParseAction(Entry.pa), True)

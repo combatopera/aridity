@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import loader as l
+from .test_grammar import loader as l
 from .model import Directive, Stream, Text
 from .repl import Repl
 from .scope import Scope, StaticScope

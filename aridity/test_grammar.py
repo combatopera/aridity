@@ -15,11 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .grammar import expressionparser as p, loader as l
+from .grammar import Factory, Parser, ZeroOrMore
 from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
 from decimal import Decimal
 from pyparsing import ParseException
 from unittest import TestCase
+
+p = expressionparser = Parser(Factory().create())
+l = loader = Parser(ZeroOrMore(Factory().create().setParseAction(Entry.pa)))
 
 class TestGrammar(TestCase):
 
