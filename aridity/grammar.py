@@ -73,21 +73,19 @@ class Factory:
         return factory._create()
 
     def _create(self):
-        def getaction():
-            def clauses():
-                def getbrackets(blankpa, scalarpa):
-                    optblank = _getoptblank(blankpa, '')
-                    return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
-                for o, c in bracketpairs:
-                    yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-                    yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
-                    yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
-            action = Forward()
-            action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
-            return action
+        def clauses():
+            def getbrackets(blankpa, scalarpa):
+                optblank = _getoptblank(blankpa, '')
+                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
+            for o, c in bracketpairs:
+                yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
+                yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
+        action = Forward()
+        action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
         return reduce(operator.add, [
-            self.ormorecls(optblank + _getarg(getaction(), self.scalarpa, self.boundarychars)),
+            self.ormorecls(optblank + _getarg(action, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
