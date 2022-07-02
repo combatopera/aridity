@@ -38,14 +38,25 @@ bracketpairs = '()', '[]'
 idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
 identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
+class ConcatPA:
+
+    def __init__(self, monitor):
+        self.monitor = monitor
+
+    def strict(self, s, l, t):
+        return Concat(t[1:-1])
+
+    def _smart(self, s, l, t):
+        return Concat.unlesssingleton(t.asList())
+
+    def getarg(self, action, scalarpa, boundarychars):
+        def gettext(pa):
+            return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
+        opttext = Optional(gettext(Text.pa))
+        return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(self._smart)
+
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
-
-def _getarg(action, scalarpa, boundarychars):
-    def gettext(pa):
-        return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
-    opttext = Optional(gettext(Text.pa))
-    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
 class Parser:
 
@@ -76,16 +87,17 @@ class Factory:
         def clauses():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
+                return Literal(o) + ZeroOrMore(optblank + concatpa.getarg(action, scalarpa, c)) + optblank + Literal(c)
             for o, c in bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(concatpa.strict)
                 yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
+        concatpa = ConcatPA(None)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
         action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
         return reduce(operator.add, [
-            self.ormorecls(optblank + _getarg(action, self.scalarpa, self.boundarychars)),
+            self.ormorecls(optblank + concatpa.getarg(action, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
