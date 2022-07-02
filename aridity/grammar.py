@@ -38,31 +38,31 @@ bracketpairs = '()', '[]'
 idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
 identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
-def getoptblank(pa, boundarychars):
+def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
 
-def gettext(pa, boundarychars):
+def _gettext(pa, boundarychars):
     return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
 
-def getoptboundary(pa, boundarychars):
+def _getoptboundary(pa, boundarychars):
     return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa) if boundarychars else NoMatch())
 
-def getaction():
+def _getaction():
     action = Forward()
     def clauses():
         for o, c in bracketpairs:
             yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
             def getbrackets(blankpa, scalarpa):
-                optblank = getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + getarg(action, scalarpa, c)) + optblank + Literal(c)
+                optblank = _getoptblank(blankpa, '')
+                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
             yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(Concat.strictpa)
             yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
     action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
     return action
 
-def getarg(action, scalarpa, boundarychars):
-    opttext = Optional(gettext(Text.pa, boundarychars))
-    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa, boundarychars)).setParseAction(Concat.smartpa)
+def _getarg(action, scalarpa, boundarychars):
+    opttext = Optional(_gettext(Text.pa, boundarychars))
+    return (OneOrMore(opttext + action) + opttext | _gettext(scalarpa, boundarychars)).setParseAction(Concat.smartpa)
 
 class Parser:
 
@@ -83,14 +83,14 @@ class Factory:
         self.boundarychars = boundarychars
 
     def create(self):
-        optboundary = getoptboundary(Boundary.pa, self.boundarychars)
-        optblank = getoptblank(Blank.pa, self.boundarychars)
-        return OneOrMore(optblank + getarg(getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+        optboundary = _getoptboundary(Boundary.pa, self.boundarychars)
+        optblank = _getoptblank(Blank.pa, self.boundarychars)
+        return OneOrMore(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
     def getcommand(self):
-        optboundary = getoptboundary(Boundary.pa, self.boundarychars)
-        optblank = getoptblank(Blank.pa, self.boundarychars)
-        return ZeroOrMore(optblank + getarg(getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+        optboundary = _getoptboundary(Boundary.pa, self.boundarychars)
+        optblank = _getoptblank(Blank.pa, self.boundarychars)
+        return ZeroOrMore(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
 templateparser = Parser(Factory(Text.pa, '').create() | Regex('^$').setParseAction(Text.pa))
 commandparser = Parser(Factory().getcommand().setParseAction(Entry.pa), True)
