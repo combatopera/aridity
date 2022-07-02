@@ -29,7 +29,6 @@ def _blockquote(scope, resolvable):
 class TestTemplate(TestCase):
 
     def test_indentworks(self):
-        s = Scope()
         with NamedTemporaryFile('w') as f:
             f.write('root: .$(indent).\n')
             f.write(' sp: .$(indent).\n')
@@ -44,14 +43,13 @@ class TestTemplate(TestCase):
 \ttab: .\t.
 \t mixed: .\t .
 \t\t compound: .\t\t .
-''', processtemplate(s, Text(f.name)))
+''', processtemplate(Scope(), Text(f.name)))
 
     def test_trivialindent(self):
-        s = Scope()
         with NamedTemporaryFile('w') as f:
             f.write('$(indent) should not fail')
             f.flush()
-            self.assertEqual(' should not fail', processtemplate(s, Text(f.name)))
+            self.assertEqual(' should not fail', processtemplate(Scope(), Text(f.name)))
 
     def test_getindentinfunction(self):
         s = Scope()
