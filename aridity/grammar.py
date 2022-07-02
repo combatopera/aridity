@@ -78,7 +78,11 @@ class Parser:
 
 class Factory:
 
-    def __init__(self, scalarpa = AnyScalar.pa, boundarychars = '\r\n'):
+    @classmethod
+    def default(cls):
+        return cls(AnyScalar.pa, '\r\n')
+
+    def __init__(self, scalarpa, boundarychars):
         self.scalarpa = scalarpa
         self.boundarychars = boundarychars
 
@@ -93,4 +97,4 @@ class Factory:
         return ZeroOrMore(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
 templateparser = Parser(Factory(Text.pa, '').create() | Regex('^$').setParseAction(Text.pa))
-commandparser = Parser(Factory().getcommand().setParseAction(Entry.pa), True)
+commandparser = Parser(Factory.default().getcommand().setParseAction(Entry.pa), True)

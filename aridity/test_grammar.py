@@ -21,8 +21,8 @@ from decimal import Decimal
 from pyparsing import ParseException
 from unittest import TestCase
 
-p = expressionparser = Parser(Factory().create())
-l = loader = Parser(ZeroOrMore(Factory().create().setParseAction(Entry.pa)))
+p = expressionparser = Parser(Factory.default().create())
+l = loader = Parser(ZeroOrMore(Factory.default().create().setParseAction(Entry.pa)))
 
 class TestGrammar(TestCase):
 
