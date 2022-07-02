@@ -30,9 +30,8 @@ class AnyScalar:
         text, = t
         if text in cls.booleans:
             return cls.booleans[text]
-        else:
-            m = cls.numberpattern.search(text)
-            return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
+        m = cls.numberpattern.search(text)
+        return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
 bracketpairs = '()', '[]'
 idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
