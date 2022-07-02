@@ -16,13 +16,15 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .grammar import Factory, Parser, ZeroOrMore
-from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
+from .model import Blank, Boolean, Boundary, Call, Concat as ConcatImpl, Entry, nullmonitor, Number, Text
 from decimal import Decimal
+from functools import partial
 from pyparsing import ParseException
 from unittest import TestCase
 
 p = expressionparser = Parser(Factory.create())
 l = loader = Parser(ZeroOrMore(Factory.create().setParseAction(Entry.pa)))
+Concat = partial(ConcatImpl, monitor = nullmonitor)
 
 class TestGrammar(TestCase):
 

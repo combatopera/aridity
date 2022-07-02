@@ -48,15 +48,17 @@ class Resolved(Resolvable):
     def spread(self, k): # TODO: Probably makes more sense on SimpleValue, which more things should extend.
         yield k, self
 
+nullmonitor = lambda text: None
+
 class Concat(Resolvable):
 
     ignorable = False
 
     @classmethod
     def unlesssingleton(cls, v):
-        return v[0] if 1 == len(v) else cls(v)
+        return v[0] if 1 == len(v) else cls(v, nullmonitor)
 
-    def __init__(self, parts, monitor = lambda text: None):
+    def __init__(self, parts, monitor):
         self.parts = parts
         self.monitor = monitor
 

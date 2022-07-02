@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .test_grammar import expressionparser as p
-from .model import Blank, Call, Concat, Function, Number, Text
+from .test_grammar import Concat, expressionparser as p
+from .model import Blank, Call, Function, Number, Text
 from .scope import Scope
 from .util import allfunctions
 from unittest import TestCase

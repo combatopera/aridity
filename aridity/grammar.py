@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Blank, Boolean, Boundary, Call, Concat, Entry, Number, Text
+from .model import Blank, Boolean, Boundary, Call, Concat, Entry, nullmonitor, Number, Text
 from decimal import Decimal
 from functools import reduce
 from pyparsing import Forward, Literal, MatchFirst, NoMatch, OneOrMore, Optional, Regex, Suppress, ZeroOrMore
@@ -44,7 +44,7 @@ class ConcatPA:
         self.monitor = monitor
 
     def strict(self, s, l, t):
-        return Concat(t[1:-1])
+        return Concat(t[1:-1], self.monitor)
 
     def _smart(self, s, l, t):
         return Concat.unlesssingleton(t.asList())
@@ -75,6 +75,7 @@ class Factory:
     scalarpa = AnyScalar.pa
     boundarychars = '\r\n'
     ormorecls = OneOrMore
+    concatpa = ConcatPA(nullmonitor)
 
     @classmethod
     def create(cls, **kwargs):
@@ -87,17 +88,16 @@ class Factory:
         def clauses():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + concatpa.getarg(action, scalarpa, c)) + optblank + Literal(c)
+                return Literal(o) + ZeroOrMore(optblank + self.concatpa.getarg(action, scalarpa, c)) + optblank + Literal(c)
             for o, c in bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(concatpa.strict)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self.concatpa.strict)
                 yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
-        concatpa = ConcatPA(None)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
         action << Suppress('$').leaveWhitespace() + MatchFirst(clauses()).leaveWhitespace()
         return reduce(operator.add, [
-            self.ormorecls(optblank + concatpa.getarg(action, self.scalarpa, self.boundarychars)),
+            self.ormorecls(optblank + self.concatpa.getarg(action, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
