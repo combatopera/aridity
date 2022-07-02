@@ -43,9 +43,6 @@ def _getoptblank(pa, boundarychars):
 def _gettext(pa, boundarychars):
     return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
 
-def _getoptboundary(pa, boundarychars):
-    return Optional(Regex("[%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa) if boundarychars else NoMatch())
-
 def _getaction():
     def clauses():
         def getbrackets(blankpa, scalarpa):
@@ -89,7 +86,7 @@ class Factory:
         return factory._create()
 
     def _create(self):
-        optboundary = _getoptboundary(Boundary.pa, self.boundarychars)
+        optboundary = Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch())
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         return self.ormorecls(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
