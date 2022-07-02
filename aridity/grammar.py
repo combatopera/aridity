@@ -77,23 +77,21 @@ class Parser:
 
 class Factory:
 
+    scalarpa = AnyScalar.pa
+    boundarychars = '\r\n'
+    ormorecls = OneOrMore
+
     @classmethod
-    def default(cls):
-        return cls(AnyScalar.pa, '\r\n')
+    def create(cls, **kwargs):
+        factory = cls()
+        for k, v in kwargs.items():
+            setattr(factory, k, v)
+        return factory._create()
 
-    def __init__(self, scalarpa, boundarychars):
-        self.scalarpa = scalarpa
-        self.boundarychars = boundarychars
-
-    def create(self):
+    def _create(self):
         optboundary = _getoptboundary(Boundary.pa, self.boundarychars)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
-        return OneOrMore(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
+        return self.ormorecls(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
 
-    def getcommand(self):
-        optboundary = _getoptboundary(Boundary.pa, self.boundarychars)
-        optblank = _getoptblank(Blank.pa, self.boundarychars)
-        return ZeroOrMore(optblank + _getarg(_getaction(), self.scalarpa, self.boundarychars)) + optblank + optboundary
-
-templateparser = Parser(Factory(Text.pa, '').create() | Regex('^$').setParseAction(Text.pa))
-commandparser = Parser(Factory.default().getcommand().setParseAction(Entry.pa), True)
+templateparser = Parser(Factory.create(scalarpa = Text.pa, boundarychars = '') | Regex('^$').setParseAction(Text.pa))
+commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
