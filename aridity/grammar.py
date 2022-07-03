@@ -73,7 +73,7 @@ class Parser:
             result, = result
         return result
 
-class Factory:
+class GFactory:
 
     scalarpa = AnyScalar.pa
     boundarychars = '\r\n'
@@ -105,11 +105,11 @@ class Factory:
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
 
-commandparser = Parser(Factory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
+commandparser = Parser(GFactory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
 
 def templateparser(monitor):
     concatpa = ConcatPA(monitor)
     return Parser(reduce(operator.or_, [
-        Factory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.template),
+        GFactory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.template),
         Regex('^$').setParseAction(Text.pa),
     ]), True)
