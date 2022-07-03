@@ -29,10 +29,11 @@ class AnyScalar:
     @classmethod
     def pa(cls, s, l, t):
         text, = t
-        if text in cls.booleans:
+        try:
             return cls.booleans[text]
-        m = cls.numberpattern.search(text)
-        return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
+        except KeyError:
+            m = cls.numberpattern.search(text)
+            return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
 def _smartpa(s, l, t):
     return Concat.unlesssingleton(t.asList())
