@@ -63,7 +63,7 @@ def _getoptblank(pa, boundarychars):
 
 class Parser:
 
-    def __init__(self, g, singleton = False):
+    def __init__(self, g, singleton = True):
         self.g = g.parseWithTabs()
         self.singleton = singleton
 
@@ -105,11 +105,11 @@ class GFactory:
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
 
-commandparser = Parser(GFactory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa), True)
+commandparser = Parser(GFactory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa))
 
 def templateparser(monitor):
     concatpa = ConcatPA(monitor)
     return Parser(reduce(operator.or_, [
         GFactory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.template),
         Regex('^$').setParseAction(Text.pa),
-    ]), True)
+    ]))
