@@ -22,8 +22,8 @@ from functools import partial
 from pyparsing import ParseException
 from unittest import TestCase
 
-p = expressionparser = Parser(GFactory().create(), False)
-l = loader = Parser(ZeroOrMore(GFactory().create().setParseAction(Entry.pa)), False)
+p = expressionparser = Parser(GFactory().create(None), False)
+l = loader = Parser(ZeroOrMore(GFactory().create(Entry.pa)), False)
 Concat = partial(ConcatImpl, monitor = nullmonitor)
 
 class TestGrammar(TestCase):

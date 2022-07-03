@@ -76,7 +76,7 @@ class GFactory:
     def _bracketspa(self, s, l, t):
         return Concat(t[1:-1], self.monitor)
 
-    def create(self):
+    def create(self, pa):
         def clauses():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
@@ -92,10 +92,10 @@ class GFactory:
             self.ormorecls(optblank + _getarg(action, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
-        ])
+        ]).setParseAction(pa)
 
-commandparser = Parser(GFactory(ormorecls = ZeroOrMore).create().setParseAction(Entry.pa))
+commandparser = Parser(GFactory(ormorecls = ZeroOrMore).create(Entry.pa))
 
 def templateparser(monitor):
     gfactory = GFactory(scalarpa = Text.pa, boundarychars = '', monitor = monitor)
-    return Parser(gfactory.create().setParseAction(gfactory.templatepa) | Regex('^$').setParseAction(Text.pa))
+    return Parser(gfactory.create(gfactory.templatepa) | Regex('^$').setParseAction(Text.pa))
