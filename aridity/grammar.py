@@ -38,17 +38,6 @@ bracketpairs = '()', '[]'
 idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
 identifier = Regex("%s(?:[$]%s)*" % (idregex, idregex))
 
-class ConcatPA:
-
-    def __init__(self, monitor):
-        self.monitor = monitor
-
-    def template(self, s, l, t):
-        return Concat(t, self.monitor)
-
-    def brackets(self, s, l, t):
-        return Concat(t[1:-1], self.monitor)
-
 def _smartpa(s, l, t):
     return Concat.unlesssingleton(t.asList())
 
@@ -75,26 +64,26 @@ class Parser:
 
 class GFactory:
 
-    scalarpa = AnyScalar.pa
-    boundarychars = '\r\n'
-    ormorecls = OneOrMore
-    concatpa = ConcatPA(nullmonitor)
+    def __init__(self, scalarpa = AnyScalar.pa, boundarychars = '\r\n', ormorecls = OneOrMore, monitor = nullmonitor):
+        self.scalarpa = scalarpa
+        self.boundarychars = boundarychars
+        self.ormorecls = ormorecls
+        self.monitor = monitor
 
-    @classmethod
-    def create(cls, **kwargs):
-        factory = cls()
-        for k, v in kwargs.items():
-            setattr(factory, k, v)
-        return factory._create()
+    def templatepa(self, s, l, t):
+        return Concat(t, self.monitor)
 
-    def _create(self):
+    def _bracketspa(self, s, l, t):
+        return Concat(t[1:-1], self.monitor)
+
+    def create(self):
         def clauses():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
                 return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
             for o, c in bracketpairs:
                 yield (Suppress(Regex("lit|'")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
-                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self.concatpa.brackets)
+                yield (Suppress(Regex('pass|[.]')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
                 yield (identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(Call.pa)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
@@ -105,11 +94,8 @@ class GFactory:
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ])
 
-commandparser = Parser(GFactory.create(ormorecls = ZeroOrMore).setParseAction(Entry.pa))
+commandparser = Parser(GFactory(ormorecls = ZeroOrMore).create().setParseAction(Entry.pa))
 
 def templateparser(monitor):
-    concatpa = ConcatPA(monitor)
-    return Parser(reduce(operator.or_, [
-        GFactory.create(scalarpa = Text.pa, boundarychars = '', concatpa = concatpa).setParseAction(concatpa.template),
-        Regex('^$').setParseAction(Text.pa),
-    ]))
+    gfactory = GFactory(scalarpa = Text.pa, boundarychars = '', monitor = monitor)
+    return Parser(gfactory.create().setParseAction(gfactory.templatepa) | Regex('^$').setParseAction(Text.pa))
