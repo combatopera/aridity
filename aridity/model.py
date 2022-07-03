@@ -55,6 +55,10 @@ class Concat(Resolvable):
     ignorable = False
 
     @classmethod
+    def smartpa(cls, s, l, t):
+        return cls.unlesssingleton(t.asList())
+
+    @classmethod
     def unlesssingleton(cls, v):
         return v[0] if 1 == len(v) else cls(v, nullmonitor)
 

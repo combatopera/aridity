@@ -35,14 +35,11 @@ class AnyScalar:
             m = cls.numberpattern.search(text)
             return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
-def _smartpa(s, l, t):
-    return Concat.unlesssingleton(t.asList())
-
 def _getarg(action, scalarpa, boundarychars):
     def gettext(pa):
         return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
     opttext = Optional(gettext(Text.pa))
-    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(_smartpa)
+    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
