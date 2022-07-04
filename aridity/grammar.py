@@ -65,8 +65,7 @@ def _callpa2(s, l, t):
 class GFactory:
 
     bracketpairs = '()', '[]'
-    idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
-    identifier = Regex(idregex)
+    identifier = Regex(r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs))
 
     def __init__(self, scalarpa = AnyScalar.pa, boundarychars = '\r\n', ormorecls = OneOrMore, monitor = nullmonitor):
         self.scalarpa = scalarpa
