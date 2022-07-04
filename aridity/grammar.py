@@ -56,10 +56,10 @@ class Parser:
             result, = result
         return result
 
-def _callpa(s, l, t):
+def _innercallpa(s, l, t):
     return Call(t[0], t[2:-1], t[1] + t[-1])
 
-def _callpa2(s, l, t):
+def _outercallpa(s, l, t):
     return Call(t[0], t[1:], ['', ''])
 
 class GFactory:
@@ -87,8 +87,8 @@ class GFactory:
             for o, c in self.bracketpairs:
                 yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
-                yield (Suppress('$') + self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_callpa)
-                yield (Suppress('$') + self.identifier + action).setParseAction(_callpa2)
+                yield (Suppress('$') + self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_innercallpa)
+                yield (Suppress('$') + self.identifier + action).setParseAction(_outercallpa)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
         action << MatchFirst(clauses()).leaveWhitespace()
