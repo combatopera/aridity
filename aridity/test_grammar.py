@@ -102,3 +102,15 @@ class TestGrammar(TestCase):
         ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Boolean(True)])], l('x = true'))
         ae([Entry([Text('x'), Blank(' '), Text('=true'), Blank(' ')])], l('x =true '))
         ae([Entry([Text('x'), Blank(' '), Text('='), Blank(' '), Call('a', [Blank('\n'), Text('b'), Blank('\r')], '()')])], l('x = $a(\nb\r)'))
+
+    def test_functionsdot(self):
+        ae = self.assertEqual
+        ae([Concat([Text('100')])], p('$.(100)'))
+        ae([Call('x', [Concat([Text('100')])], ['', ''])], p('$x$.(100)'))
+        ae([Call('y', [Call('x', [Concat([Text('100')])], ['', ''])], ['', ''])], p('$y$x$.(100)'))
+
+    def test_functionsquote(self):
+        ae = self.assertEqual
+        ae([Text('100')], p("$'(100)"))
+        ae([Call('x', [Text('100')], ['', ''])], p("$x$'(100)"))
+        ae([Call('y', [Call('x', [Text('100')], ['', ''])], ['', ''])], p("$y$x$'(100)"))
