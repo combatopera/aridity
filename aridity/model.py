@@ -218,14 +218,6 @@ class Call(Resolvable):
 
     ignorable = False
 
-    @classmethod
-    def pa(cls, s, l, t):
-        names = t[0].split('$')
-        call = cls(names[-1], t[2:-1], t[1] + t[-1])
-        for name in reversed(names[:-1]):
-            call = cls(name, [call], ['', ''])
-        return call
-
     def __init__(self, name, args, brackets):
         self.name = name
         self.args = args
