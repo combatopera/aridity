@@ -57,16 +57,16 @@ class Parser:
         return result
 
 def _callpa(s, l, t):
-    return Call(t[0][1:], t[2:-1], t[1] + t[-1])
+    return Call(t[0], t[2:-1], t[1] + t[-1])
 
 def _callpa2(s, l, t):
-    return Call(t[0][1:], t[1:], ['', ''])
+    return Call(t[0], t[1:], ['', ''])
 
 class GFactory:
 
     bracketpairs = '()', '[]'
     idregex = r'[^\s$%s]*' % ''.join(re.escape(o) for o, _ in bracketpairs)
-    identifier = Regex("[$]%s" % idregex)
+    identifier = Regex(idregex)
 
     def __init__(self, scalarpa = AnyScalar.pa, boundarychars = '\r\n', ormorecls = OneOrMore, monitor = nullmonitor):
         self.scalarpa = scalarpa
@@ -88,8 +88,8 @@ class GFactory:
             for o, c in self.bracketpairs:
                 yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
-                yield (self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_callpa)
-                yield (self.identifier + action).setParseAction(_callpa2)
+                yield (Suppress('$') + self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_callpa)
+                yield (Suppress('$') + self.identifier + action).setParseAction(_callpa2)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
         action = Forward()
         action << MatchFirst(clauses()).leaveWhitespace()
