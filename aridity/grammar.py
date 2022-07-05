@@ -35,11 +35,11 @@ class AnyScalar:
             m = cls.numberpattern.search(text)
             return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
-def _getarg(action, scalarpa, boundarychars):
+def _getarg(callchain, scalarpa, boundarychars):
     def gettext(pa):
         return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
     opttext = Optional(gettext(Text.pa))
-    return (OneOrMore(opttext + action) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
+    return (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
@@ -80,20 +80,20 @@ class GFactory:
         return Concat(t[1:-1], self.monitor)
 
     def create(self, pa):
-        def clauses():
+        def itercalls():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + _getarg(action, scalarpa, c)) + optblank + Literal(c)
+                return Literal(o) + ZeroOrMore(optblank + _getarg(callchain, scalarpa, c)) + optblank + Literal(c)
             for o, c in self.bracketpairs:
                 yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
                 yield (Suppress('$') + self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_principalcallpa)
-                yield (Suppress('$') + self.identifier + action).setParseAction(_additionalcallpa)
+                yield (Suppress('$') + self.identifier + callchain).setParseAction(_additionalcallpa)
         optblank = _getoptblank(Blank.pa, self.boundarychars)
-        action = Forward()
-        action << MatchFirst(clauses()).leaveWhitespace()
+        callchain = Forward()
+        callchain << MatchFirst(itercalls()).leaveWhitespace()
         return reduce(operator.add, [
-            self.ormorecls(optblank + _getarg(action, self.scalarpa, self.boundarychars)),
+            self.ormorecls(optblank + _getarg(callchain, self.scalarpa, self.boundarychars)),
             optblank,
             Optional(Regex("[%s]+" % re.escape(self.boundarychars)).leaveWhitespace().setParseAction(Boundary.pa) if self.boundarychars else NoMatch()),
         ]).setParseAction(pa)
