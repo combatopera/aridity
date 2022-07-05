@@ -44,7 +44,7 @@ class TestModel(TestCase):
                 s[name,] = Function(f)
         s['minus124',] = Number(-124)
         s['minus124txt',] = Text('minus124')
-        s['gett',], = p('$($.())')
+        s['gett',], = p('$$.()')
         ae = self.assertEqual
         ae(Text(''), Text('').resolve(None))
         ae(Text('\r\n\t'), Text('\r\n\t').resolve(None))
