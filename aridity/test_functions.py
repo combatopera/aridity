@@ -179,7 +179,7 @@ class TestFunctions(TestCase):
             return
         s = Scope()
         with Repl(s) as repl:
-            repl('a = $urlquote($.( /?&=_\N{POUND SIGN}))')
+            repl('a = $urlquote$.( /?&=_\N{POUND SIGN})')
         self.assertEqual('%20%2F%3F%26%3D_%C2%A3', s.resolved('a').cat())
 
     def test_pyref(self):
