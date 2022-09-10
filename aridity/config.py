@@ -24,7 +24,7 @@ from functools import partial
 from importlib_metadata import entry_points
 from itertools import chain
 from weakref import WeakKeyDictionary
-import errno, logging, os
+import errno, logging, os, sys
 
 log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
@@ -36,6 +36,9 @@ def _newnode(ctrl):
 
 def _processmainfunction(mainfunction):
     module = mainfunction.__module__
+    if '__main__' == module:
+        srcname = os.path.basename(sys.argv[0])
+        return module, srcname[:srcname.rindex('.')]
     attr = mainfunction.__qualname__
     appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
     return module, appname
