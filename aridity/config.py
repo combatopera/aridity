@@ -28,6 +28,7 @@ import errno, logging, os, sys
 
 log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
+dotpy = '.py'
 
 def _newnode(ctrl):
     node = Config()
@@ -37,8 +38,9 @@ def _newnode(ctrl):
 def _processmainfunction(mainfunction):
     module = mainfunction.__module__
     if '__main__' == module:
-        srcname = os.path.basename(sys.argv[0])
-        appname = srcname[:srcname.rindex('.')]
+        scriptname = os.path.basename(sys.argv[0])
+        assert scriptname.endswith(dotpy)
+        appname = scriptname[:-len(dotpy)]
     else:
         attr = mainfunction.__qualname__
         appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
