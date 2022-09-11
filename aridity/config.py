@@ -38,9 +38,10 @@ def _processmainfunction(mainfunction):
     module = mainfunction.__module__
     if '__main__' == module:
         srcname = os.path.basename(sys.argv[0])
-        return module, srcname[:srcname.rindex('.')]
-    attr = mainfunction.__qualname__
-    appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
+        appname = srcname[:srcname.rindex('.')]
+    else:
+        attr = mainfunction.__qualname__
+        appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
     return module, appname
 
 class ForeignScopeException(Exception): pass
