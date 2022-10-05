@@ -30,3 +30,6 @@ def main_aridity():
     with Repl(scope, True) as repl:
         for line in sys.stdin:
             repl(line)
+
+if '__main__' == __name__:
+    main_aridity()

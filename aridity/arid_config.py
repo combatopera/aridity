@@ -33,3 +33,6 @@ def main_arid_config():
     scope = Scope()
     scope.source(Entry([]), _configpath(sys.argv[1]))
     sys.stdout.write(scope.resolved(*sys.argv[2:]).tobash(True))
+
+if '__main__' == __name__:
+    main_arid_config()
