@@ -40,7 +40,7 @@ def _processmainfunction(mainfunction):
     if '__main__' == module:
         scriptname = os.path.basename(sys.argv[0])
         assert scriptname.endswith(dotpy)
-        appname = scriptname[:-len(dotpy)]
+        appname = scriptname[:-len(dotpy)].replace('_', '-')
     else:
         attr = mainfunction.__qualname__
         appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
