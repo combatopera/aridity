@@ -39,7 +39,7 @@ def _processmainfunction(mainfunction):
     module = mainfunction.__module__
     if '__main__' == module:
         scriptname = os.path.basename(sys.argv[0])
-        assert scriptname.endswith(dotpy)
+        assert scriptname.endswith(dotpy) and '-' not in scriptname
         appname = scriptname[:-len(dotpy)].replace('_', '-')
     else:
         attr = mainfunction.__qualname__
