@@ -21,6 +21,7 @@ from importlib import import_module
 from io import BytesIO, TextIOWrapper
 import collections, importlib_resources, inspect, sys
 
+dotpy = '.py'
 ispy2 = sys.version_info.major < 3
 null_exc_info = None, None, None
 

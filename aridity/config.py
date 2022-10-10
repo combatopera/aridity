@@ -19,7 +19,7 @@ from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
 from .scope import Resource, Scope
-from .util import CycleException, NoSuchPathException
+from .util import CycleException, dotpy, NoSuchPathException
 from functools import partial
 from importlib_metadata import entry_points
 from itertools import chain
@@ -28,7 +28,6 @@ import errno, logging, os, sys
 
 log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
-dotpy = '.py'
 
 def _newnode(ctrl):
     node = Config()
