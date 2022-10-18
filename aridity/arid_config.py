@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+'Print given config (with optional path in config) as shell snippet.'
 from .model import Entry
 from .scope import Scope
 import os, sys
@@ -28,11 +29,10 @@ def _configpath(configname):
             return path
     raise Exception("Not found: %s" % configname)
 
-def main_arid_config():
-    'Print given config (with optional path in config) as shell snippet.'
+def main():
     scope = Scope()
     scope.source(Entry([]), _configpath(sys.argv[1]))
     sys.stdout.write(scope.resolved(*sys.argv[2:]).tobash(True))
 
 if '__main__' == __name__:
-    main_arid_config()
+    main()

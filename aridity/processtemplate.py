@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+'Process the given template to stdout using config from stdin.'
 from .repl import Repl
 import os, sys
 
-def main_processtemplate():
-    'Process the given template to stdout using config from stdin.'
+def main():
     templatepath, = sys.argv[1:]
     with Repl() as repl:
         for line in sys.stdin:
@@ -27,4 +27,4 @@ def main_processtemplate():
         repl.printf("< %s", os.path.abspath(templatepath))
 
 if '__main__' == __name__:
-    main_processtemplate()
+    main()

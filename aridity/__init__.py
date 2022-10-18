@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+'Interactive REPL.'
 from .model import Stream
 from .repl import Repl
 from .scope import Scope
@@ -23,8 +24,7 @@ import sys
 
 assert NoSuchPathException
 
-def main_aridity():
-    'Interactive REPL.'
+def main():
     scope = Scope()
     scope['stdout',] = Stream(sys.stdout)
     with Repl(scope, True) as repl:
@@ -32,4 +32,4 @@ def main_aridity():
             repl(line)
 
 if '__main__' == __name__:
-    main_aridity()
+    main()
