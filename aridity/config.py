@@ -42,7 +42,7 @@ def _processmainfunction(mainfunction):
         appname = scriptname[:-len(dotpy)].replace('_', '-')
     else:
         attr = mainfunction.__qualname__
-        appname, = (ep.name for ep in entry_points()['console_scripts'] if ep.module == module and ep.attr == attr)
+        appname, = (ep.name for ep in entry_points(group = 'console_scripts') if ep.module == module and ep.attr == attr)
     return module, appname
 
 class ForeignScopeException(Exception): pass
