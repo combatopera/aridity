@@ -127,3 +127,7 @@ def openresource(package_or_name, resource_name, encoding = 'ascii'):
             f = BytesIO(f.read())
         with TextIOWrapper(f, encoding) as f:
             yield f
+
+def solo(v):
+    x, = v
+    return x

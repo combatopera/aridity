@@ -19,7 +19,7 @@ from .directives import lookup, Precedence
 from .functions import getfunctions, OpaqueKey
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import CycleException, NoSuchPathException, openresource, OrderedDict, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
+from .util import CycleException, NoSuchPathException, openresource, OrderedDict, solo, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 from itertools import chain
 import collections, os, sys, threading
 
@@ -32,9 +32,9 @@ class Resolvables:
     def _proto(self):
         revpath = []
         s = self.scope
-        while s.parent is not None:
+        while s.parents is not None:
             try:
-                protoc = s.parent.resolvables.d[Star.protokey]
+                protoc = solo(s.parents).resolvables.d[Star.protokey]
             except KeyError:
                 pass
             else:
@@ -49,7 +49,7 @@ class Resolvables:
             except AttributeError:
                 break
             revpath.append(keyobj.scalar)
-            s = s.parent
+            s, = s.parents
         return {}
 
     def __init__(self, scope):
@@ -88,7 +88,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def __init__(self, parent):
         self.resolvables = Resolvables(self)
         self.threadlocals = threading.local()
-        self.parent = parent
+        self.parents = None if parent is None else [parent]
 
     def __setitem__(self, path, resolvable):
         # TODO: Interpret non-tuple path as singleton.
@@ -114,7 +114,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return child
 
     def duplicate(self):
-        s = self.parent.createchild()
+        s = solo(self.parents).createchild()
         for k, v in self.resolvables.items():
             try:
                 d = v.duplicate
@@ -153,9 +153,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def _selfandparents(self):
         while True:
             yield self
-            self = self.parent
-            if self is None:
+            if self.parents is None:
                 break
+            self, = self.parents
 
     def _scoreresolvables(self, path):
         tail = path[1:]
@@ -238,7 +238,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                 try: d = s.resolvables
                 except AttributeError: break
                 yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
-                s = s.parent
+                s, = s.parents
         return eol.join(g())
 
     def itero(self):

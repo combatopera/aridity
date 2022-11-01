@@ -19,7 +19,7 @@ from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
 from .scope import Resource, Scope
-from .util import CycleException, dotpy, NoSuchPathException
+from .util import CycleException, dotpy, NoSuchPathException, solo
 from functools import partial
 from importlib_metadata import entry_points
 from itertools import chain
@@ -83,8 +83,8 @@ class ConfigCtrl:
             _, appname = _processmainfunction(mainfunction)
         s = self.scope(True).duplicate()
         s.label = Text(appname)
-        s.parent[appname,] = s
-        parent = self._of(s.parent)
+        solo(s.parents)[appname,] = s
+        parent = self._of(solo(s.parents))
         parent.loadsettings()
         return getattr(parent.node, appname)
 
