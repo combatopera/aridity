@@ -86,38 +86,33 @@ class Functions:
     def map(scope, objsresolvable, *args):
         def g():
             for k, v in objs.resolvables.items():
-                for p in objs, scope:
-                    try:
-                        yield k, resolvable.resolve(context(p, k, v))
-                        break
-                    except NoSuchPathException: # TODO: Combine these when no result.
-                        if p is scope:
-                            raise
+                yield k, resolvable.resolve(context(k, v))
         from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
+        parents = objs, scope
         if 1 == len(args):
-            def context(p, k, v):
+            def context(k, v):
                 try:
                     resolvables = v.resolvables
                 except AttributeError:
-                    s = ScalarScope([p], v)
+                    s = ScalarScope(parents, v)
                 else:
-                    s = p.createchild()
+                    s = Scope(parents)
                     s.label = Text(k)
                     for i in resolvables.items():
                         s.resolvables.put(*i)
                 return s
             resolvable, = args
         elif 2 == len(args):
-            def context(p, k, v):
-                s = p.createchild()
+            def context(k, v):
+                s = Scope(parents)
                 s[vname,] = v
                 return s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
-            def context(p, k, v):
-                s = p.createchild()
+            def context(k, v):
+                s = Scope(parents)
                 s[kname,] = Text(k)
                 s[vname,] = v
                 return s
