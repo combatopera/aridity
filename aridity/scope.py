@@ -85,10 +85,10 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     except NameError:
         pass
 
-    def __init__(self, parent):
+    def __init__(self, parents):
         self.resolvables = Resolvables(self)
         self.threadlocals = threading.local()
-        self.parents = [] if parent is None else [parent]
+        self.parents = parents
 
     def __setitem__(self, path, resolvable):
         # TODO: Interpret non-tuple path as singleton.
@@ -278,7 +278,7 @@ class StaticScope(AbstractScope):
     stacktypes = dict(here = SimpleStack, indent = IndentStack)
 
     def __init__(self):
-        super(StaticScope, self).__init__(None)
+        super(StaticScope, self).__init__(())
         for word, d in lookup.items():
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
@@ -336,7 +336,7 @@ StaticScope = StaticScope()
 class Scope(AbstractScope):
 
     def __init__(self, parent = StaticScope, islist = False):
-        super(Scope, self).__init__(parent)
+        super(Scope, self).__init__([] if parent is None else [parent])
         self.islist = islist
 
     def resolve(self, scope):
