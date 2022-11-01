@@ -154,10 +154,6 @@ class Functions:
     @realname('')
     def get_(*args): return getimpl(*args)
 
-    @realname('in')
-    def in_(scope, scoperesolvable, *resolvables):
-        return getimpl(scoperesolvable.resolve(scope), *resolvables)
-
     @realname(',') # XXX: Oh yeah?
     def aslist(scope, *resolvables):
         return scope.resolved(*(r.resolve(scope).cat() for r in resolvables), **{'aslist': True})
@@ -224,6 +220,10 @@ class Functions:
     @realname('\N{NOT SIGN}')
     def not_(scope, resolvable):
         return Boolean(not resolvable.resolve(scope).truth())
+
+    @realname('in')
+    def in_(scope, scoperesolvable, *resolvables):
+        return scoperesolvable.resolve(scope).resolved(*(r.resolve(scope).cat() for r in resolvables))
 
 class Spread:
 
