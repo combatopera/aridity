@@ -138,7 +138,7 @@ class TestFunctions(TestCase):
             repl('" = $(jsonquote)')
         self.assertEqual('"one","two"', s.resolved('x').scalar)
 
-    def test_in(self):
+    def test_getfrom(self):
         s = Scope()
         with Repl(s) as repl:
             repl('nest')
@@ -147,7 +147,7 @@ class TestFunctions(TestCase):
             repl('  u b v x = 300')
             repl('  u b v y = 400')
             repl('nest2 V = v')
-            repl('nest2 r = $join$map($(nest u) uu $join$map($in($(uu) $(V)) vv $(vv)))')
+            repl('nest2 r = $join$map($(nest u) uu $join$map($getfrom($(uu) $(V)) vv $(vv)))')
         self.assertEqual('100200300400', s.resolved('nest2', 'r').scalar)
 
     def test_maplookup(self):
@@ -166,9 +166,9 @@ class TestFunctions(TestCase):
             repl('  info b u n = $(lookup y)')
             repl('  info b v m = z')
             repl('  info b v n = $(lookup z)')
-            repl('text0 = $join($map($(nest info) $join($map($in($() $(dim)) k v $(k)=$(v)) ,)) ;)')
-            repl('text1 = $join($map($(nest info) i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
-            repl('text2 = $join($map($(nest info) / i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text0 = $join($map($(nest info) $join($map($getfrom($() $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text1 = $join($map($(nest info) i $join($map($getfrom($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text2 = $join($map($(nest info) / i $join($map($getfrom($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
             repl('dim = u')
         self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text0').scalar)
         self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text1').scalar)

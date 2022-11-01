@@ -221,8 +221,7 @@ class Functions:
     def not_(scope, resolvable):
         return Boolean(not resolvable.resolve(scope).truth())
 
-    @realname('in')
-    def in_(scope, scoperesolvable, *resolvables):
+    def getfrom(scope, scoperesolvable, *resolvables):
         return scoperesolvable.resolve(scope).resolved(*(r.resolve(scope).cat() for r in resolvables))
 
 class Spread:
