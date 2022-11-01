@@ -231,14 +231,14 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             raise UnsupportedEntryException("Expected at least one directive: %s" % entry)
 
     def __str__(self):
-        eol = '\n'
         def g():
             s = self
             while True:
-                try: d = s.resolvables
-                except AttributeError: break
-                yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in d.items()))
+                yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in s.resolvables.items()))
+                if s.parents is None:
+                    break
                 s, = s.parents
+        eol = '\n'
         return eol.join(g())
 
     def itero(self):
