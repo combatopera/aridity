@@ -30,11 +30,19 @@ class NotAResolvableException(Exception): pass
 class Resolvables:
 
     def _proto(self):
+        def allparents():
+            scopes = [self.scope]
+            while scopes:
+                nextscopes = []
+                for s in scopes:
+                    for p in s.parents:
+                        yield s, p
+                        nextscopes.append(p)
+                scopes = nextscopes
         revpath = []
-        s = self.scope
-        while s.parents:
+        for s, parent in allparents():
             try:
-                protoc = solo(s.parents).resolvables.d[Star.protokey]
+                protoc = parent.resolvables.d[Star.protokey]
             except KeyError:
                 pass
             else:
@@ -49,7 +57,6 @@ class Resolvables:
             except AttributeError:
                 break
             revpath.append(keyobj.scalar)
-            s, = s.parents
         return {}
 
     def __init__(self, scope):
