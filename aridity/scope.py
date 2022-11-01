@@ -175,8 +175,9 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                     yield [k], r
 
     def _findresolvable(self, path):
+        pairs = list(self._scoreresolvables(path))
         try:
-            return min(self._scoreresolvables(path), key = lambda t: t[0])[1]
+            return min(pairs, key = lambda t: t[0])[1]
         except ValueError:
             raise UnparseNoSuchPathException(path)
 
