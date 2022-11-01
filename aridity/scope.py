@@ -250,7 +250,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         yield k, self
 
     def createchild(self, **kwargs):
-        return Scope(self, **kwargs)
+        return Scope([self], **kwargs)
 
 class Resource(Resolved):
 
@@ -335,8 +335,8 @@ StaticScope = StaticScope()
 
 class Scope(AbstractScope):
 
-    def __init__(self, parent = StaticScope, islist = False):
-        super(Scope, self).__init__([parent])
+    def __init__(self, parents = None, islist = False):
+        super(Scope, self).__init__([StaticScope] if parents is None else parents)
         self.islist = islist
 
     def resolve(self, scope):
@@ -355,8 +355,8 @@ class Scope(AbstractScope):
 
 class ScalarScope(Scope):
 
-    def __init__(self, parent, scalarobj):
-        super(ScalarScope, self).__init__(parent)
+    def __init__(self, parents, scalarobj):
+        super(ScalarScope, self).__init__(parents)
         self.scalarobj = scalarobj
 
     def __getattr__(self, name):

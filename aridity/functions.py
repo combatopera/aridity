@@ -100,7 +100,7 @@ class Functions:
                 try:
                     resolvables = v.resolvables
                 except AttributeError:
-                    s = ScalarScope(p, v)
+                    s = ScalarScope([p], v)
                 else:
                     s = p.createchild()
                     s.label = Text(k)
