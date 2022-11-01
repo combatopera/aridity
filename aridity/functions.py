@@ -84,40 +84,46 @@ class Functions:
         return Text(quote(resolvable.resolve(scope).cat(), safe = ''))
 
     def map(scope, objsresolvable, *args):
+        def g():
+            for k, v in objs.resolvables.items():
+                for p in objs, scope:
+                    try:
+                        yield k, resolvable.resolve(context(p, k, v))
+                        break
+                    except NoSuchPathException:
+                        if p is scope:
+                            raise
         from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
         if 1 == len(args):
+            def context(p, k, v):
+                try:
+                    resolvables = v.resolvables
+                except AttributeError:
+                    s = ScalarScope(p, v)
+                else:
+                    s = p.createchild()
+                    s.label = Text(k)
+                    for i in resolvables.items():
+                        s.resolvables.put(*i)
+                return s
             resolvable, = args
-            def g():
-                for k, v in objs.resolvables.items():
-                    try:
-                        resolvables = v.resolvables
-                    except AttributeError:
-                        s = ScalarScope(scope, v)
-                    else:
-                        s = scope.createchild()
-                        s.label = Text(k)
-                        for i in resolvables.items():
-                            s.resolvables.put(*i)
-                    yield k, resolvable.resolve(s)
         elif 2 == len(args):
+            def context(p, k, v):
+                s = p.createchild()
+                s[vname,] = v
+                return s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
-            def g():
-                for k, v in objs.resolvables.items():
-                    s = scope.createchild()
-                    s[vname,] = v
-                    yield k, resolvable.resolve(s)
         else:
+            def context(p, k, v):
+                s = p.createchild()
+                s[kname,] = Text(k)
+                s[vname,] = v
+                return s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
-            def g():
-                for k, v in objs.resolvables.items():
-                    s = scope.createchild()
-                    s[kname,] = Text(k)
-                    s[vname,] = v
-                    yield k, resolvable.resolve(s)
         s = Scope(islist = True) # XXX: Really no parent?
         for i in g():
             s.resolvables.put(*i)
@@ -147,6 +153,10 @@ class Functions:
 
     @realname('')
     def get_(*args): return getimpl(*args)
+
+    @realname('in')
+    def in_(scope, scoperesolvable, *resolvables):
+        return getimpl(scoperesolvable.resolve(scope), *resolvables)
 
     @realname(',') # XXX: Oh yeah?
     def aslist(scope, *resolvables):

@@ -138,6 +138,40 @@ class TestFunctions(TestCase):
             repl('" = $(jsonquote)')
         self.assertEqual('"one","two"', s.resolved('x').scalar)
 
+    def test_in(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('nest')
+            repl('  u a v x = 100')
+            repl('  u a v y = 200')
+            repl('  u b v x = 300')
+            repl('  u b v y = 400')
+            repl('r = $join$map($(nest u) uu $join$map($in($(uu) v) vv $(vv)))')
+        self.assertEqual('100200300400', s.resolved('r').scalar)
+
+    def test_maplookup(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('nest')
+            repl('  lookup w = ww')
+            repl('  lookup x = xx')
+            repl('  lookup y = yy')
+            repl('  lookup z = zz')
+            repl('  info a u m = w')
+            repl('  info a u n = $(nest lookup w)')
+            repl('  info a v m = x')
+            repl('  info a v n = $(lookup x)')
+            repl('  info b u m = y')
+            repl('  info b u n = $(lookup y)')
+            repl('  info b v m = z')
+            repl('  info b v n = $(lookup z)')
+            repl('text = $join($map($(nest info) i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('dim = u')
+        self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text').scalar)
+        with Repl(s) as repl:
+            repl('dim = v')
+        self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text').scalar)
+
     def test_listref(self):
         s = Scope()
         with Repl(s) as repl:
@@ -148,11 +182,7 @@ class TestFunctions(TestCase):
             repl('x = $join($map($(foo args) it $(it)) .)')
         self.assertEqual(['yyup=YYUP', 'w/e'], s.resolved('foo', 'args').unravel())
         self.assertEqual('yyup=YYUP.w/e', s.resolved('foo', 'x').unravel())
-        try:
-            self.assertEqual('yyup=YYUP.w/e', s.resolved('x').unravel())
-            self.fail('You fixed a bug!')
-        except NoSuchPathException:
-            pass
+        self.assertEqual('yyup=YYUP.w/e', s.resolved('x').unravel())
 
     def test_xmlquoting(self):
         s = Scope()
