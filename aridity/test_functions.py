@@ -165,12 +165,18 @@ class TestFunctions(TestCase):
             repl('  info b u n = $(lookup y)')
             repl('  info b v m = z')
             repl('  info b v n = $(lookup z)')
-            repl('text = $join($map($(nest info) i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text0 = $join($map($(nest info) $join($map($in($() $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text1 = $join($map($(nest info) i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
+            repl('text2 = $join($map($(nest info) / i $join($map($in($(i) $(dim)) k v $(k)=$(v)) ,)) ;)')
             repl('dim = u')
-        self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text').scalar)
+        self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text0').scalar)
+        self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text1').scalar)
+        self.assertEqual('m=w,n=ww;m=y,n=yy', s.resolved('text2').scalar)
         with Repl(s) as repl:
             repl('dim = v')
-        self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text').scalar)
+        self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text0').scalar)
+        self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text1').scalar)
+        self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text2').scalar)
 
     def test_listref(self):
         s = Scope()
