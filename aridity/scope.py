@@ -32,7 +32,7 @@ class Resolvables:
     def _proto(self):
         revpath = []
         s = self.scope
-        while s.parents is not None:
+        while s.parents:
             try:
                 protoc = solo(s.parents).resolvables.d[Star.protokey]
             except KeyError:
@@ -88,7 +88,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def __init__(self, parent):
         self.resolvables = Resolvables(self)
         self.threadlocals = threading.local()
-        self.parents = None if parent is None else [parent]
+        self.parents = [] if parent is None else [parent]
 
     def __setitem__(self, path, resolvable):
         # TODO: Interpret non-tuple path as singleton.
@@ -153,7 +153,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def _selfandparents(self):
         while True:
             yield self
-            if self.parents is None:
+            if not self.parents:
                 break
             self, = self.parents
 
@@ -235,7 +235,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             s = self
             while True:
                 yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in s.resolvables.items()))
-                if s.parents is None:
+                if not s.parents:
                     break
                 s, = s.parents
         eol = '\n'
