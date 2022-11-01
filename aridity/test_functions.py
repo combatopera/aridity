@@ -146,8 +146,9 @@ class TestFunctions(TestCase):
             repl('  u a v y = 200')
             repl('  u b v x = 300')
             repl('  u b v y = 400')
-            repl('r = $join$map($(nest u) uu $join$map($in($(uu) v) vv $(vv)))')
-        self.assertEqual('100200300400', s.resolved('r').scalar)
+            repl('nest2 V = v')
+            repl('nest2 r = $join$map($(nest u) uu $join$map($in($(uu) $(V)) vv $(vv)))')
+        self.assertEqual('100200300400', s.resolved('nest2', 'r').scalar)
 
     def test_maplookup(self):
         s = Scope()
