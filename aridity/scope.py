@@ -158,15 +158,19 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return s
 
     def _selfandparents(self):
-        while True:
-            yield self
-            if not self.parents:
-                break
-            self, = self.parents
+        scopes = [self]
+        depth = 0
+        while scopes:
+            nextscopes = []
+            for s in scopes:
+                yield depth, s
+                nextscopes.extend(s.parents)
+            scopes = nextscopes
+            depth += 1
 
     def _scoreresolvables(self, path):
         tail = path[1:]
-        for k, s in enumerate(self._selfandparents()):
+        for k, s in self._selfandparents():
             r = s.resolvables.getornone(path[0])
             if r is not None:
                 if tail:
@@ -192,7 +196,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         errors = []
         for start in range(len(path)):
             for end in range(len(path) - 1, start - 1, -1):
-                for s in (s.resolvedscopeornone(path[start:end]) for s in self._selfandparents()):
+                for s in (s.resolvedscopeornone(path[start:end]) for _, s in self._selfandparents()):
                     if s is not None:
                         try:
                             return resolvable.resolve(s, **kwargs)
@@ -205,7 +209,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return list(d) if self.islist or (d and all(OpaqueKey.isopaque(k) for k in d.keys())) else d
 
     def staticscope(self):
-        for s in self._selfandparents():
+        for _, s in self._selfandparents():
             pass
         return s
 
