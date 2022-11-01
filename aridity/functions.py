@@ -90,7 +90,7 @@ class Functions:
                     try:
                         yield k, resolvable.resolve(context(p, k, v))
                         break
-                    except NoSuchPathException:
+                    except NoSuchPathException: # TODO: Combine these when no result.
                         if p is scope:
                             raise
         from .scope import ScalarScope, Scope
