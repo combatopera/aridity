@@ -336,7 +336,7 @@ StaticScope = StaticScope()
 class Scope(AbstractScope):
 
     def __init__(self, parent = StaticScope, islist = False):
-        super(Scope, self).__init__([] if parent is None else [parent])
+        super(Scope, self).__init__([parent])
         self.islist = islist
 
     def resolve(self, scope):
