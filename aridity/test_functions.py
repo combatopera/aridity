@@ -179,6 +179,19 @@ class TestFunctions(TestCase):
         self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text1').scalar)
         self.assertEqual('m=x,n=xx;m=z,n=zz', s.resolved('text2').scalar)
 
+    def test_maplookup2(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('root1')
+            repl('  param = woo')
+            repl('  expr = $join$map($(root2 item) $(param)$(value))')
+            repl('root2')
+            repl('  lookup x = 100')
+            repl('  lookup y = 200')
+            repl('  item x value = $(lookup x)')
+            repl('  item y value = $(lookup y)')
+        self.assertEqual('woo100woo200', s.resolved('root1', 'expr').scalar)
+
     def test_listref(self):
         s = Scope()
         with Repl(s) as repl:
