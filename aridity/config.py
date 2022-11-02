@@ -83,8 +83,9 @@ class ConfigCtrl:
             _, appname = _processmainfunction(mainfunction)
         s = self.scope(True).duplicate()
         s.label = Text(appname)
-        solo(s.parents)[appname,] = s
-        parent = self._of(solo(s.parents))
+        p = solo(s.parents)
+        p[appname,] = s
+        parent = self._of(p)
         parent.loadsettings()
         return getattr(parent.node, appname)
 
