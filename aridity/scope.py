@@ -249,7 +249,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                 yield "%s%s" % (type(s).__name__, ''.join("%s\t%s = %r" % (eol, w, r) for w, r in s.resolvables.items()))
                 if not s.parents:
                     break
-                s, = s.parents
+                s, = s.parents # FIXME: Support multiple parents.
         eol = '\n'
         return eol.join(g())
 
