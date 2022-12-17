@@ -135,12 +135,12 @@ class ConfigCtrl:
 
     def __iter__(self): # TODO: Add API to get keys without resolving values.
         s = self.scope()
-        for k, r in s.resolvables.items():
-            o = r.resolve(s)
-            try:
-                yield k, o.scalar
-            except AttributeError:
-                yield k, self._of(self.basescope, self.prefix + [k]).node
+        for slot, r in s.resolvables.items():
+            for k, o in r.resolvemulti(slot, s):
+                try:
+                    yield k, o.scalar
+                except AttributeError:
+                    yield k, self._of(self.basescope, self.prefix + [k]).node
 
     def processtemplate(self, frompathorstream, topathorstream):
         s = self.scope()
