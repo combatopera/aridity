@@ -88,12 +88,12 @@ class Functions:
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
         if 1 == len(args):
-            def contexts(slot, v):
+            def contexts(slot, r):
                 s = Scope(parents)
                 try:
-                    resolvables = v.resolvables
+                    resolvables = r.resolvables
                 except AttributeError:
-                    s = ScalarScope(parents, v.resolve(s))
+                    s = ScalarScope(parents, r.resolve(s))
                 else:
                     s.label = Text(slot)
                     for i in resolvables.items():
@@ -101,17 +101,17 @@ class Functions:
                 yield slot, s
             resolvable, = args
         elif 2 == len(args):
-            def contexts(slot, v):
+            def contexts(slot, r):
                 s = Scope(parents)
-                s[vname,] = v
+                s[vname,] = r
                 yield slot, s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
-            def contexts(slot, v):
+            def contexts(slot, r):
                 s = Scope(parents)
                 s[kname,] = Text(slot)
-                s[vname,] = v
+                s[vname,] = r
                 yield slot, s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
