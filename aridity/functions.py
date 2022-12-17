@@ -88,7 +88,7 @@ class Functions:
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
         if 1 == len(args):
-            def context(slot, v):
+            def contexts(slot, v):
                 s = Scope(parents)
                 try:
                     resolvables = v.resolvables
@@ -98,27 +98,28 @@ class Functions:
                     s.label = Text(slot)
                     for i in resolvables.items():
                         s.resolvables.put(*i)
-                return s
+                yield slot, s
             resolvable, = args
         elif 2 == len(args):
-            def context(slot, v):
+            def contexts(slot, v):
                 s = Scope(parents)
                 s[vname,] = v
-                return s
+                yield slot, s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
-            def context(slot, v):
+            def contexts(slot, v):
                 s = Scope(parents)
                 s[kname,] = Text(slot)
                 s[vname,] = v
-                return s
+                yield slot, s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
         result = Scope(islist = True) # XXX: Really no parent?
         for rk, r in objs.resolvables.items():
-            result.resolvables.put(rk, resolvable.resolve(context(rk, r)))
+            for k, s in contexts(rk, r):
+                result.resolvables.put(k, resolvable.resolve(s))
         return result
 
     def flat(scope, listsresolvable):
