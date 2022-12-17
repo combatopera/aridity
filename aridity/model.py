@@ -238,7 +238,7 @@ class Call(Resolvable):
     def resolvemulti(self, slot, scope):
         f = scope.resolved(self.name)
         if star != f.functionvalue:
-            for t in super().resolvemulti(slot, scope):
+            for t in super(Call, self).resolvemulti(slot, scope):
                 yield t
         else:
             resolvable, = self._resolvables() # XXX: Support many?
