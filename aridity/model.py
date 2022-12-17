@@ -224,7 +224,7 @@ class Call(Resolvable):
         self.brackets = brackets
 
     def resolve(self, scope, aslist = False):
-        result = scope.resolved(self.name).call(scope, *(a for a in self.args if not a.ignorable))
+        result = scope.resolved(self.name).functionvalue(scope, *(a for a in self.args if not a.ignorable))
         return List([result]) if aslist else result
 
     def unparse(self):
@@ -257,9 +257,6 @@ class Function(Resolved):
 
     def __init__(self, functionvalue):
         self.functionvalue = functionvalue
-
-    def call(self, *args):
-        return self.functionvalue(*args)
 
     def unravel(self):
         return self.functionvalue
