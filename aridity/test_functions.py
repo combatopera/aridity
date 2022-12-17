@@ -306,5 +306,6 @@ class TestFunctions(TestCase):
             repl('s1 = $join($map($(v) a $pystr$(a)) $.( ))')
             repl('s0 = $join($map($(v) $pystr$()) $.( ))')
         self.assertEqual(['woo', 100, 200, 'yay'], s.resolved('v').unravel())
-        self.assertEqual("'woo' 100 200 'yay'", s.resolved('s1').scalar)
-        self.assertEqual("'woo' 100 200 'yay'", s.resolved('s0').scalar)
+        with self.assertRaises(AttributeError):
+            self.assertEqual("'woo' 100 200 'yay'", s.resolved('s1').scalar)
+            self.assertEqual("'woo' 100 200 'yay'", s.resolved('s0').scalar)
