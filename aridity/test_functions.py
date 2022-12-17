@@ -284,3 +284,12 @@ class TestFunctions(TestCase):
             repl('b = $x$y()')
         self.assertEqual('woo', s.resolved('a').scalar)
         self.assertEqual('woo', s.resolved('b').scalar)
+
+    def test_maplist(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('x = woo&')
+            repl('y = 100!')
+            repl('u = $list($(x) $(y) 200)')
+            repl('v = $join($map($(u) $shstr$()) $.( ))')
+        self.assertEqual('woo& 100! 200', s.resolved('v').scalar)
