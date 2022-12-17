@@ -92,12 +92,12 @@ class Functions:
         parents = objs, scope
         if 1 == len(args):
             def context(k, v):
+                s = Scope(parents)
                 try:
                     resolvables = v.resolvables
                 except AttributeError:
-                    s = ScalarScope(parents, v)
+                    s = ScalarScope(parents, v.resolve(s))
                 else:
-                    s = Scope(parents)
                     s.label = Text(k)
                     for i in resolvables.items():
                         s.resolvables.put(*i)
