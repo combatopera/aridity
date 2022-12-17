@@ -16,8 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import Config, ConfigCtrl
-from .model import Boolean, Function, Number, Scalar, Text
-from .scope import _star
+from .model import Boolean, Function, Number, Scalar, star, Text
 from io import StringIO
 from unittest import TestCase
 import os
@@ -155,13 +154,13 @@ class TestConfig(TestCase):
         self.assertEqual(os.sep, obj.scalar)
         self.assertEqual(os.sep, obj.unravel())
         self.assertNotEqual(os.sep, obj.functionvalue)
-        self.assertEqual(_star, c.b)
-        self.assertEqual(_star, getattr(c, '*'))
+        self.assertEqual(star, c.b)
+        self.assertEqual(star, getattr(c, '*'))
         obj = cc.scope().resolved('*')
-        self.assertEqual(_star, obj.functionvalue)
-        self.assertEqual(_star, obj.scalar)
-        self.assertEqual(_star, obj.unravel())
-        self.assertNotEqual(_star, obj.directivevalue)
+        self.assertEqual(star, obj.functionvalue)
+        self.assertEqual(star, obj.scalar)
+        self.assertEqual(star, obj.unravel())
+        self.assertNotEqual(star, obj.directivevalue)
 
     def test_badmap(self):
         cc = ConfigCtrl()

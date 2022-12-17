@@ -17,7 +17,7 @@
 
 from .directives import lookup, Precedence
 from .functions import getfunctions, OpaqueKey
-from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, Stream, Text
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, star, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import CycleException, NoSuchPathException, openresource, OrderedDict, solo, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 from itertools import chain
@@ -323,15 +323,12 @@ def slashfunction(scope, *resolvables):
             break
     return Text(os.path.join() if path is None else path)
 
-def _star(scope, resolvable):
-    raise Exception('Spread not implemented in this context.')
-
 class Star(Function, Directive):
 
     protokey = object()
 
     def __init__(self):
-        Function.__init__(self, _star)
+        Function.__init__(self, star)
         Directive.__init__(self, self.star)
 
     def star(self, prefix, suffix, scope):

@@ -211,6 +211,9 @@ class Boolean(BaseScalar):
     def tobash(self, toplevel):
         return 'true' if self.booleanvalue else 'false'
 
+def star(scope, resolvable):
+    raise Exception('Spread not implemented in this context.')
+
 class Call(Resolvable):
 
     ignorable = False
