@@ -323,15 +323,15 @@ def slashfunction(scope, *resolvables):
             break
     return Text(os.path.join() if path is None else path)
 
-def _spread(scope, resolvable):
-    raise Exception('No.')
+def _star(scope, resolvable):
+    raise Exception('Spread not implemented in this context.')
 
 class Star(Function, Directive):
 
     protokey = object()
 
     def __init__(self):
-        Function.__init__(self, _spread)
+        Function.__init__(self, _star)
         Directive.__init__(self, self.star)
 
     def star(self, prefix, suffix, scope):
