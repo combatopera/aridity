@@ -135,7 +135,7 @@ class ConfigCtrl:
 
     def __iter__(self): # TODO: Add API to get keys without resolving values.
         s = self.scope()
-        for k, r in s.resolvekeys():
+        for k, r in s.resolvables.items():
             o = r.resolve(s)
             try:
                 yield k, o.scalar

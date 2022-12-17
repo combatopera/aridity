@@ -142,7 +142,7 @@ class Functions:
         else:
             separator = ''
         s = resolvables.resolve(scope)
-        return Text(separator.join(r.resolve(s).cat() for _, r in s.resolvekeys()))
+        return Text(separator.join(r.resolve(s).cat() for _, r in s.resolvables.items()))
 
     def get(*args): return getimpl(*args)
 
@@ -218,19 +218,6 @@ class Functions:
 
     def getfrom(scope, scoperesolvable, *resolvables):
         return scoperesolvable.resolve(scope).resolved(*(r.resolve(scope).cat() for r in resolvables))
-
-class Spread:
-
-    @classmethod
-    def of(cls, scope, resolvable):
-        return cls(resolvable.resolve(scope))
-
-    def __init__(self, scope):
-        self.scope = scope
-
-    def spread(self, j):
-        for k, r in self.scope.resolvekeys():
-            yield (j, k), r.resolve(self.scope)
 
 def getimpl(scope, *resolvables):
     return scope.resolved(*(r.resolve(scope).cat() for r in resolvables))

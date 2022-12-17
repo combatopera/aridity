@@ -205,7 +205,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         raise TreeNoSuchPathException(path, errors)
 
     def unravel(self):
-        d = OrderedDict([k, r.resolve(self).unravel()] for k, r in self.resolvekeys())
+        d = OrderedDict([k, r.resolve(self).unravel()] for k, r in self.resolvables.items())
         return list(d) if self.islist or (d and all(OpaqueKey.isopaque(k) for k in d.keys())) else d
 
     def staticscope(self):
@@ -252,14 +252,6 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                 s, = s.parents # FIXME: Support multiple parents.
         eol = '\n'
         return eol.join(g())
-
-    def resolvekeys(self):
-        for k, r in self.resolvables.items():
-            for t in r.resolve(self).spread(k):
-                yield t
-
-    def spread(self, k):
-        yield k, self
 
     def createchild(self, **kwargs):
         return Scope([self], **kwargs)
@@ -331,13 +323,15 @@ def slashfunction(scope, *resolvables):
             break
     return Text(os.path.join() if path is None else path)
 
+def _spread(scope, resolvable):
+    raise Exception('No.')
+
 class Star(Function, Directive):
 
     protokey = object()
 
     def __init__(self):
-        from .functions import Spread
-        Function.__init__(self, Spread.of)
+        Function.__init__(self, _spread)
         Directive.__init__(self, self.star)
 
     def star(self, prefix, suffix, scope):

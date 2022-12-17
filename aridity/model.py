@@ -45,9 +45,6 @@ class Resolved(Resolvable):
     def resolve(self, scope, aslist = False):
         return List([self]) if aslist else self
 
-    def spread(self, k): # TODO: Probably makes more sense on SimpleValue, which more things should extend.
-        yield k, self
-
 nullmonitor = lambda text: None
 
 class Concat(Resolvable):

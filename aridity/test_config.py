@@ -16,8 +16,8 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import Config, ConfigCtrl
-from .functions import Spread
 from .model import Boolean, Function, Number, Scalar, Text
+from .scope import _spread
 from io import StringIO
 from unittest import TestCase
 import os
@@ -155,13 +155,13 @@ class TestConfig(TestCase):
         self.assertEqual(os.sep, obj.scalar)
         self.assertEqual(os.sep, obj.unravel())
         self.assertNotEqual(os.sep, obj.functionvalue)
-        self.assertEqual(Spread.of, c.b)
-        self.assertEqual(Spread.of, getattr(c, '*'))
+        self.assertEqual(_spread, c.b)
+        self.assertEqual(_spread, getattr(c, '*'))
         obj = cc.scope().resolved('*')
-        self.assertEqual(Spread.of, obj.functionvalue)
-        self.assertEqual(Spread.of, obj.scalar)
-        self.assertEqual(Spread.of, obj.unravel())
-        self.assertNotEqual(Spread.of, obj.directivevalue)
+        self.assertEqual(_spread, obj.functionvalue)
+        self.assertEqual(_spread, obj.scalar)
+        self.assertEqual(_spread, obj.unravel())
+        self.assertNotEqual(_spread, obj.directivevalue)
 
     def test_badmap(self):
         cc = ConfigCtrl()
