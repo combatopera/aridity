@@ -110,10 +110,11 @@ class Functions:
             vname = vname.resolve(scope).cat()
         else:
             def contexts(slot, r):
-                s = Scope(parents)
-                s[kname,] = Text(slot)
-                s[vname,] = r
-                yield slot, s
+                for k, v in r.resolvemulti(slot, Scope(parents)):
+                    s = Scope(parents)
+                    s[kname,] = Text(k)
+                    s[vname,] = v
+                    yield k, s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
