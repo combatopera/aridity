@@ -142,7 +142,7 @@ class Functions:
         else:
             separator = ''
         s = resolvables.resolve(scope)
-        return Text(separator.join(o.cat() for _, o in s.itero()))
+        return Text(separator.join(r.resolve(s).cat() for _, r in s.resolvekeys()))
 
     def get(*args): return getimpl(*args)
 
@@ -229,8 +229,8 @@ class Spread:
         self.scope = scope
 
     def spread(self, j):
-        for k, o in self.scope.itero(): # XXX: Or just the resolvables?
-            yield (j, k), o
+        for k, r in self.scope.resolvekeys():
+            yield (j, k), r.resolve(self.scope)
 
 def getimpl(scope, *resolvables):
     return scope.resolved(*(r.resolve(scope).cat() for r in resolvables))
