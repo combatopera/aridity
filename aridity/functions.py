@@ -142,7 +142,7 @@ class Functions:
         else:
             separator = ''
         s = resolvables.resolve(scope)
-        return Text(separator.join(r.resolve(s).cat() for _, r in s.resolvables.items()))
+        return Text(separator.join(o.cat() for slot, r in s.resolvables.items() for _, o in r.resolvemulti(slot, s)))
 
     def get(*args): return getimpl(*args)
 
