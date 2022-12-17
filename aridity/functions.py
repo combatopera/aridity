@@ -102,9 +102,10 @@ class Functions:
             resolvable, = args
         elif 2 == len(args):
             def contexts(slot, r):
-                s = Scope(parents)
-                s[vname,] = r
-                yield slot, s
+                for k, v in r.resolvemulti(slot, Scope(parents)):
+                    s = Scope(parents)
+                    s[vname,] = v
+                    yield k, s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
