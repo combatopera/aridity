@@ -295,3 +295,14 @@ class TestFunctions(TestCase):
             repl('v0 = $join($map($(u) $pystr$()) $.( ))')
         self.assertEqual("'woo&' '100!' 200", s.resolved('v1').scalar)
         self.assertEqual("'woo&' '100!' 200", s.resolved('v0').scalar)
+
+    def test_mapspread(self):
+        s = Scope()
+        with Repl(s) as repl:
+            repl('u +=')
+            repl(' 100')
+            repl(' 200')
+            repl('v = $list(woo $*$(u) yay)')
+            repl('s = $join($map($(v) $pystr$()) $.( ))')
+        self.assertEqual(['woo', 100, 200, 'yay'], s.resolved('v').unravel())
+        self.assertEqual("'woo' 100 200 'yay'", s.resolved('s').scalar)
