@@ -88,38 +88,38 @@ class Functions:
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
         if 1 == len(args):
-            def context(k, v):
+            def context(slot, v):
                 s = Scope(parents)
                 try:
                     resolvables = v.resolvables
                 except AttributeError:
                     s = ScalarScope(parents, v.resolve(s))
                 else:
-                    s.label = Text(k)
+                    s.label = Text(slot)
                     for i in resolvables.items():
                         s.resolvables.put(*i)
                 return s
             resolvable, = args
         elif 2 == len(args):
-            def context(k, v):
+            def context(slot, v):
                 s = Scope(parents)
                 s[vname,] = v
                 return s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
-            def context(k, v):
+            def context(slot, v):
                 s = Scope(parents)
-                s[kname,] = Text(k)
+                s[kname,] = Text(slot)
                 s[vname,] = v
                 return s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
-        s = Scope(islist = True) # XXX: Really no parent?
-        for k, v in objs.resolvables.items():
-            s.resolvables.put(k, resolvable.resolve(context(k, v)))
-        return s
+        result = Scope(islist = True) # XXX: Really no parent?
+        for rk, r in objs.resolvables.items():
+            result.resolvables.put(rk, resolvable.resolve(context(rk, r)))
+        return result
 
     def flat(scope, listsresolvable):
         from .scope import Scope
