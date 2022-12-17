@@ -84,9 +84,6 @@ class Functions:
         return Text(quote(resolvable.resolve(scope).cat(), safe = ''))
 
     def map(scope, objsresolvable, *args):
-        def g():
-            for k, v in objs.resolvables.items():
-                yield k, resolvable.resolve(context(k, v))
         from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
@@ -120,8 +117,8 @@ class Functions:
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
         s = Scope(islist = True) # XXX: Really no parent?
-        for i in g():
-            s.resolvables.put(*i)
+        for k, v in objs.resolvables.items():
+            s.resolvables.put(k, resolvable.resolve(context(k, v)))
         return s
 
     def flat(scope, listsresolvable):
