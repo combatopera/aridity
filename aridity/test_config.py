@@ -301,3 +301,17 @@ w += $(g)''')
         result = $(lib hcllist)''')
         self.assertEqual('["foo", "bar"]', cc.node.tf.stuff)
         self.assertEqual(r'["\"\\"]', cc.node.tf.other.result)
+
+    def test_anchor(self):
+        cc = ConfigCtrl()
+        cc.execute('''TOP = $()
+x = 200
+y
+    x
+        ` = $()
+        x = 100
+        y
+            x = $(` x)
+            y = $(TOP x)''')
+        self.assertEqual(100, cc.node.y.x.y.x)
+        self.assertEqual(200, cc.node.y.x.y.y)
