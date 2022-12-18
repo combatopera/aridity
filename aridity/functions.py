@@ -87,9 +87,10 @@ class Functions:
         from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
+        p = Scope(parents)
         if 1 == len(args):
             def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, Scope(parents)):
+                for k, v in r.resolvemulti(slot, p):
                     try:
                         resolvables = v.resolvables
                     except AttributeError:
@@ -103,7 +104,7 @@ class Functions:
             resolvable, = args
         elif 2 == len(args):
             def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, Scope(parents)):
+                for k, v in r.resolvemulti(slot, p):
                     s = Scope(parents)
                     s[vname,] = v
                     yield k, s
@@ -111,7 +112,7 @@ class Functions:
             vname = vname.resolve(scope).cat()
         else:
             def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, Scope(parents)):
+                for k, v in r.resolvemulti(slot, p):
                     s = Scope(parents)
                     s[kname,] = Text(k)
                     s[vname,] = v
