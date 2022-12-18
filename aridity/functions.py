@@ -117,10 +117,8 @@ class Functions:
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
         result = Scope(islist = True) # XXX: Really no parent?
-        p = Scope(parents)
-        for rk, r in objs.resolvables.items():
-            for k, v in r.resolvemulti(rk, p):
-                result.resolvables.put(k, resolvable.resolve(context(k, v)))
+        for k, v in objs.resolveditems():
+            result.resolvables.put(k, resolvable.resolve(context(k, v)))
         return result
 
     def flat(scope, listsresolvable):
