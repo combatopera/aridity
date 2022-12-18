@@ -40,8 +40,8 @@ class Resolvable(Struct):
     def resolve(self, scope):
         raise NotImplementedError
 
-    def resolvemulti(self, slot, scope):
-        yield slot, self.resolve(scope)
+    def resolvemulti(self, j, scope):
+        yield j, self.resolve(scope)
 
 class Resolved(Resolvable):
 
@@ -238,14 +238,14 @@ class Call(Resolvable):
         result = self._functionvalue(scope)(scope, *self._resolvables())
         return List([result]) if aslist else result
 
-    def resolvemulti(self, slot, scope):
+    def resolvemulti(self, j, scope):
         f = self._functionvalue(scope)
         if star != f:
-            yield slot, f(scope, *self._resolvables())
+            yield j, f(scope, *self._resolvables())
         else:
             resolvable, = self._resolvables() # XXX: Support many?
-            for k, v in resolvable.resolve(scope).resolveditems():
-                yield (slot, k), v
+            for k, o in resolvable.resolve(scope).resolveditems():
+                yield (j, k), o
 
     def unparse(self):
         return "$%s%s%s%s" % (self.name, self.brackets[0], ''.join(a.unparse() for a in self.args), self.brackets[1])
