@@ -89,41 +89,38 @@ class Functions:
         parents = objs, scope
         p = Scope(parents)
         if 1 == len(args):
-            def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, p):
-                    try:
-                        resolvables = v.resolvables
-                    except AttributeError:
-                        s = ScalarScope(parents, v)
-                    else:
-                        s = Scope(parents)
-                        s.label = Text(k)
-                        for i in resolvables.items():
-                            s.resolvables.put(*i)
-                    yield k, s
+            def context(k, v):
+                try:
+                    resolvables = v.resolvables
+                except AttributeError:
+                    s = ScalarScope(parents, v)
+                else:
+                    s = Scope(parents)
+                    s.label = Text(k)
+                    for i in resolvables.items():
+                        s.resolvables.put(*i)
+                return s
             resolvable, = args
         elif 2 == len(args):
-            def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, p):
-                    s = Scope(parents)
-                    s[vname,] = v
-                    yield k, s
+            def context(k, v):
+                s = Scope(parents)
+                s[vname,] = v
+                return s
             vname, resolvable = args
             vname = vname.resolve(scope).cat()
         else:
-            def contexts(slot, r):
-                for k, v in r.resolvemulti(slot, p):
-                    s = Scope(parents)
-                    s[kname,] = Text(k)
-                    s[vname,] = v
-                    yield k, s
+            def context(k, v):
+                s = Scope(parents)
+                s[kname,] = Text(k)
+                s[vname,] = v
+                return s
             kname, vname, resolvable = args
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
         result = Scope(islist = True) # XXX: Really no parent?
         for rk, r in objs.resolvables.items():
-            for k, s in contexts(rk, r):
-                result.resolvables.put(k, resolvable.resolve(s))
+            for k, v in r.resolvemulti(rk, p):
+                result.resolvables.put(k, resolvable.resolve(context(k, v)))
         return result
 
     def flat(scope, listsresolvable):
