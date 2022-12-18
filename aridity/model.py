@@ -244,8 +244,8 @@ class Call(Resolvable):
             yield slot, f(scope, *self._resolvables())
         else:
             resolvable, = self._resolvables() # XXX: Support many?
-            for k, r in resolvable.resolve(scope).resolvables.items():
-                for t in r.resolvemulti((slot, k), scope):
+            for rk, r in resolvable.resolve(scope).resolvables.items():
+                for t in r.resolvemulti((slot, rk), scope):
                     yield t
 
     def unparse(self):

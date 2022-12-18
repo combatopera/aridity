@@ -205,7 +205,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         raise TreeNoSuchPathException(path, errors)
 
     def unravel(self):
-        d = OrderedDict([k, o.unravel()] for slot, r in self.resolvables.items() for k, o in r.resolvemulti(slot, self))
+        d = OrderedDict([k, o.unravel()] for k, o in self.resolveditems())
         return list(d) if self.islist or (d and all(OpaqueKey.isopaque(k) for k in d.keys())) else d
 
     def staticscope(self):
@@ -252,6 +252,11 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
                 s, = s.parents # FIXME: Support multiple parents.
         eol = '\n'
         return eol.join(g())
+
+    def resolveditems(self):
+        for rk, r in self.resolvables.items():
+            for t in r.resolvemulti(rk, self):
+                yield t
 
     def createchild(self, **kwargs):
         return Scope([self], **kwargs)
