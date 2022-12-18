@@ -90,12 +90,12 @@ class Functions:
         if 1 == len(args):
             def contexts(slot, r):
                 for k, v in r.resolvemulti(slot, Scope(parents)):
-                    s = Scope(parents)
                     try:
                         resolvables = v.resolvables
                     except AttributeError:
                         s = ScalarScope(parents, v)
                     else:
+                        s = Scope(parents)
                         s.label = Text(k)
                         for i in resolvables.items():
                             s.resolvables.put(*i)
