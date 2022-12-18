@@ -134,8 +134,7 @@ class ConfigCtrl:
         return self.basescope.resolved(*self.prefix) # TODO: Test what happens if it changes.
 
     def __iter__(self): # TODO: Add API to get keys without resolving values.
-        s = self.scope()
-        for k, o in s.resolveditems():
+        for k, o in self.scope().resolveditems():
             try:
                 yield k, o.scalar
             except AttributeError:

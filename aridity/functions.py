@@ -87,7 +87,6 @@ class Functions:
         from .scope import ScalarScope, Scope
         objs = objsresolvable.resolve(scope)
         parents = objs, scope
-        p = Scope(parents)
         if 1 == len(args):
             def context(k, v):
                 try:
@@ -118,6 +117,7 @@ class Functions:
             kname = kname.resolve(scope).cat()
             vname = vname.resolve(scope).cat()
         result = Scope(islist = True) # XXX: Really no parent?
+        p = Scope(parents)
         for rk, r in objs.resolvables.items():
             for k, v in r.resolvemulti(rk, p):
                 result.resolvables.put(k, resolvable.resolve(context(k, v)))
