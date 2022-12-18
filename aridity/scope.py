@@ -254,8 +254,8 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
         return eol.join(g())
 
     def resolveditems(self):
-        for rk, r in self.resolvables.items():
-            for t in r.resolvemulti(rk, self):
+        for k, r in self.resolvables.items():
+            for t in r.resolvemulti(k, self):
                 yield t
 
     def createchild(self, **kwargs):
