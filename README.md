@@ -16,6 +16,42 @@ DRY config and template system, easily extensible with Python
 * Principle of least astonishment driven design
 * Don't make users jump through hoops
 
+## Motivation
+* Environment variables are too crude to configure non-trivial apps, and maybe even trivial apps in the cloud
+    * They do not support nested data or lists, without some encoding scheme implemented in app code or a lib
+    * Multiple bespoke encoding schemes in the system are an error-prone maintenance burden worth avoiding
+* Testing code that queries the environment directly comes with a big risk of leaking state between tests
+* Often tools/libraries must be configured using config files
+    * Support for config file interpolation is not enough to stay DRY, and comes with a different set of gotchas per tool
+    * In particular Helm/Terraform have their own ways of sharing config between envs
+* aridity is a general purpose solution for all the above, also see [soak](https://github.com/combatopera/soak)
+
+## Config API
+* Normally you pass around a Config object, and application code can get data out via attribute access e.g. config.foo.bar
+    * Here config.foo is also a Config object, a child scope of config named foo
+    * The passing around can be taken care of by a dependency injection container such as [diapyr](https://github.com/combatopera/diapyr)
+* Every Config has an associated ConfigCtrl on which Python API such as processtemplate is available
+    * Use negation to get ConfigCtrl when you have a Config e.g. (-config).processtemplate(...)
+    * Use the node attribute to get Config when you have a ConfigCtrl, this is a rare situation in practice
+* When unit testing a class or function that expects a Config object, you can use SimpleNamespace to mock one
+
+## Guidelines
+* Config files have the extension .arid and templates .aridt
+* A template is simply a file-sized aridity expression
+    * Conventionally the template processor sets " to the appropriate quote function for the file format, e.g. jsonquote for JSON/YAML
+* Instead of adding Python objects to the config in main, it's tidier to use aridity's pyref function to achieve this
+* When some value needs to be constructed using concatenation, consider whether it would be more tasteful to do this in the config
+
+## Feature switch
+* Sometimes we want to deploy a change, but something in production isn't ready for that change
+* A feature switch allows deployment to production in this case
+* Add a boolean to the base config (conventionally root.arid) e.g. foo enabled = true
+    * This value should be the configuration that we eventually want in all environments
+* In production config, override with foo enabled = false
+* In the code, read config.foo.enabled and enable the change based on this boolean
+* The above can now be deployed to all environments, and is not a blocker for other changes
+* Later when production is ready for it, it's a 1 line change to remove the override from production config
+
 ## Install
 These are generic installation instructions.
 
