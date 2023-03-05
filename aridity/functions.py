@@ -38,7 +38,7 @@ class OpaqueKey(object):
 
 class Functions:
 
-    from .keyring import keyring
+    from .keyring import gpg, keyring
 
     def screenstr(scope, resolvable):
         text = resolvable.resolve(scope).cat()
