@@ -21,6 +21,7 @@ from base64 import b64decode
 from functools import partial
 from getpass import getpass
 from subprocess import check_output
+from tempfile import NamedTemporaryFile
 from threading import Semaphore
 import logging, os
 
@@ -55,4 +56,7 @@ def keyring(scope, serviceres, usernameres):
     return Scalar(Password(*[getpass(), partial(set_password, service, username)] if password is None else [password, None]))
 
 def gpg(scope, resolvable):
-    return Scalar(Password(check_output(['gpg', '-d'], input = b64decode(resolvable.resolve(scope).cat())).decode('ascii'), None))
+    with NamedTemporaryFile() as f:
+        f.write(b64decode(resolvable.resolve(scope).cat()))
+        f.flush()
+        return Scalar(Password(check_output(['gpg', '-d', f.name]).decode('ascii'), None))
