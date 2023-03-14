@@ -42,6 +42,7 @@ def _processmainfunction(mainfunction):
         appname = scriptname[:-len(dotpy)].replace('_', '-')
     else:
         attr = mainfunction.__qualname__
+        # FIXME: Requires metadata e.g. egg-info in projects that have not been installed:
         appname, = (ep.name for ep in entry_points(group = 'console_scripts') if ep.module == module and ep.attr == attr)
     return module, appname
 
