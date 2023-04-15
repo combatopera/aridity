@@ -18,6 +18,7 @@
 from __future__ import division
 from contextlib import contextmanager
 from importlib import import_module
+from importlib_metadata import entry_points
 from io import BytesIO, TextIOWrapper
 import collections, importlib_resources, inspect, sys
 
@@ -140,3 +141,11 @@ def qualname(obj):
         if getattr(sys.modules[obj.__module__], name) is not obj:
             raise
         return name
+
+def selectentrypoints(group):
+    obj = entry_points()
+    try:
+        select = obj.select
+    except AttributeError:
+        return obj[group]
+    return select(group = group)

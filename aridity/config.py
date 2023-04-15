@@ -19,9 +19,8 @@ from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
 from .scope import Resource, Scope
-from .util import CycleException, dotpy, NoSuchPathException, qualname, solo
+from .util import CycleException, dotpy, NoSuchPathException, qualname, selectentrypoints, solo
 from functools import partial
-from importlib_metadata import entry_points
 from itertools import chain
 from weakref import WeakKeyDictionary
 import errno, logging, os, sys
@@ -43,7 +42,7 @@ def _processmainfunction(mainfunction):
     else:
         attr = qualname(mainfunction)
         # FIXME: Requires metadata e.g. egg-info in projects that have not been installed:
-        appname, = (ep.name for ep in entry_points(group = 'console_scripts') if ep.module == module and ep.attr == attr)
+        appname, = (ep.name for ep in {ep for ep in selectentrypoints('console_scripts') if ep.module == module and ep.attr == attr})
     return module, appname
 
 class ForeignScopeException(Exception): pass
