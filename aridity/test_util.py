@@ -54,3 +54,5 @@ class TestUtil(TestCase):
             self.assertEqual(u'\N{POUND SIGN}\n', f.read())
         with openresource(__name__, 'test_util/resource.utf8') as f, self.assertRaises(UnicodeDecodeError):
             f.read()
+        with openresource(__package__, 'test_util/resource.utf8', 'utf-8') as f:
+            self.assertEqual(u'\N{POUND SIGN}\n', f.read())
