@@ -120,7 +120,11 @@ def allfunctions(clazz):
 
 @contextmanager
 def openresource(package_or_name, resource_name, encoding = 'ascii'):
-    path = importlib_resources.files(import_module(package_or_name).__package__)
+    m = import_module(package_or_name)
+    package = m.__package__
+    if package is None:
+        package = package_or_name if hasattr(m, '__path__') else package_or_name[:package_or_name.rindex('.')]
+    path = importlib_resources.files(package)
     for name in resource_name.split('/'):
         path /= name
     with path.open('rb') as f:
