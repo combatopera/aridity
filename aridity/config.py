@@ -19,7 +19,7 @@ from .directives import processtemplate, processtemplateimpl
 from .model import Entry, Function, Number, Scalar, Text, wrap
 from .repl import Repl
 from .scope import Resource, Scope
-from .util import CycleException, dotpy, NoSuchPathException, solo
+from .util import CycleException, dotpy, NoSuchPathException, qualname, solo
 from functools import partial
 from importlib_metadata import entry_points
 from itertools import chain
@@ -41,7 +41,7 @@ def _processmainfunction(mainfunction):
         assert scriptname.endswith(dotpy) and '-' not in scriptname
         appname = scriptname[:-len(dotpy)].replace('_', '-')
     else:
-        attr = mainfunction.__qualname__
+        attr = qualname(mainfunction)
         # FIXME: Requires metadata e.g. egg-info in projects that have not been installed:
         appname, = (ep.name for ep in entry_points(group = 'console_scripts') if ep.module == module and ep.attr == attr)
     return module, appname

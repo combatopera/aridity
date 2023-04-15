@@ -131,3 +131,12 @@ def openresource(package_or_name, resource_name, encoding = 'ascii'):
 def solo(v):
     x, = v
     return x
+
+def qualname(obj):
+    try:
+        return obj.__qualname__
+    except AttributeError:
+        name = obj.__name__
+        if getattr(sys.modules[obj.__module__], name) is not obj:
+            raise
+        return name
