@@ -62,11 +62,14 @@ class TestLoad(TestCase):
     %s()
 """ % main.__name__)
             with open(os.path.join(self.d, 'setup.py'), 'w') as f:
-                f.write('''from setuptools import setup
-setup(entry_points = dict(console_scripts = [
-    'function-style=pkg.functionstyle:functionstyle',
-    'tuple-style=pkg.tuplestyle:tuplestyle',
-]))
+                f.write('''from setuptools import find_packages, setup
+setup(
+    entry_points = dict(console_scripts = [
+        'function-style=pkg.functionstyle:functionstyle',
+        'tuple-style=pkg.tuplestyle:tuplestyle',
+    ]),
+    packages = find_packages(),
+)
 ''')
         except:
             rmtree(self.d)
