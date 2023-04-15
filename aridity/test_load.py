@@ -24,21 +24,21 @@ import os, sys
 
 def functionstyle():
     from aridity.config import ConfigCtrl
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid').appname)
+    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
 
 def tuplestyle():
     from aridity.config import ConfigCtrl
-    print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid').appname)
+    print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True).appname)
 
 def otherfunction():
     from pkg.functionstyle import functionstyle
     from aridity.config import ConfigCtrl
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid').appname)
+    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
 
 def otherfunction2():
     from pkg.tuplestyle import tuplestyle
     from aridity.config import ConfigCtrl
-    print(ConfigCtrl().loadappconfig(tuplestyle, 'root.arid').appname)
+    print(ConfigCtrl().loadappconfig(tuplestyle, 'root.arid', settingsoptional = True).appname)
 
 class TestLoad(TestCase):
 
