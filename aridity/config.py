@@ -42,7 +42,7 @@ def _processmainfunction(mainfunction):
     else:
         attr = qualname(mainfunction)
         # FIXME: Requires metadata e.g. egg-info in projects that have not been installed:
-        appname, = (ep.name for ep in {ep for ep in selectentrypoints('console_scripts') if ep.module == module and ep.attr == attr})
+        appname, = (ep.name for ep in selectentrypoints('console_scripts') if ep.module == module and ep.attr == attr)
     return module, appname
 
 class ForeignScopeException(Exception): pass
