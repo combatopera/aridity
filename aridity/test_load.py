@@ -32,15 +32,15 @@ class TestLoad(TestCase):
             rmtree(self.tempdir)
             raise
 
-    def _runmodule(self, module):
-        return check_output([sys.executable, '-m', module], cwd = self.d, env = dict(os.environ, PYTHONPATH = os.pathsep.join(sys.path)), universal_newlines = True)
+    def _runmodule(self, module, command):
+        return check_output([sys.executable, '-m', module, command], cwd = self.d, env = dict(os.environ, PYTHONPATH = os.pathsep.join(sys.path)), universal_newlines = True)
 
     def tearDown(self):
         rmtree(self.tempdir)
 
     def test_works(self):
-        self.assertEqual('functionstyle\n', self._runmodule('pkg.functionstyle'))
-        self.assertEqual('woo\n', self._runmodule('pkg.tuplestyle'))
+        self.assertEqual('file\n', self._runmodule('pkg.file', 'functionstyle'))
+        self.assertEqual('woo\n', self._runmodule('pkg.file', 'tuplestyle'))
         check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
-        self.assertEqual('function-style\n', self._runmodule('otherpkg.otherfunction'))
-        self.assertEqual('tuple-style\n', self._runmodule('otherpkg.otherfunction2'))
+        self.assertEqual('function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
+        self.assertEqual('tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))

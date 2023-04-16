@@ -16,9 +16,14 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from aridity.config import ConfigCtrl
+from pkg.file import functionstyle, tuplestyle
+import sys
 
-def main():
-    print(ConfigCtrl().loadappconfig(main, 'root.arid', settingsoptional = True).appname)
+def otherfunction():
+    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
+
+def otherfunction2():
+    print(ConfigCtrl().loadappconfig(tuplestyle, 'root.arid', settingsoptional = True).appname)
 
 if '__main__' == __name__:
-    main()
+    globals()[sys.argv.pop(1)]()
