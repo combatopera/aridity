@@ -20,10 +20,10 @@ from pkg.file import functionstyle, tuplestyle
 import sys
 
 def otherfunction():
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
+    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).info)
 
 def otherfunction2():
-    print(ConfigCtrl().loadappconfig(tuplestyle, 'root.arid', settingsoptional = True).appname)
+    print(ConfigCtrl().loadappconfig(tuplestyle, 'root.arid', settingsoptional = True).info)
 
 if '__main__' == __name__:
     globals()[sys.argv.pop(1)]()

@@ -15,14 +15,3 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from aridity.config import ConfigCtrl
-import sys
-
-def functionstyle():
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).info)
-
-def tuplestyle():
-    print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True).info)
-
-if '__main__' == __name__:
-    globals()[sys.argv.pop(1)]()

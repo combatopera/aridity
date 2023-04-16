@@ -39,8 +39,10 @@ class TestLoad(TestCase):
         rmtree(self.tempdir)
 
     def test_works(self):
-        self.assertEqual('file\n', self._runmodule('pkg.file', 'functionstyle'))
-        self.assertEqual('woo\n', self._runmodule('pkg.file', 'tuplestyle'))
+        self.assertEqual('pkg file\n', self._runmodule('pkg.file', 'functionstyle'))
+        self.assertEqual('pkg woo\n', self._runmodule('pkg.file', 'tuplestyle'))
+        self.assertEqual('sub file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
+        self.assertEqual('sub woo\n', self._runmodule('pkg.subpkg.file', 'tuplestyle'))
         check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
-        self.assertEqual('function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
-        self.assertEqual('tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))
+        self.assertEqual('pkg function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
+        self.assertEqual('pkg tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))
