@@ -24,5 +24,8 @@ def functionstyle():
 def tuplestyle():
     print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True).info)
 
-if '__main__' == __name__:
+def main():
     globals()[sys.argv.pop(1)]()
+
+if '__main__' == __name__:
+    main()

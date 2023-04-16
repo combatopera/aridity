@@ -32,8 +32,8 @@ class TestLoad(TestCase):
             rmtree(self.tempdir)
             raise
 
-    def _runmodule(self, module, command):
-        return check_output([sys.executable, '-m', module, command], cwd = self.d, env = dict(os.environ, PYTHONPATH = os.pathsep.join(sys.path)), universal_newlines = True)
+    def _runmodule(self, module, *command):
+        return check_output([sys.executable, '-m', module] + list(command), cwd = self.d, env = dict(os.environ, PYTHONPATH = os.pathsep.join(sys.path)), universal_newlines = True)
 
     def tearDown(self):
         rmtree(self.tempdir)
@@ -44,6 +44,8 @@ class TestLoad(TestCase):
         self.assertEqual('sub file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
         self.assertEqual('sub woo\n', self._runmodule('pkg.subpkg.file', 'tuplestyle'))
         self.assertEqual('pkg woo\n', self._runmodule('toplevel', 'tuplestyle'))
+        self.assertEqual('pkg woo\n', self._runmodule('delegate', 'pkg.file', 'tuplestyle'))
         check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
         self.assertEqual('pkg function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
         self.assertEqual('pkg tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))
+        self.assertEqual('pkg function-style\n', self._runmodule('delegate', 'pkg.file', 'functionstyle'))
