@@ -19,8 +19,8 @@ from setuptools import find_packages, setup
 
 setup(
     entry_points = dict(console_scripts = [
-        'function-style=pkg.functionstyle:functionstyle',
-        'tuple-style=pkg.tuplestyle:tuplestyle',
+        'function-style=pkg.functionstyle:main',
+        'tuple-style=pkg.tuplestyle:main',
     ]),
     packages = find_packages(),
 )

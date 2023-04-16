@@ -17,8 +17,8 @@
 
 from aridity.config import ConfigCtrl
 
-def functionstyle():
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
+def main():
+    print(ConfigCtrl().loadappconfig(main, 'root.arid', settingsoptional = True).appname)
 
 if '__main__' == __name__:
-    functionstyle()
+    main()

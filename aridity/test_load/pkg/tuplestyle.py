@@ -17,8 +17,8 @@
 
 from aridity.config import ConfigCtrl
 
-def tuplestyle():
+def main():
     print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True).appname)
 
 if '__main__' == __name__:
-    tuplestyle()
+    main()

@@ -16,10 +16,10 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from aridity.config import ConfigCtrl
-from pkg.functionstyle import functionstyle
+from pkg import functionstyle
 
-def otherfunction():
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).appname)
+def main():
+    print(ConfigCtrl().loadappconfig(functionstyle.main, 'root.arid', settingsoptional = True).appname)
 
 if '__main__' == __name__:
-    otherfunction()
+    main()
