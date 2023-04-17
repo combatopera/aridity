@@ -44,6 +44,7 @@ class TestLoad(TestCase):
         self.assertEqual('sub __main__ file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
         self.assertEqual('sub __main__ woo\n', self._runmodule('pkg.subpkg.file', 'tuplestyle'))
         self.assertEqual('pkg __main__ woo\n', self._runmodule('toplevel', 'tuplestyle'))
+        self.assertEqual('pkg toplevel woo\n', self._runmodule('delegate', 'toplevel', 'tuplestyle'))
         self.assertEqual('pkg pkg.file woo\n', self._runmodule('delegate', 'pkg.file', 'tuplestyle'))
         check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
         self.assertEqual('pkg __main__ function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
