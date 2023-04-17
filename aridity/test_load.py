@@ -55,4 +55,6 @@ class TestLoad(TestCase):
         self.assertEqual('sub pkg.subpkg.file woo\n', self._runmodule('delegate', 'pkg.subpkg.file', 'tuplestyle'))
 
         self.assertEqual('pkg __main__ function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
+        self.assertEqual('pkg otherpkg.file function-style\n', self._runmodule('delegate', 'otherpkg.file', 'otherfunction'))
         self.assertEqual('pkg __main__ tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))
+        self.assertEqual('pkg otherpkg.file tuple-style\n', self._runmodule('delegate', 'otherpkg.file', 'otherfunction2'))
