@@ -44,10 +44,16 @@ class TestLoad(TestCase):
         self.assertEqual('pkg __main__ woo\n', self._runmodule('toplevel', 'tuplestyle'))
         self.assertEqual('pkg toplevel woo\n', self._runmodule('delegate', 'toplevel', 'tuplestyle'))
 
+        self.assertEqual('pkg __main__ --main--\n', self._runmodule('pkg', 'functionstyle'))
+        self.assertEqual('pkg __main__ woo\n', self._runmodule('pkg', 'tuplestyle'))
+
         self.assertEqual('pkg __main__ file\n', self._runmodule('pkg.file', 'functionstyle'))
         self.assertEqual('pkg pkg.file function-style\n', self._runmodule('delegate', 'pkg.file', 'functionstyle'))
         self.assertEqual('pkg __main__ woo\n', self._runmodule('pkg.file', 'tuplestyle'))
         self.assertEqual('pkg pkg.file woo\n', self._runmodule('delegate', 'pkg.file', 'tuplestyle'))
+
+        self.assertEqual('sub __main__ --main--\n', self._runmodule('pkg.subpkg', 'functionstyle'))
+        self.assertEqual('sub __main__ woo\n', self._runmodule('pkg.subpkg', 'tuplestyle'))
 
         self.assertEqual('sub __main__ file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
         self.assertEqual('sub pkg.subpkg.file function-style-sub\n', self._runmodule('delegate', 'pkg.subpkg.file', 'functionstyle'))
