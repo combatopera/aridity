@@ -39,14 +39,20 @@ class TestLoad(TestCase):
         rmtree(self.tempdir)
 
     def test_works(self):
-        self.assertEqual('pkg __main__ file\n', self._runmodule('pkg.file', 'functionstyle'))
-        self.assertEqual('pkg __main__ woo\n', self._runmodule('pkg.file', 'tuplestyle'))
-        self.assertEqual('sub __main__ file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
-        self.assertEqual('sub __main__ woo\n', self._runmodule('pkg.subpkg.file', 'tuplestyle'))
+        check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
+
         self.assertEqual('pkg __main__ woo\n', self._runmodule('toplevel', 'tuplestyle'))
         self.assertEqual('pkg toplevel woo\n', self._runmodule('delegate', 'toplevel', 'tuplestyle'))
+
+        self.assertEqual('pkg __main__ file\n', self._runmodule('pkg.file', 'functionstyle'))
+        self.assertEqual('pkg pkg.file function-style\n', self._runmodule('delegate', 'pkg.file', 'functionstyle'))
+        self.assertEqual('pkg __main__ woo\n', self._runmodule('pkg.file', 'tuplestyle'))
         self.assertEqual('pkg pkg.file woo\n', self._runmodule('delegate', 'pkg.file', 'tuplestyle'))
-        check_call([sys.executable, 'setup.py', 'egg_info'], cwd = self.d)
+
+        self.assertEqual('sub __main__ file\n', self._runmodule('pkg.subpkg.file', 'functionstyle'))
+        self.assertEqual('sub pkg.subpkg.file function-style-sub\n', self._runmodule('delegate', 'pkg.subpkg.file', 'functionstyle'))
+        self.assertEqual('sub __main__ woo\n', self._runmodule('pkg.subpkg.file', 'tuplestyle'))
+        self.assertEqual('sub pkg.subpkg.file woo\n', self._runmodule('delegate', 'pkg.subpkg.file', 'tuplestyle'))
+
         self.assertEqual('pkg __main__ function-style\n', self._runmodule('otherpkg.file', 'otherfunction'))
         self.assertEqual('pkg __main__ tuple-style\n', self._runmodule('otherpkg.file', 'otherfunction2'))
-        self.assertEqual('pkg pkg.file function-style\n', self._runmodule('delegate', 'pkg.file', 'functionstyle'))

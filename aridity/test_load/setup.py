@@ -21,6 +21,7 @@ setup(
     entry_points = dict(console_scripts = [
         'function-style=pkg.file:functionstyle',
         'tuple-style=pkg.file:tuplestyle',
+        'function-style-sub=pkg.subpkg.file:functionstyle',
     ]),
     packages = find_packages(),
 )
