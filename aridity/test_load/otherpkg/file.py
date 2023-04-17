@@ -15,19 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from aridity.config import ConfigCtrl
+from common import printinfo
 from pkg.file import functionstyle, tuplestyle
 import sys
 
 def otherfunction():
-    c = ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True)
-    c.modname = __name__
-    print(c.info)
+    printinfo(__name__, functionstyle)
 
 def otherfunction2():
-    c = ConfigCtrl().loadappconfig(tuplestyle, 'root.arid', settingsoptional = True)
-    c.modname = __name__
-    print(c.info)
+    printinfo(__name__, tuplestyle)
 
 def main():
     globals()[sys.argv.pop(1)]()
