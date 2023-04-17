@@ -19,10 +19,14 @@ from aridity.config import ConfigCtrl
 import sys
 
 def functionstyle():
-    print(ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True).info)
+    c = ConfigCtrl().loadappconfig(functionstyle, 'root.arid', settingsoptional = True)
+    c.modname = __name__
+    print(c.info)
 
 def tuplestyle():
-    print(ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True).info)
+    c = ConfigCtrl().loadappconfig((__name__, 'woo'), 'root.arid', settingsoptional = True)
+    c.modname = __name__
+    print(c.info)
 
 def main():
     globals()[sys.argv.pop(1)]()
