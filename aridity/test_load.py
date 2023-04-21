@@ -64,6 +64,9 @@ class TestLoad(TestCase):
         self.assertEqual('sub __main__ --main--\n', self._moduleasmain('pkg.subpkg', 'functionstyle'))
         self.assertEqual('sub __main__ woo\n', self._moduleasmain('pkg.subpkg', 'tuplestyle'))
 
+        self.assertEqual('sub pkg.subpkg function-style-init2\n', self._moduleasself('pkg.subpkg', 'functionstyle'))
+        self.assertEqual('sub pkg.subpkg woo\n', self._moduleasself('pkg.subpkg', 'tuplestyle'))
+
         self.assertEqual('sub __main__ file\n', self._moduleasmain('pkg.subpkg.file', 'functionstyle'))
         self.assertEqual('sub pkg.subpkg.file function-style-sub\n', self._moduleasself('pkg.subpkg.file', 'functionstyle'))
         self.assertEqual('sub __main__ woo\n', self._moduleasmain('pkg.subpkg.file', 'tuplestyle'))
