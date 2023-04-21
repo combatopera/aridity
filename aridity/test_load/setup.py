@@ -19,6 +19,7 @@ from setuptools import find_packages, setup
 
 setup(
     entry_points = dict(console_scripts = [
+        'function-style-init=pkg:functionstyle',
         'function-style=pkg.file:functionstyle',
         'tuple-style=pkg.file:tuplestyle',
         'function-style-sub=pkg.subpkg.file:functionstyle',

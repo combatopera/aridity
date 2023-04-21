@@ -53,6 +53,9 @@ class TestLoad(TestCase):
         self.assertEqual('pkg __main__ --main--\n', self._moduleasmain('pkg', 'functionstyle'))
         self.assertEqual('pkg __main__ woo\n', self._moduleasmain('pkg', 'tuplestyle'))
 
+        self.assertEqual('pkg pkg function-style-init\n', self._moduleasself('pkg', 'functionstyle'))
+        self.assertEqual('pkg pkg woo\n', self._moduleasself('pkg', 'tuplestyle'))
+
         self.assertEqual('pkg __main__ file\n', self._moduleasmain('pkg.file', 'functionstyle'))
         self.assertEqual('pkg pkg.file function-style\n', self._moduleasself('pkg.file', 'functionstyle'))
         self.assertEqual('pkg __main__ woo\n', self._moduleasmain('pkg.file', 'tuplestyle'))

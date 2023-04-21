@@ -15,3 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from common import printinfo
+import sys
+
+def functionstyle():
+    printinfo(__name__, functionstyle)
+
+def tuplestyle():
+    printinfo(__name__, (__name__, 'woo'))
+
+def main():
+    globals()[sys.argv.pop(1)]()
+
+if '__main__' == __name__:
+    main()
