@@ -33,46 +33,32 @@ class TestLoad(TestCase):
             rmtree(self.tempdir)
             raise
 
-    def _file(self, *args):
+    def _python(self, *args):
         return check_output([sys.executable] + list(args), cwd = self.d, env = dict(os.environ, PYTHONPATH = os.pathsep.join(sys.path)), universal_newlines = True)
 
     def _moduleasself(self, module, command):
-        return self._file('-m', 'delegate', module, command)
+        return self._python('-m', 'delegate', module, command)
 
     def _moduleasmain(self, module, command):
-        return self._file('-m', module, command)
+        return self._python('-m', module, command)
 
     def tearDown(self):
         rmtree(self.tempdir)
 
-    def test_works(self):
-        self.assertEqual('pkg __main__ woo\n', self._file('toplevel.py', 'tuplestyle'))
-        self.assertEqual('pkg __main__ woo\n', self._moduleasmain('toplevel', 'tuplestyle'))
-        self.assertEqual('pkg toplevel woo\n', self._moduleasself('toplevel', 'tuplestyle'))
-
+    def test_functionstyle(self):
         self.assertEqual('pkg __main__ --main--\n', self._moduleasmain('pkg', 'functionstyle'))
-        self.assertEqual('pkg __main__ woo\n', self._moduleasmain('pkg', 'tuplestyle'))
-
-        self.assertEqual('pkg pkg function-style-init\n', self._moduleasself('pkg', 'functionstyle'))
-        self.assertEqual('pkg pkg woo\n', self._moduleasself('pkg', 'tuplestyle'))
-
         self.assertEqual('pkg __main__ file\n', self._moduleasmain('pkg.file', 'functionstyle'))
-        self.assertEqual('pkg pkg.file function-style\n', self._moduleasself('pkg.file', 'functionstyle'))
-        self.assertEqual('pkg __main__ woo\n', self._moduleasmain('pkg.file', 'tuplestyle'))
-        self.assertEqual('pkg pkg.file woo\n', self._moduleasself('pkg.file', 'tuplestyle'))
-
         self.assertEqual('sub __main__ --main--\n', self._moduleasmain('pkg.subpkg', 'functionstyle'))
-        self.assertEqual('sub __main__ woo\n', self._moduleasmain('pkg.subpkg', 'tuplestyle'))
-
-        self.assertEqual('sub pkg.subpkg function-style-init2\n', self._moduleasself('pkg.subpkg', 'functionstyle'))
-        self.assertEqual('sub pkg.subpkg woo\n', self._moduleasself('pkg.subpkg', 'tuplestyle'))
-
         self.assertEqual('sub __main__ file\n', self._moduleasmain('pkg.subpkg.file', 'functionstyle'))
+        self.assertEqual('pkg __main__ function-style-init\n', self._moduleasmain('others', 'pkg'))
+        self.assertEqual('pkg __main__ function-style\n', self._moduleasmain('others', 'pkg_file'))
+        self.assertEqual('sub __main__ function-style-init2\n', self._moduleasmain('others', 'pkg_subpkg'))
+        self.assertEqual('sub __main__ function-style-sub\n', self._moduleasmain('others', 'pkg_subpkg_file'))
+        self.assertEqual('pkg pkg function-style-init\n', self._moduleasself('pkg', 'functionstyle'))
+        self.assertEqual('pkg pkg.file function-style\n', self._moduleasself('pkg.file', 'functionstyle'))
+        self.assertEqual('sub pkg.subpkg function-style-init2\n', self._moduleasself('pkg.subpkg', 'functionstyle'))
         self.assertEqual('sub pkg.subpkg.file function-style-sub\n', self._moduleasself('pkg.subpkg.file', 'functionstyle'))
-        self.assertEqual('sub __main__ woo\n', self._moduleasmain('pkg.subpkg.file', 'tuplestyle'))
-        self.assertEqual('sub pkg.subpkg.file woo\n', self._moduleasself('pkg.subpkg.file', 'tuplestyle'))
-
-        self.assertEqual('pkg __main__ function-style\n', self._moduleasmain('otherpkg.file', 'otherfunction'))
-        self.assertEqual('pkg otherpkg.file function-style\n', self._moduleasself('otherpkg.file', 'otherfunction'))
-        self.assertEqual('pkg __main__ tuple-style\n', self._moduleasmain('otherpkg.file', 'otherfunction2'))
-        self.assertEqual('pkg otherpkg.file tuple-style\n', self._moduleasself('otherpkg.file', 'otherfunction2'))
+        self.assertEqual('pkg others function-style-init\n', self._moduleasself('others', 'pkg'))
+        self.assertEqual('pkg others function-style\n', self._moduleasself('others', 'pkg_file'))
+        self.assertEqual('sub others function-style-init2\n', self._moduleasself('others', 'pkg_subpkg'))
+        self.assertEqual('sub others function-style-sub\n', self._moduleasself('others', 'pkg_subpkg_file'))
