@@ -26,12 +26,12 @@ def pkg_file():
     from pkg.file import functionstyle
     printinfo(__name__, functionstyle)
 
-def pkg_subpkg():
-    from pkg.subpkg import functionstyle
+def pkg_sub():
+    from pkg.sub import functionstyle
     printinfo(__name__, functionstyle)
 
-def pkg_subpkg_file():
-    from pkg.subpkg.file import functionstyle
+def pkg_sub_file():
+    from pkg.sub.file import functionstyle
     printinfo(__name__, functionstyle)
 
 def main():
