@@ -19,10 +19,10 @@ from setuptools import find_packages, setup
 
 setup(
     entry_points = dict(console_scripts = [
-        'function-style-init=pkg:functionstyle',
-        'function-style=pkg.file:functionstyle',
-        'function-style-init2=pkg.sub:functionstyle',
-        'function-style-sub=pkg.sub.file:functionstyle',
+        'function-style-pkg=pkg:functionstyle',
+        'function-style-pkg-file=pkg.file:functionstyle',
+        'function-style-pkg-sub=pkg.sub:functionstyle',
+        'function-style-pkg-sub-file=pkg.sub.file:functionstyle',
     ]),
     packages = find_packages(),
 )

@@ -21,7 +21,4 @@ import sys
 def functionstyle():
     printinfo(__name__, functionstyle)
 
-def tuplestyle():
-    printinfo(__name__, (__name__, 'woo'))
-
 globals()[sys.argv.pop(1)]()
