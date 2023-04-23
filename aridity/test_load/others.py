@@ -30,8 +30,8 @@ def pkg_sub():
     from pkg.sub import functionstyle
     printinfo(__name__, functionstyle)
 
-def pkg_sub_file():
-    from pkg.sub.file import functionstyle
+def pkg_sub_fyle():
+    from pkg.sub.fyle import functionstyle
     printinfo(__name__, functionstyle)
 
 def main():

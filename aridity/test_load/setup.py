@@ -22,7 +22,7 @@ setup(
         'function-style-pkg=pkg:functionstyle',
         'function-style-pkg-file=pkg.file:functionstyle',
         'function-style-pkg-sub=pkg.sub:functionstyle',
-        'function-style-pkg-sub-file=pkg.sub.file:functionstyle',
+        'function-style-pkg-sub-fyle=pkg.sub.fyle:functionstyle',
     ]),
     packages = find_packages(),
 )
