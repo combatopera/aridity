@@ -36,9 +36,15 @@ def _newnode(ctrl):
 def _processmainfunction(mainfunction):
     module = mainfunction.__module__
     if '__main__' == module:
-        scriptname = os.path.basename(sys.argv[0])
-        assert scriptname.endswith(dotpy) and '-' not in scriptname
-        appname = scriptname[:-len(dotpy)].replace('_', '-')
+        p = sys.argv[0]
+        name = os.path.basename(p)
+        if '__main__.py' == name:
+            stem = os.path.basename(os.path.dirname(p))
+        else:
+            assert name.endswith(dotpy)
+            stem = name[:-len(dotpy)]
+        assert '-' not in stem
+        appname = stem.replace('_', '-')
     else:
         attr = qualname(mainfunction)
         # FIXME: Requires metadata e.g. egg-info in projects that have not been installed:

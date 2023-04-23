@@ -46,9 +46,9 @@ class TestLoad(TestCase):
         rmtree(self.tempdir)
 
     def test_functionstyle(self):
-        self.assertEqual('pkg __main__ --main--\n', self._moduleasmain('pkg', 'functionstyle'))
+        self.assertEqual('pkg __main__ pkg\n', self._moduleasmain('pkg', 'functionstyle'))
         self.assertEqual('pkg __main__ file\n', self._moduleasmain('pkg.file', 'functionstyle'))
-        self.assertEqual('sub __main__ --main--\n', self._moduleasmain('pkg.sub', 'functionstyle'))
+        self.assertEqual('sub __main__ sub\n', self._moduleasmain('pkg.sub', 'functionstyle'))
         self.assertEqual('sub __main__ file\n', self._moduleasmain('pkg.sub.file', 'functionstyle'))
         self.assertEqual('pkg __main__ function-style-pkg\n', self._moduleasmain('others', 'pkg'))
         self.assertEqual('pkg __main__ function-style-pkg-file\n', self._moduleasmain('others', 'pkg_file'))
