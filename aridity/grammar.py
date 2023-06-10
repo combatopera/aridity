@@ -41,13 +41,13 @@ def _getarg(callchain, scalarpa, boundarychars):
     opttext = Optional(gettext(Text.pa))
     return (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
-def _getarg2(callchain, blankpa, scalarpa, o, c):
+def _bracketed(callchain, blankpa, scalarpa, o, c):
     def gettext(pa):
         return Regex(r"[^$\s%s]+" % re.escape(c)).leaveWhitespace().setParseAction(pa)
     opttext = Optional(gettext(Text.pa))
     concat = OneOrMore(opttext + callchain) + opttext
     optblank = _getoptblank(blankpa, '')
-    return Literal(o) + ZeroOrMore(optblank + (concat | gettext(scalarpa)).setParseAction(Concat.smartpa)) + optblank + Literal(c)
+    return ZeroOrMore(optblank + (concat | gettext(scalarpa)).setParseAction(Concat.smartpa)) + optblank
 
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
@@ -90,7 +90,7 @@ class GFactory:
     def create(self, pa):
         def itercalls():
             def getbrackets(blankpa, scalarpa):
-                return _getarg2(callchain, blankpa, scalarpa, o, c)
+                return Literal(o) + _bracketed(callchain, blankpa, scalarpa, o, c) + Literal(c)
             for o, c in self.bracketpairs:
                 yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
