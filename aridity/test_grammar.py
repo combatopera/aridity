@@ -118,9 +118,10 @@ class TestGrammar(TestCase):
 
     def test_nestedbrackets(self):
         cc = ConfigCtrl()
-        cc.execute('a = $lower(ABC(DEF)GHI)')
-        cc.execute('b = $lower$.( ABC ( DEF ) GHI )')
-        cc.execute('''c = $lower$'( ABC ( DEF ) GHI )''')
+        cc.execute('E = E')
+        cc.execute('a = $lower(ABC(D$(E)F)GHI)')
+        cc.execute('b = $lower$.( ABC ( D$(E)F ) GHI )')
+        cc.execute('''c = $lower$'( ABC ( D$(E)F ) GHI )''')
         self.assertEqual('abc(def)ghi', cc.node.a)
         self.assertEqual(' abc ( def ) ghi ', cc.node.b)
         self.assertEqual(' abc ( def ) ghi ', cc.node.c)
