@@ -41,6 +41,12 @@ def _getarg(callchain, scalarpa, boundarychars):
     opttext = Optional(gettext(Text.pa))
     return (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
+def _getarg2(callchain, scalarpa, o, c):
+    def gettext(pa):
+        return Regex(r"[^$\s%s]+" % re.escape(c)).leaveWhitespace().setParseAction(pa)
+    opttext = Optional(gettext(Text.pa))
+    return (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
+
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
 
@@ -83,7 +89,7 @@ class GFactory:
         def itercalls():
             def getbrackets(blankpa, scalarpa):
                 optblank = _getoptblank(blankpa, '')
-                return Literal(o) + ZeroOrMore(optblank + _getarg(callchain, scalarpa, c)) + optblank + Literal(c)
+                return Literal(o) + ZeroOrMore(optblank + _getarg2(callchain, scalarpa, o, c)) + optblank + Literal(c)
             for o, c in self.bracketpairs:
                 yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + Regex("[^%s]*" % re.escape(c)) + Suppress(c)).setParseAction(Text.pa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
