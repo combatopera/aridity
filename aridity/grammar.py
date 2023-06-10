@@ -46,8 +46,8 @@ def _getarg2(callchain, blankpa, scalarpa, o, c):
         return Regex(r"[^$\s%s]+" % re.escape(c)).leaveWhitespace().setParseAction(pa)
     optblank = _getoptblank(blankpa, '')
     opttext = Optional(gettext(Text.pa))
-    hmm = (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
-    return Literal(o) + ZeroOrMore(optblank + hmm) + optblank + Literal(c)
+    concat = (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
+    return Literal(o) + ZeroOrMore(optblank + concat) + optblank + Literal(c)
 
 def _getoptblank(pa, boundarychars):
     return Optional(Regex(r"[^\S%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa))
