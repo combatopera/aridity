@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
+from .config import ConfigCtrl
 from .grammar import GFactory, Parser, ZeroOrMore
 from .model import Blank, Boolean, Boundary, Call, Concat as ConcatImpl, Entry, nullmonitor, Number, Text
 from decimal import Decimal
@@ -114,3 +115,12 @@ class TestGrammar(TestCase):
         ae([Text('100')], p("$'(100)"))
         ae([Call('x', [Text('100')], ['', ''])], p("$x$'(100)"))
         ae([Call('y', [Call('x', [Text('100')], ['', ''])], ['', ''])], p("$y$x$'(100)"))
+
+    def test_nestedbrackets(self):
+        cc = ConfigCtrl()
+        cc.execute('a = $lower(ABC(DEF)GHI)')
+        cc.execute('b = $lower$.( ABC ( DEF ) GHI )')
+        cc.execute('''c = $lower$'( ABC ( DEF ) GHI )''')
+        self.assertEqual('abc(def)ghi', cc.node.a)
+        self.assertEqual(' abc ( def ) ghi ', cc.node.b)
+        self.assertEqual(' abc ( def ) ghi ', cc.node.c)
