@@ -137,10 +137,10 @@ home directory = $(~)
 
 : To get a literal dollar there is a special form for quoting:
 financial report = $'(We lost $100 on Friday.)
-: Be careful with nested brackets, the first matching bracket ends the special form:
+: Unlike in older versions, nested brackets (if any) do not end the special form early:
 behaviour
-    expected   = $'[Lunch cost $20 (worth it though).]
-    unexpected = $'(Lunch cost $20 (worth it though).)
+    expected = $'[Lunch cost $20 (worth it though).]
+    same     = $'(Lunch cost $20 (worth it though).)
 
 : Another special form can be used to preserve leading/trailing whitespace:
 padded bars = $.( $(foo) $(foo) )
