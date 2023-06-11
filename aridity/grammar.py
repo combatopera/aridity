@@ -17,7 +17,7 @@
 
 from .model import Blank, Boolean, Boundary, Call, Concat, Entry, nullmonitor, Number, Text
 from decimal import Decimal
-from functools import reduce
+from functools import partial, reduce
 from pyparsing import Forward, Literal, MatchFirst, NoMatch, OneOrMore, Optional, Regex, Suppress, ZeroOrMore
 import operator, re
 
@@ -35,15 +35,16 @@ class AnyScalar:
             m = cls.numberpattern.search(text)
             return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
 
+def _gettext(notchars, pa):
+    return Regex(r"[^$\s%s]+" % re.escape(notchars)).leaveWhitespace().setParseAction(pa)
+
 def _getarg(callchain, scalarpa, boundarychars):
-    def gettext(pa):
-        return Regex(r"[^$\s%s]+" % re.escape(boundarychars)).leaveWhitespace().setParseAction(pa)
+    gettext = partial(_gettext, boundarychars)
     opttext = Optional(gettext(Text.pa))
     return (OneOrMore(opttext + callchain) + opttext | gettext(scalarpa)).setParseAction(Concat.smartpa)
 
 def _bracketed(callchain, blankpa, scalarpa, o, c):
-    def gettext(pa):
-        return Regex(r"[^$\s%s]+" % re.escape(o + c)).leaveWhitespace().setParseAction(pa)
+    gettext = partial(_gettext, o + c)
     bracketed = Forward()
     chainorbrackets = callchain | Literal(o).setParseAction(Text.pa) + bracketed + Literal(c).setParseAction(Text.pa)
     opttext = Optional(gettext(Text.pa))
