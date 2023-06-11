@@ -124,4 +124,4 @@ class TestGrammar(TestCase):
         cc.execute('''c = $lower$'( ABC ( D$(E)F ) GHI ( JKL ) MNO )''')
         self.assertEqual('abc(def)ghi(jkl)mno', cc.node.a)
         self.assertEqual(' abc ( def ) ghi ( jkl ) mno ', cc.node.b)
-        self.assertEqual(' abc ( def ) ghi ( jkl ) mno ', cc.node.c)
+        self.assertEqual(' abc ( d$(e)f ) ghi ( jkl ) mno ', cc.node.c)
