@@ -44,9 +44,12 @@ def _getarg(callchain, scalarpa, boundarychars):
 def _bracketed(callchain, blankpa, scalarpa, o, c):
     def gettext(pa):
         return Regex(r"[^$\s%s]+" % re.escape(c)).leaveWhitespace().setParseAction(pa)
+    def gettext2(pa):
+        return Regex(r"[^$\s%s]+" % re.escape(o + c)).leaveWhitespace().setParseAction(pa)
     bracketed = Forward()
-    opttext = Optional(gettext(Text.pa))
-    concat = OneOrMore(opttext + callchain) + opttext
+    chainorbrackets = callchain | Literal(o).setParseAction(Text.pa) + bracketed + Literal(c).setParseAction(Text.pa)
+    opttext = Optional(gettext2(Text.pa))
+    concat = OneOrMore(opttext + chainorbrackets.leaveWhitespace()) + opttext
     optblank = _getoptblank(blankpa, '')
     bracketed << ZeroOrMore(optblank + (concat | gettext(scalarpa)).setParseAction(Concat.smartpa)) + optblank
     return bracketed
