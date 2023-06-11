@@ -66,8 +66,8 @@ class TestGrammar(TestCase):
 
     def test_lit(self):
         ae = self.assertEqual
-        ae([Text('$doesNotExist(]')], p('''$'($doesNotExist(])'''))
-        ae([Text('$doesNotExist[)')], p('''$'[$doesNotExist[)]'''))
+        ae([Concat([Text('$doesNotExist('), Text(']')])], p('''$'[$doesNotExist(]]'''))
+        ae([Concat([Text('$doesNotExist['), Text(')')])], p('''$'($doesNotExist[))'''))
         ae([Text(' \t')], p('''$'[ \t]'''))
         ae([Text('10')], p('''$'[10]'''))
         ae([Text('true')], p('''$'(true)'''))
