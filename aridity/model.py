@@ -133,6 +133,10 @@ class Scalar(BaseScalar):
 class Text(Cat, BaseScalar):
 
     @classmethod
+    def multipa(cls, s, l, t):
+        return cls(''.join(t))
+
+    @classmethod
     def _of(cls, textvalue):
         return cls(textvalue)
 

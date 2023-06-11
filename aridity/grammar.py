@@ -54,7 +54,9 @@ def _bracketed(callchain, blankpa, scalarpa, o, c):
 
 def _literalbracketed(o, c):
     bracketed = Forward()
-    bracketed << Regex("[^%s]*" % re.escape(c))
+    brackets = Literal(o) + bracketed + Literal(c)
+    opttext = Regex("[^%s]*" % re.escape(o + c)).leaveWhitespace()
+    bracketed << ZeroOrMore(opttext + brackets.leaveWhitespace()) + opttext
     return bracketed
 
 def _getoptblank(pa, boundarychars):
@@ -100,7 +102,7 @@ class GFactory:
             def getbrackets(blankpa, scalarpa):
                 return Literal(o) + _bracketed(callchain, blankpa, scalarpa, o, c) + Literal(c)
             for o, c in self.bracketpairs:
-                yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + _literalbracketed(o, c) + Suppress(c)).setParseAction(Text.pa)
+                yield (Suppress(Regex("[$](?:lit|')")) + Suppress(o) + _literalbracketed(o, c) + Suppress(c)).setParseAction(Text.multipa)
                 yield (Suppress(Regex('[$](?:pass|[.])')) + getbrackets(Text.pa, Text.pa)).setParseAction(self._bracketspa)
                 yield (Suppress('$') + self.identifier + getbrackets(Blank.pa, AnyScalar.pa)).setParseAction(_principalcallpa)
                 yield (Suppress('$') + self.identifier + callchain).setParseAction(_additionalcallpa)
