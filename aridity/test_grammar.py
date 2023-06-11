@@ -88,7 +88,7 @@ class TestGrammar(TestCase):
         ae([Concat([Text(' '), Text('x'), Text('  '), Text('y'), Text('\t')])], p('$.[ x  y\t]'))
         ae([Call('act', [Text('x'), Blank(' '), Concat([Text(' '), Text('y'), Text('\t')])], '()')], p('$act(x $.[ y\t])'))
         ae([Concat([Text('10')])], p('$.[10]'))
-        ae([Concat([Text('x(')]), Blank(' '), Text(')')], p('$.(x() )')) # Gotcha!
+        ae([Concat([Concat([Text('x'), Text('('), Text(')')]), Text(' ')])], p('$.(x() )'))
         ae([Concat([Text('x()'), Text(' ')])], p('$.[x() ]'))
 
     def test_loader(self):
