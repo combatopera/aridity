@@ -55,9 +55,9 @@ def _bracketed(callchain, blankpa, scalarpa, o, c):
 
 def _literalbracketed(o, c):
     bracketed = Forward()
-    brackets = Literal(o) + bracketed + Literal(c)
+    brackets = (Literal(o) + bracketed + Literal(c)).leaveWhitespace()
     opttext = Regex("[^%s]*" % re.escape(o + c)).leaveWhitespace()
-    bracketed << ZeroOrMore(opttext + brackets.leaveWhitespace()) + opttext
+    bracketed << ZeroOrMore(opttext + brackets) + opttext
     return bracketed
 
 def _getoptblank(pa, boundarychars):
