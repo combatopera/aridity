@@ -28,7 +28,7 @@ class MalformedEntryException(Exception): pass
 
 class Repl:
 
-    quotablebysquare = re.compile('[$)]+')
+    quotablebysquare = re.compile('[$()]+')
 
     @classmethod
     def _quote(cls, obj): # TODO: Duplicates some wrap logic.
