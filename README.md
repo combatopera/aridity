@@ -141,6 +141,10 @@ financial report = $'(We lost $100 on Friday.)
 behaviour
     expected = $'[Lunch cost $20 (worth it though).]
     same     = $'(Lunch cost $20 (worth it though).)
+: Consequently, unbalanced brackets of the same kind as used by the special form must be avoided:
+interval
+    lower = $'[The interval ][$'[0, 1) includes 0 but not 1.]
+    upper = $'(The interval )($'(0, 1] includes 1 but not 0.)
 
 : Another special form can be used to preserve leading/trailing whitespace:
 padded bars = $.( $(foo) $(foo) )
