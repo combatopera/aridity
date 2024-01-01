@@ -23,7 +23,7 @@ import operator, re
 
 class AnyScalar:
 
-    numberpattern = re.compile('^-?(?:[0-9]+|[0-9]*[.][0-9]+)$')
+    numberpattern = re.compile('^-?(?:0|[1-9][0-9]*)([.][0-9]+)?$')
     booleans = {str(b).lower(): Boolean(b) for b in map(bool, range(2))}
 
     @classmethod
@@ -33,7 +33,7 @@ class AnyScalar:
             return cls.booleans[text]
         except KeyError:
             m = cls.numberpattern.search(text)
-            return Text(text) if m is None else Number((Decimal if '.' in text else int)(text))
+            return Text(text) if m is None or '-0' == text else Number((int if m.group(1) is None else Decimal)(text))
 
 def _gettext(notchars, pa):
     return Regex(r"[^$\s%s]+" % re.escape(notchars)).leaveWhitespace().setParseAction(pa)

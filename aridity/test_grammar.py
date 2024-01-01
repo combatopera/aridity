@@ -53,7 +53,7 @@ class TestGrammar(TestCase):
         ae([Text('woo'), Blank(' '), Call('get', [Blank('\n '), Text('yay'), Blank('\n')], '()'), Blank('\t'), Text('houpla'), Blank('  ')], p('''woo $get(\n yay\n)\thoupla  '''))
         ae([Number(1)], p('1'))
         ae([Number(-5)], p('-5'))
-        ae([Call('id', [Number(Decimal('.1'))], '()')], p('$id(.1)'))
+        ae([Call('id', [Text('.1')], '()')], p('$id(.1)'))
         ae([Call('id', [Number(Decimal('-5.4'))], '()')], p('$id(-5.4)'))
         ae([Call('id', [Text('.1woo')], '()')], p('$id(.1woo)'))
         ae([Text('100woo')], p('100woo'))
@@ -129,3 +129,27 @@ class TestGrammar(TestCase):
         self.assertEqual('abc(def)ghi(jkl)mno', cc.node.a)
         self.assertEqual(' abc ( def ) ghi ( jkl ) mno ', cc.node.b)
         self.assertEqual(' abc ( d$(e)f ) ghi ( jkl ) mno ', cc.node.c)
+
+    def test_leadingzero(self):
+        a = '100 0100 -100 -0100'
+        b = '1.0 1.00 1. -1.0 -1.00 -1.'
+        c = '.5 0.5 00.5 -.5 -0.5 -00.5'
+        d = '0 00 -0 -00'
+        e = '.0 0. 0.0 00.0 0.00 -.0 -0. -0.0 -00.0 -0.00'
+        cc = ConfigCtrl()
+        cc.execute("a = $list(%s)" % a)
+        cc.execute("b = $list(%s)" % b)
+        cc.execute("c = $list(%s)" % c)
+        cc.execute("d = $list(%s)" % d)
+        cc.execute("e = $list(%s)" % e)
+        conf = cc.node
+        self.assertEqual([100, '0100', -100, '-0100'], list(conf.a))
+        self.assertEqual([1, 1, '1.', -1, -1, '-1.'], list(conf.b))
+        self.assertEqual(['.5', .5, '00.5', '-.5', -.5, '-00.5'], list(conf.c))
+        self.assertEqual([0, '00', '-0', '-00'], list(conf.d))
+        self.assertEqual(['.0', '0.', 0, '00.0', 0, '-.0', '-0.', 0, '-00.0', 0], list(conf.e))
+        self.assertEqual(a.split(), list(map(str, conf.a)))
+        self.assertEqual(b.split(), list(map(str, conf.b)))
+        self.assertEqual(c.split(), list(map(str, conf.c)))
+        self.assertEqual(d.split(), list(map(str, conf.d)))
+        self.assertEqual(e.split(), list(map(str, conf.e)))
