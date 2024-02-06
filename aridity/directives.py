@@ -109,7 +109,7 @@ class Cat:
         scope.resolved('stdout').flush(processtemplate(scope, suffix.tophrase()))
 
 def resolvepath(resolvable, scope):
-    return resolvable.resolve(scope).pathvalue(scope) # TODO: Support resources.
+    return resolvable.resolve(scope).pathobj(scope).scalar # TODO: Support resources.
 
 def processtemplate(scope, pathresolvable):
     path = resolvepath(pathresolvable, scope)
