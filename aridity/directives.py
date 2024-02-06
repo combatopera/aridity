@@ -46,7 +46,7 @@ class Colon:
 class Redirect:
     name = 'redirect'
     def __call__(self, prefix, suffix, scope):
-        scope['stdout',] = Stream(open(resolvepath(suffix.tophrase(), scope), 'w'))
+        scope['stdout',] = Stream(open(resolvepathobj(scope, suffix.tophrase()).scalar, 'w'))
 
 @directive
 class Write:
@@ -71,7 +71,7 @@ class Source:
 class CD:
     name = 'cd'
     def __call__(self, prefix, suffix, scope):
-        scope['cwd',] = Text(resolvepath(suffix.tophrase(), scope))
+        scope['cwd',] = resolvepathobj(scope, suffix.tophrase())
 
 @directive
 class Test:
@@ -108,11 +108,11 @@ class Cat:
         scope = scope.getorcreatesubscope(prefix.topath(scope))
         scope.resolved('stdout').flush(processtemplate(scope, suffix.tophrase()))
 
-def resolvepath(resolvable, scope):
-    return resolvable.resolve(scope).pathobj(scope).scalar # TODO: Support resources.
+def resolvepathobj(scope, resolvable):
+    return resolvable.resolve(scope).pathobj(scope) # TODO: Support resources.
 
 def processtemplate(scope, pathresolvable):
-    path = resolvepath(pathresolvable, scope)
+    path = resolvepathobj(scope, pathresolvable).scalar
     with open(path) as f, scope.staticscope().here.push(Text(os.path.dirname(path))):
         return processtemplateimpl(scope, f)
 
