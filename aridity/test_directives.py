@@ -152,3 +152,5 @@ class TestDirectives(TestCase):
         c.cwd = 'woo'
         cc.execute('cd yay')
         self.assertEqual('woo/yay', c.cwd)
+        cc.execute('cd /houpla')
+        self.assertEqual('/houpla', c.cwd)
