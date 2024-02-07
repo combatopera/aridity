@@ -30,31 +30,31 @@ class Precedence:
 
 lookup = {}
 
-def directive(cls):
+def _directive(cls):
     obj = cls()
     lookup[Text(cls.name)] = obj
     return obj
 
-@directive
+@_directive
 class Colon:
     name = ':'
     precedence = Precedence.colon
     def __call__(self, prefix, suffix, scope):
         scope.execute(prefix, True)
 
-@directive
+@_directive
 class Redirect:
     name = 'redirect'
     def __call__(self, prefix, suffix, scope):
         scope['stdout',] = Stream(open(resolvepathobj(scope, suffix.tophrase()).scalar, 'w'))
 
-@directive
+@_directive
 class Write:
     name = 'write'
     def __call__(self, prefix, suffix, scope):
         scope.resolved('stdout').flush(suffix.tophrase().resolve(scope).cat())
 
-@directive
+@_directive
 class Source:
     name = '.'
     def __call__(self, prefix, suffix, scope):
@@ -67,33 +67,33 @@ class Source:
             phrasescope = s
         suffix.tophrase().resolve(phrasescope).source(scope, prefix)
 
-@directive
+@_directive
 class CD:
     name = 'cd'
     def __call__(self, prefix, suffix, scope):
         scope['cwd',] = resolvepathobj(scope, suffix.tophrase())
 
-@directive
+@_directive
 class Test:
     name = 'test'
     def __call__(self, prefix, suffix, scope):
         sys.stderr.write(suffix.tophrase().resolve(scope))
         sys.stderr.write(os.linesep)
 
-@directive
+@_directive
 class Equals:
     name = '='
     def __call__(self, prefix, suffix, scope):
         scope[prefix.topath(scope)] = suffix.tophrase()
 
-@directive
+@_directive
 class ColonEquals:
     name = ':='
     def __call__(self, prefix, suffix, scope):
         path = prefix.topath(scope)
         scope[path] = suffix.tophrase().resolve(scope.getorcreatesubscope(path[:-1]))
 
-@directive
+@_directive
 class PlusEquals:
     name = '+='
     def __call__(self, prefix, suffix, scope):
@@ -101,7 +101,7 @@ class PlusEquals:
         phrase = suffix.tophrase()
         scope[prefix.topath(scope) + (OpaqueKey(),)] = phrase
 
-@directive
+@_directive
 class Cat:
     name = '<'
     def __call__(self, prefix, suffix, scope):
