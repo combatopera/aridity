@@ -18,9 +18,10 @@
 from .config import ConfigCtrl
 from .repl import Repl
 from .scope import Scope
-from .util import openresource
+from .util import NoSuchPathException, openresource
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
+import os
 
 class TestDirectives(TestCase):
 
@@ -136,3 +137,18 @@ class TestDirectives(TestCase):
         self.assertEqual('alt', (-c).scope().label.scalar)
         self.assertEqual(70, c.relref)
         self.assertEqual(110, c.absref)
+
+    def test_cd(self):
+        assert '/' == os.sep
+        cc = ConfigCtrl()
+        with self.assertRaises(NoSuchPathException) as cm:
+            cc.execute('cd woo')
+        self.assertEqual((('cwd',),), cm.exception.args)
+        cc.execute('cd /woo')
+        c = cc.node
+        self.assertEqual('/woo', c.cwd)
+        cc.execute('cd yay')
+        self.assertEqual('/woo/yay', c.cwd)
+        c.cwd = 'woo'
+        cc.execute('cd yay')
+        self.assertEqual('woo/yay', c.cwd)
