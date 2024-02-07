@@ -44,7 +44,7 @@ class Colon:
 
 @_directive
 class Redirect:
-    name = 'redirect'
+    name = '!redirect'
     def __call__(self, prefix, suffix, scope):
         scope['stdout',] = Stream(open(resolvepathobj(scope, suffix.tophrase()).scalar, 'w'))
 

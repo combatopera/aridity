@@ -67,7 +67,7 @@ class TestFunctions(TestCase):
             s = Scope()
             with Repl(s) as repl:
                 repl.printf("text = $processtemplate(%s)", f.name)
-                repl.printf("redirect %s", g.name)
+                repl.printf("!redirect %s", g.name)
                 repl.printf("< %s", f.name)
             d = os.path.dirname(f.name)
             expected = "%s %s %s" % (d, os.path.join(d, 'sibling'), os.path.join(d, 'sib', 'child'))
