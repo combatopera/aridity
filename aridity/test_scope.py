@@ -34,14 +34,14 @@ class TestScope(TestCase):
             repl('x2 = y $.(=) z') # FIXME: Quote should work too.
             repl('blank =')
             repl("$'() = blank")
-            repl('write yo')
-            repl('$.(write) = yo')
+            repl('!write yo')
+            repl('$.(!write) = yo')
         ae = self.assertEqual
         ae('y', s.resolved('x').unravel())
         ae('y = z', s.resolved('x2').unravel())
         ae('', s.resolved('blank').unravel())
         ae('blank', s.resolved('').unravel())
-        ae('yo', s.resolved('write').unravel())
+        ae('yo', s.resolved('!write').unravel())
 
     def test_directivestack(self):
         phrases = []

@@ -50,7 +50,7 @@ class Redirect:
 
 @_directive
 class Write:
-    name = 'write'
+    name = '!write'
     def __call__(self, prefix, suffix, scope):
         scope.resolved('stdout').flush(suffix.tophrase().resolve(scope).cat())
 
