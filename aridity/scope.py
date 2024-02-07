@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .directives import lookup, Precedence
+from . import directives
+from .directives import Precedence
 from .functions import getfunctions, OpaqueKey
 from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, star, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
@@ -288,7 +289,7 @@ class StaticScope(AbstractScope):
 
     def __init__(self):
         super(StaticScope, self).__init__(())
-        for word, d in lookup.items():
+        for word, d in directives.lookup.items():
             self[word.cat(),] = Directive(d)
         for name, f in getfunctions():
             self[name,] = Function(f)
