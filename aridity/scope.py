@@ -18,10 +18,9 @@
 from . import directives
 from .directives import Precedence
 from .functions import getfunctions, OpaqueKey
-from .model import CatNotSupportedException, Directive, Function, Resolvable, Resolved, Scalar, star, Stream, Text
+from .model import CatNotSupportedException, Directive, Function, Resolvable, Scalar, star, Stream, Text
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
-from .util import CycleException, NoSuchPathException, openresource, OrderedDict, solo, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
-from itertools import chain
+from .util import CycleException, NoSuchPathException, OrderedDict, solo, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 import collections, os, sys, threading, unicodedata
 
 class NotAPathException(Exception): pass
@@ -277,27 +276,6 @@ def _categoryornone(c):
         except UnicodeDecodeError:
             return
         return unicodedata.category(u)
-
-class Resource(Resolved):
-
-    @classmethod
-    def _of(cls, *args):
-        return cls(*args)
-
-    def __init__(self, package_or_requirement, resource_name, encoding = 'ascii'):
-        self.package_or_requirement = package_or_requirement
-        self.resource_name = resource_name
-        self.encoding = encoding
-
-    def open(self):
-        return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
-
-    def slash(self, words, rstrip):
-        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
-
-    def source(self, scope, prefix):
-        with scope.staticscope().here.push(self.slash([], True)), self.open() as f:
-            scope.sourceimpl(prefix, f)
 
 class StaticScope(AbstractScope):
 

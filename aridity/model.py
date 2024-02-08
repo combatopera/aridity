@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-import itertools, numbers, os
+from .util import openresource
+from itertools import chain, islice
+import numbers, os
 
 class Struct(object):
 
@@ -169,6 +171,27 @@ class Text(Cat, BaseScalar):
         else:
             scope.resolved('cwd').slash([self.textvalue], False).source(scope, prefix)
 
+class Resource(Resolved):
+
+    @classmethod
+    def _of(cls, *args):
+        return cls(*args)
+
+    def __init__(self, package_or_requirement, resource_name, encoding = 'ascii'):
+        self.package_or_requirement = package_or_requirement
+        self.resource_name = resource_name
+        self.encoding = encoding
+
+    def open(self):
+        return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
+
+    def slash(self, words, rstrip):
+        return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
+
+    def source(self, scope, prefix):
+        with scope.staticscope().here.push(self.slash([], True)), self.open() as f:
+            scope.sourceimpl(prefix, f)
+
 class Binary(BaseScalar):
 
     @property
@@ -316,7 +339,7 @@ class Entry(Struct):
         return List([r.resolve(None) for r in self.resolvables])
 
     def word(self, i):
-        word, = itertools.islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
+        word, = islice((r for r in self.resolvables if not r.ignorable), i, i + 1)
         return word
 
     def words(self):

@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import Config, ConfigCtrl
-from .model import Boolean, Function, Number, Scalar, star, Text
+from .model import Boolean, Function, Number, Resource, Scalar, star, Text
 from io import StringIO
 from unittest import TestCase
 import os
@@ -197,7 +197,6 @@ class TestConfig(TestCase):
         self.assertEqual('1 days', c.ago)
 
     def test_resourcecwd(self):
-        from .scope import Resource
         cc = ConfigCtrl()
         cc.scope()['cwd',] = Resource(__name__, 'test_config')
         cc.execute('. chess.arid')

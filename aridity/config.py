@@ -16,9 +16,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .directives import processtemplate, processtemplateimpl
-from .model import Entry, Function, Number, Scalar, Text, wrap
+from .model import Entry, Function, Number, Resource, Scalar, Text, wrap
 from .repl import Repl
-from .scope import Resource, Scope
+from .scope import Scope
 from .util import CycleException, dotpy, NoSuchPathException, qualname, selectentrypoints, solo
 from functools import partial
 from itertools import chain

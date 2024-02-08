@@ -16,9 +16,9 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .functions import _tomlquote
-from .model import Entry, Function, Text
+from .model import Entry, Function, Resource, Text
 from .repl import Repl
-from .scope import Resource, Scope
+from .scope import Scope
 from .util import ispy2, NoSuchPathException
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
