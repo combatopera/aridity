@@ -69,7 +69,7 @@ class Source:
 
 @_directive
 class CD:
-    name = 'cd'
+    name = '!cd'
     def __call__(self, prefix, suffix, scope):
         scope['cwd',] = resolvepathobj(scope, suffix.tophrase())
 

@@ -142,15 +142,15 @@ class TestDirectives(TestCase):
         assert '/' == os.sep
         cc = ConfigCtrl()
         with self.assertRaises(NoSuchPathException) as cm:
-            cc.execute('cd woo')
+            cc.execute('!cd woo')
         self.assertEqual((('cwd',),), cm.exception.args)
-        cc.execute('cd /woo')
+        cc.execute('!cd /woo')
         c = cc.node
         self.assertEqual('/woo', c.cwd)
-        cc.execute('cd yay')
+        cc.execute('!cd yay')
         self.assertEqual('/woo/yay', c.cwd)
         c.cwd = 'woo'
-        cc.execute('cd yay')
+        cc.execute('!cd yay')
         self.assertEqual('woo/yay', c.cwd)
-        cc.execute('cd /houpla')
+        cc.execute('!cd /houpla')
         self.assertEqual('/houpla', c.cwd)
