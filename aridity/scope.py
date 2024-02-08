@@ -22,7 +22,7 @@ from .model import CatNotSupportedException, Directive, Function, Resolvable, Re
 from .stacks import IndentStack, SimpleStack, ThreadLocalResolvable
 from .util import CycleException, NoSuchPathException, openresource, OrderedDict, solo, TreeNoSuchPathException, UnparseNoSuchPathException, UnsupportedEntryException
 from itertools import chain
-import collections, os, sys, threading
+import collections, os, sys, threading, unicodedata
 
 class NotAPathException(Exception): pass
 
@@ -227,9 +227,15 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
     def execute(self, entry, lenient = False):
         directives = []
         precedence = Precedence.void
-        for i, word in enumerate(entry.words()):
+        for i, wordobj in enumerate(entry.words()):
             try:
-                d = self._findresolvable([word.cat()]).directivevalue
+                word = wordobj.cat()
+                if not word:
+                    continue
+                initialcategory = _categoryornone(word[0])
+                if initialcategory is None or initialcategory[0] not in 'PS':
+                    continue
+                d = self._findresolvable([word]).directivevalue
                 p = Precedence.ofdirective(d)
                 if p > precedence:
                     del directives[:]
@@ -261,6 +267,16 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
 
     def createchild(self, **kwargs):
         return Scope([self], **kwargs)
+
+def _categoryornone(c):
+    try:
+        return unicodedata.category(c)
+    except TypeError:
+        try:
+            u = c.decode('ascii')
+        except UnicodeDecodeError:
+            return
+        return unicodedata.category(u)
 
 class Resource(Resolved):
 
