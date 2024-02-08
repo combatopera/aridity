@@ -77,7 +77,7 @@ class CD:
 class Test:
     name = '!test'
     def __call__(self, prefix, suffix, scope):
-        sys.stderr.write(suffix.tophrase().resolve(scope))
+        sys.stderr.write(str(suffix.tophrase().resolve(scope)))
         sys.stderr.write(os.linesep)
 
 @_directive
