@@ -345,14 +345,6 @@ class Scope(AbstractScope):
     def resolve(self, scope):
         return self
 
-    def tobash(self, toplevel = False):
-        if toplevel:
-            return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
-        elif self.islist:
-            return "(%s)" % ' '.join(x.resolve(self).tobash() for _, x in self.resolvables.items())
-        else:
-            return Text(self.tobash(True)).tobash()
-
     def tojava(self):
         return Text(''.join("%s %s\n" % (k, v.resolve(self).unravel()) for k, v in self.resolvables.items())) # TODO: Escaping.
 

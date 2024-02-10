@@ -152,9 +152,6 @@ class Text(Cat, BaseScalar):
     def totext(self):
         return self
 
-    def tobash(self):
-        return "'%s'" % self.textvalue.replace("'", r"'\''")
-
     def writeout(self, path):
         with open(path, 'w') as f:
             f.write(self.textvalue)
@@ -217,9 +214,6 @@ class Number(BaseScalar):
     def totext(self):
         return Text(self.unparse())
 
-    def tobash(self):
-        return str(self.numbervalue)
-
     def unparse(self):
         return str(self.numbervalue) # FIXME: Should unparse.
 
@@ -237,9 +231,6 @@ class Boolean(BaseScalar):
 
     def truth(self):
         return self.booleanvalue
-
-    def tobash(self, toplevel):
-        return 'true' if self.booleanvalue else 'false'
 
 def star(scope, resolvable):
     raise Exception('Spread not implemented in this context.')

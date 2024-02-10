@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 'Print given config (with optional path in config) as shell snippet.'
-from .model import Entry
+from .model import Boolean, Entry, Number, Text
 from .scope import Scope
 import os, sys
 
@@ -28,6 +28,18 @@ def _configpath(configname):
         if os.path.exists(path):
             return path
     raise Exception("Not found: %s" % configname)
+
+def _scopetobash(self, toplevel = False):
+    if toplevel:
+        return ''.join("%s=%s\n" % (name, obj.resolve(self).tobash()) for name, obj in self.resolvables.items())
+    if self.islist:
+        return "(%s)" % ' '.join(x.resolve(self).tobash() for _, x in self.resolvables.items())
+    return Text(self.tobash(True)).tobash()
+
+Scope.tobash = _scopetobash
+Boolean.tobash = lambda self, toplevel: 'true' if self.booleanvalue else 'false'
+Number.tobash = lambda self: str(self.numbervalue)
+Text.tobash = lambda self: "'%s'" % self.textvalue.replace("'", r"'\''")
 
 def main():
     scope = Scope()
