@@ -17,8 +17,8 @@
 
 from .config import Config, ConfigCtrl
 from .model import Boolean, Function, Number, Resource, Scalar, star, Text
-from .util import NoSuchPathException
-from io import StringIO
+from .util import ispy2, NoSuchPathException
+from io import BytesIO, StringIO
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -325,6 +325,10 @@ class TestLoading(TestCase):
             f.write('. $./(2.arid)')
         with open(os.path.join(self.d, '2.arid'), 'w') as f:
             f.write('woo = yay')
+        with open(os.path.join(self.d, '1.aridt'), 'w') as f:
+            f.write('$readfile$./(1.txt)')
+        with open(os.path.join(self.d, '1.txt'), 'w') as f:
+            f.write('yay')
 
     def tearDown(self):
         rmtree(self.d)
@@ -358,3 +362,28 @@ class TestLoading(TestCase):
             pass
         else:
             self.fail('You fixed a bug!')
+
+    def test_ptabs(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        ConfigCtrl().processtemplate(os.path.join(self.d, '1.aridt'), stream)
+        self.assertEqual('yay', stream.getvalue())
+
+    def test_ptrelativenocwd(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        with self.assertRaises(NoSuchPathException) as cm:
+            ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, '1.aridt')), stream)
+        self.assertEqual((('cwd',),), cm.exception.args)
+
+    def test_ptrelativeabscwd(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        cc = ConfigCtrl()
+        cc.node.cwd = self.d
+        cc.processtemplate(os.path.relpath(os.path.join(self.d, '1.aridt')), stream)
+        self.assertEqual('yay', stream.getvalue())
+
+    def test_ptrelativerelcwd(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        cc = ConfigCtrl()
+        cc.node.cwd = os.path.relpath(self.d)
+        cc.processtemplate(os.path.relpath(os.path.join(self.d, '1.aridt')), stream)
+        self.assertEqual('yay', stream.getvalue())
