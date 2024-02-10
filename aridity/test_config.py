@@ -329,6 +329,11 @@ class TestLoading(TestCase):
     def tearDown(self):
         rmtree(self.d)
 
+    def test_loadabs(self):
+        cc = ConfigCtrl()
+        cc.load(os.path.join(self.d, '1.arid'))
+        self.assertEqual('yay', cc.node.woo)
+
     def test_loadrelativenocwd(self):
         cc = ConfigCtrl()
         with self.assertRaises(NoSuchPathException) as cm:
