@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .directives import processtemplate, processtemplateimpl
+from .directives import processtemplateimpl
 from .model import Entry, Function, Number, Resource, Scalar, Text, wrap
 from .repl import Repl
 from .scope import Scope
@@ -151,7 +151,8 @@ class ConfigCtrl:
         if getattr(frompathorstream, 'readable', lambda: False)():
             text = processtemplateimpl(s, frompathorstream)
         else:
-            text = processtemplate(s, Text(frompathorstream))
+            with s.staticscope().here.push(Text(os.path.dirname(frompathorstream))), open(frompathorstream) as f:
+                text = processtemplateimpl(s, f)
         if getattr(topathorstream, 'writable', lambda: False)():
             topathorstream.write(text)
         else:
