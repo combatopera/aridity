@@ -17,7 +17,10 @@
 
 from .config import Config, ConfigCtrl
 from .model import Boolean, Function, Number, Resource, Scalar, star, Text
+from .util import NoSuchPathException
 from io import StringIO
+from shutil import rmtree
+from tempfile import mkdtemp
 from unittest import TestCase
 import os
 
@@ -313,3 +316,40 @@ y
             y = $(TOP x)''')
         self.assertEqual(100, cc.node.y.x.y.x)
         self.assertEqual(200, cc.node.y.x.y.y)
+
+class TestLoading(TestCase):
+
+    def setUp(self):
+        self.d = mkdtemp()
+        with open(os.path.join(self.d, '1.arid'), 'w') as f:
+            f.write('. $./(2.arid)')
+        with open(os.path.join(self.d, '2.arid'), 'w') as f:
+            f.write('woo = yay')
+
+    def tearDown(self):
+        rmtree(self.d)
+
+    def test_loadrelativenocwd(self):
+        cc = ConfigCtrl()
+        with self.assertRaises(NoSuchPathException) as cm:
+            cc.load(os.path.relpath(os.path.join(self.d, '1.arid')))
+        self.assertEqual((('cwd',),), cm.exception.args)
+
+    def test_loadrelativeabscwd(self):
+        cc = ConfigCtrl()
+        c = cc.node
+        c.cwd = self.d
+        cc.load(os.path.relpath(os.path.join(self.d, '1.arid')))
+        self.assertEqual('yay', c.woo)
+
+    def test_loadrelativerelcwd(self):
+        cc = ConfigCtrl()
+        c = cc.node
+        c.cwd = os.path.relpath(self.d)
+        try:
+            cc.load(os.path.relpath(os.path.join(self.d, '1.arid')))
+            self.assertEqual('yay', c.woo)
+        except RuntimeError:
+            pass
+        else:
+            self.fail('You fixed a bug!')
