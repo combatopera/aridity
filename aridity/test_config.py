@@ -24,6 +24,18 @@ from tempfile import mkdtemp
 from unittest import TestCase
 import os
 
+def _flip(cls):
+    def d(f):
+        def g(self, *args, **kwargs):
+            try:
+                f(self, *args, **kwargs)
+            except cls:
+                pass
+            else:
+                self.fail('You fixed a bug!')
+        return g
+    return d
+
 class TestConfig(TestCase):
 
     def test_listdict(self):
@@ -211,16 +223,13 @@ class TestConfig(TestCase):
         cc.execute('. chess.arid')
         self.assertEqual('gambit', cc.node.queen)
 
+    @_flip(AttributeError)
     def test_assigntopath(self):
         config = ConfigCtrl().node
-        try:
-            config.foo.bar = 'yay'
-            self.assertEqual('yay', config.foo.bar)
-        except AttributeError:
-            pass
-        else:
-            self.fail('You fixed a bug!')
+        config.foo.bar = 'yay'
+        self.assertEqual('yay', config.foo.bar)
 
+    @_flip(AssertionError)
     def test_listsuffixoverride(self):
         cc = ConfigCtrl()
         cc.execute('item suffix = default')
@@ -235,12 +244,7 @@ class TestConfig(TestCase):
         self.assertEqual(1, eranu.code.no)
         self.assertEqual(2, uvavu.code.no)
         self.assertEqual(['foo-default', 'bar-default'], list(eranu.those.items))
-        try:
-            self.assertEqual(['foo-override', 'bar-override'], list(uvavu.those.items))
-        except AssertionError:
-            pass
-        else:
-            self.fail('You fixed a bug!')
+        self.assertEqual(['foo-override', 'bar-override'], list(uvavu.those.items))
 
     def test_spread(self):
         c = ConfigCtrl().node
@@ -339,6 +343,7 @@ class TestLoading(TestCase):
         cc.load(os.path.join(self.d, 'h.arid'))
         self.assertEqual('yay', cc.node.woo)
 
+    @_flip(NoSuchPathException)
     def test_loadrelhere(self):
         cc = ConfigCtrl()
         cc.load(os.path.relpath(os.path.join(self.d, 'h.arid')))
@@ -349,6 +354,7 @@ class TestLoading(TestCase):
         ConfigCtrl().processtemplate(os.path.join(self.d, 'h.aridt'), stream)
         self.assertEqual('yay', stream.getvalue())
 
+    @_flip(NoSuchPathException)
     def test_ptrelhere(self):
         stream = (BytesIO if ispy2 else StringIO)()
         ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, 'h.aridt')), stream)
@@ -404,12 +410,14 @@ class TestLoading(TestCase):
         cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), stream)
         self.assertEqual('yay', stream.getvalue())
 
+    @_flip(RuntimeError)
     def test_loadabscwdrel(self):
         cc = ConfigCtrl()
         cc.node.cwd = os.path.relpath(self.d)
         cc.load(os.path.join(self.d, 'c.arid'))
         self.assertEqual('yay', cc.node.woo)
 
+    @_flip(RuntimeError)
     def test_loadrelcwdrel(self):
         cc = ConfigCtrl()
         cc.node.cwd = os.path.relpath(self.d)
