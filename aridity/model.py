@@ -187,7 +187,7 @@ class Resource(Resolved):
 
     def source(self, scope, prefix):
         with scope.staticscope().here.push(self.slash([], True)), self.open() as f:
-            scope.sourceimpl(prefix, f)
+            Stream(f).source(scope, prefix)
 
 class Binary(BaseScalar):
 
@@ -311,6 +311,12 @@ class Stream(Resolved):
     def flush(self, text):
         self.streamvalue.write(text)
         self.streamvalue.flush()
+
+    def source(self, scope, prefix):
+        from .repl import Repl
+        with Repl(scope, rootprefix = prefix) as repl:
+            for line in self.streamvalue:
+                repl(line)
 
 class Entry(Struct):
 

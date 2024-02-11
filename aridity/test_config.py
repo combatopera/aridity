@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import Config, ConfigCtrl
-from .model import Boolean, Function, Number, Resource, Scalar, star, Text
+from .model import Boolean, Function, Number, Resource, Scalar, star, Stream, Text
 from .util import ispy2, NoSuchPathException
 from functools import wraps
 from io import BytesIO, StringIO
@@ -108,7 +108,7 @@ class TestConfig(TestCase):
         self.assertEqual('woo', c.D.E.F.B.C.A)
 
     def source(self, scope, prefix):
-        scope.sourceimpl(prefix, StringIO(self.sourcetext))
+        Stream(StringIO(self.sourcetext)).source(scope, prefix)
 
     def test_appnamelabel(self):
         self.sourcetext = u'n := $label()\nx y = $(n)'

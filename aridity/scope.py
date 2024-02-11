@@ -215,13 +215,7 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
 
     def source(self, prefix, path): # XXX: Migrate to Text?
         with self.staticscope().here.push(Text(os.path.dirname(path))), open(path) as f:
-            self.sourceimpl(prefix, f)
-
-    def sourceimpl(self, prefix, f):
-        from .repl import Repl
-        with Repl(self, rootprefix = prefix) as repl:
-            for line in f:
-                repl(line)
+            Stream(f).source(self, prefix)
 
     def execute(self, entry, lenient = False):
         directives = []

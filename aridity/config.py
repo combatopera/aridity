@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .directives import processtemplateimpl
-from .model import Entry, Function, Number, Resource, Scalar, Text, wrap
+from .model import Entry, Function, Number, Resource, Scalar, Stream, Text, wrap
 from .repl import Repl
 from .scope import Scope
 from .util import CycleException, dotpy, NoSuchPathException, qualname, selectentrypoints, solo
@@ -101,7 +101,10 @@ class ConfigCtrl:
 
     def load(self, pathorstream):
         s = self.scope(True)
-        (s.sourceimpl if getattr(pathorstream, 'readable', lambda: False)() else s.source)(Entry([]), pathorstream)
+        if getattr(pathorstream, 'readable', lambda: False)():
+            Stream(pathorstream).source(s, Entry([]))
+        else:
+            s.source(Entry([]), pathorstream)
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
