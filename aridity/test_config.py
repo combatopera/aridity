@@ -32,9 +32,8 @@ def _flip(cls):
             try:
                 f(self, *args, **kwargs)
             except cls:
-                pass
-            else:
-                self.fail('You fixed a bug!')
+                return
+            self.fail('You fixed a bug!')
         return g
     return d
 
