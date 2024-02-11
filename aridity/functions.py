@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from .directives import processtemplate, resolvepathobj
+from .directives import processtemplate
 from .model import Boolean, Number, Text, wrap
 from .util import allfunctions, NoSuchPathException, realname
 from importlib import import_module
@@ -194,7 +194,7 @@ class Functions:
         return scope.resolved('here').slash((r.resolve(scope).cat() for r in resolvables), False)
 
     def readfile(scope, resolvable):
-        with open(resolvepathobj(scope, resolvable).scalar) as f:
+        with open(resolvable.resolve(scope).openable(scope).scalar) as f:
             return Text(f.read())
 
     def processtemplate(scope, resolvable):

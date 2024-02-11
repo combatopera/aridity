@@ -159,7 +159,7 @@ class Text(Cat, BaseScalar):
     def slash(self, words, rstrip):
         return self._of(os.path.join(os.path.dirname(self.textvalue) if rstrip else self.textvalue, *words))
 
-    def pathobj(self, scope):
+    def openable(self, scope):
         return self if os.path.isabs(self.textvalue) else self._of(os.path.join(scope.resolved('cwd').cat(), self.textvalue))
 
     def source(self, scope, prefix):
