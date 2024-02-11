@@ -331,13 +331,35 @@ class TestLoading(TestCase):
         self.d = mkdtemp()
         w('9.arid', 'woo = yay')
         w('9.txt', 'yay')
+        w('a.arid', ". %s" % os.path.join(self.d, '9.arid'))
         w('h.arid', '. $./(9.arid)')
         w('c.arid', '. 9.arid')
+        w('a.aridt', "$readfile(%s)" % os.path.join(self.d, '9.txt'))
         w('h.aridt', '$readfile$./(9.txt)')
         w('c.aridt', '$readfile(9.txt)')
 
     def tearDown(self):
         rmtree(self.d)
+
+    def test_loadabsabs(self):
+        cc = ConfigCtrl()
+        cc.load(os.path.join(self.d, 'a.arid'))
+        self.assertEqual('yay', cc.node.woo)
+
+    def test_loadrelabs(self):
+        cc = ConfigCtrl()
+        cc.load(os.path.relpath(os.path.join(self.d, 'a.arid')))
+        self.assertEqual('yay', cc.node.woo)
+
+    def test_ptabsabs(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        ConfigCtrl().processtemplate(os.path.join(self.d, 'a.aridt'), stream)
+        self.assertEqual('yay', stream.getvalue())
+
+    def test_ptrelabs(self):
+        stream = (BytesIO if ispy2 else StringIO)()
+        ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, 'a.aridt')), stream)
+        self.assertEqual('yay', stream.getvalue())
 
     def test_loadabshere(self):
         cc = ConfigCtrl()
