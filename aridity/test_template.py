@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .directives import processtemplate
-from .model import Function, Text
+from .model import Function, Stream, Text
 from .repl import Repl
 from .scope import Scope
 from tempfile import NamedTemporaryFile
@@ -25,6 +24,10 @@ from unittest import TestCase
 def _blockquote(scope, resolvable):
     indent = scope.resolved('indent').scalar
     return Text(''.join((indent if i else '') + l for i, l in enumerate(resolvable.resolve(scope).scalar.splitlines(True))))
+
+def _processtemplate(scope, path):
+    with open(path) as f:
+        return Stream(f).processtemplate(scope)
 
 class TestTemplate(TestCase):
 
@@ -43,13 +46,13 @@ class TestTemplate(TestCase):
 \ttab: .\t.
 \t mixed: .\t .
 \t\t compound: .\t\t .
-''', processtemplate(Scope(), Text(f.name)))
+''', _processtemplate(Scope(), f.name))
 
     def test_trivialindent(self):
         with NamedTemporaryFile('w') as f:
             f.write('$(indent) should not fail')
             f.flush()
-            self.assertEqual(' should not fail', processtemplate(Scope(), Text(f.name)))
+            self.assertEqual(' should not fail', _processtemplate(Scope(), f.name))
 
     def test_getindentinfunction(self):
         s = Scope()
@@ -63,11 +66,11 @@ class TestTemplate(TestCase):
   y
   x
 
-''', processtemplate(s, Text(f.name)))
+''', _processtemplate(s, f.name))
 
     def test_nestedexprindent(self):
         with NamedTemporaryFile('w') as f:
             f.write('''  $.[outer=<$(indent)>
     inner=<$(indent)>]''')
             f.flush()
-            self.assertEqual('  outer=<  >\n    inner=<    >', processtemplate(Scope(), Text(f.name)))
+            self.assertEqual('  outer=<  >\n    inner=<    >', _processtemplate(Scope(), f.name))
