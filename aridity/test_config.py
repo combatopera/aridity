@@ -18,6 +18,7 @@
 from .config import Config, ConfigCtrl
 from .model import Boolean, Function, Number, Resource, Scalar, star, Text
 from .util import ispy2, NoSuchPathException
+from functools import wraps
 from io import BytesIO, StringIO
 from shutil import rmtree
 from tempfile import mkdtemp
@@ -26,6 +27,7 @@ import os
 
 def _flip(cls):
     def d(f):
+        @wraps(f)
         def g(self, *args, **kwargs):
             try:
                 f(self, *args, **kwargs)
