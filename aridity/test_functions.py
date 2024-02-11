@@ -62,9 +62,10 @@ class TestFunctions(TestCase):
 
     def test_hereisavailableduringprocesstemplate(self):
         with NamedTemporaryFile('w') as f, NamedTemporaryFile('r') as g:
-            f.write('$(here) $./(sibling) $./(sib child)')
+            f.write('$pstr$(here) $pstr$./(sibling) $pstr$./(sib child)')
             f.flush()
             s = Scope()
+            s.resolvables.put('pstr', Function(lambda s, r: Text(r.resolve(s).pathvalue)))
             with Repl(s) as repl:
                 repl.printf("text = $processtemplate(%s)", f.name)
                 repl.printf("!redirect %s", g.name)

@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 'Print given config (with optional path in config) as shell snippet.'
-from .model import Boolean, Entry, Number, Text
+from .model import Boolean, Entry, Locator, Number, Text
 from .scope import Scope
 import os, sys
 
@@ -43,7 +43,7 @@ Text.tobash = lambda self: "'%s'" % self.textvalue.replace("'", r"'\''")
 
 def main():
     scope = Scope()
-    scope.source(Entry([]), _configpath(sys.argv[1]))
+    Locator(_configpath(sys.argv[1])).source(scope, Entry([]))
     sys.stdout.write(scope.resolved(*sys.argv[2:]).tobash(True))
 
 if '__main__' == __name__:

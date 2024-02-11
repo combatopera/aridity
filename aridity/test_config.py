@@ -364,7 +364,6 @@ class TestLoading(TestCase):
         self.cc.load(os.path.join(self.d, 'h.arid'))
         self.assertEqual('yay', self.c.woo)
 
-    @_flip(NoSuchPathException)
     def test_loadrelhere(self):
         self.cc.load(os.path.relpath(os.path.join(self.d, 'h.arid')))
         self.assertEqual('yay', self.c.woo)
@@ -373,7 +372,6 @@ class TestLoading(TestCase):
         self.cc.processtemplate(os.path.join(self.d, 'h.aridt'), self.buffer)
         self.assertEqual('yay', self.buffer.getvalue())
 
-    @_flip(NoSuchPathException)
     def test_ptrelhere(self):
         self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'h.aridt')), self.buffer)
         self.assertEqual('yay', self.buffer.getvalue())
@@ -418,13 +416,11 @@ class TestLoading(TestCase):
         self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), self.buffer)
         self.assertEqual('yay', self.buffer.getvalue())
 
-    @_flip(RuntimeError)
     def test_loadabscwdrel(self):
         self.c.cwd = os.path.relpath(self.d)
         self.cc.load(os.path.join(self.d, 'c.arid'))
         self.assertEqual('yay', self.c.woo)
 
-    @_flip(RuntimeError)
     def test_loadrelcwdrel(self):
         self.c.cwd = os.path.relpath(self.d)
         self.cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))

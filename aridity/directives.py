@@ -45,7 +45,7 @@ class Colon:
 class Redirect:
     name = '!redirect'
     def __call__(self, prefix, suffix, scope):
-        scope['stdout',] = Stream(open(suffix.tophrase().resolve(scope).openable(scope).scalar, 'w'))
+        scope['stdout',] = Stream(suffix.tophrase().resolve(scope).openable(scope).open(True))
 
 @_directive
 class Write:
@@ -64,7 +64,8 @@ class Source:
             if s is None:
                 break
             phrasescope = s
-        suffix.tophrase().resolve(phrasescope).source(scope, prefix)
+        # XXX: Pass phrasescope to openable?
+        suffix.tophrase().resolve(phrasescope).openable(scope).source(scope, prefix)
 
 @_directive
 class CD:
@@ -105,9 +106,4 @@ class Cat:
     name = '<'
     def __call__(self, prefix, suffix, scope):
         scope = scope.getorcreatesubscope(prefix.topath(scope))
-        scope.resolved('stdout').flush(processtemplate(scope, suffix.tophrase()))
-
-def processtemplate(scope, pathresolvable):
-    path = pathresolvable.resolve(scope).openable(scope).scalar
-    with open(path) as f, scope.staticscope().here.push(Text(os.path.dirname(path))):
-        return Stream(f).processtemplate(scope)
+        scope.resolved('stdout').flush(suffix.tophrase().resolve(scope).openable(scope).processtemplate(scope))

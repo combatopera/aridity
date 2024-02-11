@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .model import Entry, Function, Number, Resource, Scalar, Stream, Text, wrap
+from .model import Entry, Function, Locator, Number, Resource, Scalar, Stream, Text, wrap
 from .repl import Repl
 from .scope import Scope
 from .util import CycleException, dotpy, NoSuchPathException, qualname, selectentrypoints, solo
@@ -51,6 +51,9 @@ def _processmainfunction(mainfunction):
     return module, appname
 
 class ForeignScopeException(Exception): pass
+
+def _wrappathorstream(pathorstream):
+    return (Stream if getattr(pathorstream, 'readable', lambda: False)() else Locator)(pathorstream)
 
 class ConfigCtrl:
 
@@ -100,10 +103,7 @@ class ConfigCtrl:
 
     def load(self, pathorstream):
         s = self.scope(True)
-        if getattr(pathorstream, 'readable', lambda: False)():
-            Stream(pathorstream).source(s, Entry([]))
-        else:
-            s.source(Entry([]), pathorstream)
+        _wrappathorstream(pathorstream).source(s, Entry([]))
 
     def loadsettings(self):
         self.load(os.path.join(os.path.expanduser('~'), '.settings.arid'))
@@ -150,11 +150,7 @@ class ConfigCtrl:
 
     def processtemplate(self, frompathorstream, topathorstream):
         s = self.scope()
-        if getattr(frompathorstream, 'readable', lambda: False)():
-            text = Stream(frompathorstream).processtemplate(s)
-        else:
-            with s.staticscope().here.push(Text(os.path.dirname(frompathorstream))), open(frompathorstream) as f:
-                text = Stream(f).processtemplate(s)
+        text = _wrappathorstream(frompathorstream).processtemplate(s)
         if getattr(topathorstream, 'writable', lambda: False)():
             topathorstream.write(text)
         else:

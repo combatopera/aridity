@@ -213,10 +213,6 @@ class AbstractScope(Resolvable): # TODO LATER: Some methods should probably be m
             pass
         return s
 
-    def source(self, prefix, path): # XXX: Migrate to Text?
-        with self.staticscope().here.push(Text(os.path.dirname(path))), open(path) as f:
-            Stream(f).source(self, prefix)
-
     def execute(self, entry, lenient = False):
         directives = []
         precedence = Precedence.void

@@ -16,6 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .util import openresource
+from contextlib import contextmanager
 from itertools import chain, islice
 import numbers, os
 
@@ -160,15 +161,53 @@ class Text(Cat, BaseScalar):
         return self._of(os.path.join(os.path.dirname(self.textvalue) if rstrip else self.textvalue, *words))
 
     def openable(self, scope):
-        return self if os.path.isabs(self.textvalue) else self._of(os.path.join(scope.resolved('cwd').cat(), self.textvalue))
+        if os.path.isabs(self.textvalue):
+            return Locator(self.textvalue)
+        o = scope.resolved('cwd').slash([self.textvalue], False)
+        try:
+            s = o.textvalue
+        except AttributeError:
+            return o
+        return Locator(s)
+
+class Openable:
+
+    def openable(self, scope):
+        return self
+
+    @contextmanager
+    def pushopen(self, scope):
+        with scope.staticscope().here.push(self.slash([], True)), self.open(False) as f:
+            yield f
 
     def source(self, scope, prefix):
-        if os.path.isabs(self.textvalue):
-            scope.source(prefix, self.textvalue)
-        else:
-            scope.resolved('cwd').slash([self.textvalue], False).source(scope, prefix)
+        with self.pushopen(scope) as f:
+            Stream(f).source(scope, prefix)
 
-class Resource(Resolved):
+    def processtemplate(self, scope):
+        with self.pushopen(scope) as f:
+            return Stream(f).processtemplate(scope)
+
+class Locator(Resolved, Openable):
+
+    @classmethod
+    def _of(cls, pathvalue):
+        return cls(pathvalue)
+
+    @property
+    def scalar(self):
+        return self.pathvalue
+
+    def __init__(self, pathvalue):
+        self.pathvalue = pathvalue
+
+    def open(self, write):
+        return open(self.pathvalue, 'w' if write else 'r')
+
+    def slash(self, words, rstrip):
+        return self._of(os.path.join(os.path.dirname(self.pathvalue) if rstrip else self.pathvalue, *words))
+
+class Resource(Resolved, Openable):
 
     @classmethod
     def _of(cls, *args):
@@ -179,15 +218,12 @@ class Resource(Resolved):
         self.resource_name = resource_name
         self.encoding = encoding
 
-    def open(self):
+    def open(self, write):
+        assert not write
         return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
 
     def slash(self, words, rstrip):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
-
-    def source(self, scope, prefix):
-        with scope.staticscope().here.push(self.slash([], True)), self.open() as f:
-            Stream(f).source(scope, prefix)
 
 class Binary(BaseScalar):
 
