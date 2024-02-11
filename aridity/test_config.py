@@ -337,126 +337,105 @@ class TestLoading(TestCase):
         w('a.aridt', "$readfile(%s)" % os.path.join(self.d, '9.txt'))
         w('h.aridt', '$readfile$./(9.txt)')
         w('c.aridt', '$readfile(9.txt)')
+        self.cc = ConfigCtrl()
+        self.c = self.cc.node
+        self.buffer = (BytesIO if ispy2 else StringIO)()
 
     def tearDown(self):
         rmtree(self.d)
 
     def test_loadabsabs(self):
-        cc = ConfigCtrl()
-        cc.load(os.path.join(self.d, 'a.arid'))
-        self.assertEqual('yay', cc.node.woo)
+        self.cc.load(os.path.join(self.d, 'a.arid'))
+        self.assertEqual('yay', self.c.woo)
 
     def test_loadrelabs(self):
-        cc = ConfigCtrl()
-        cc.load(os.path.relpath(os.path.join(self.d, 'a.arid')))
-        self.assertEqual('yay', cc.node.woo)
+        self.cc.load(os.path.relpath(os.path.join(self.d, 'a.arid')))
+        self.assertEqual('yay', self.c.woo)
 
     def test_ptabsabs(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        ConfigCtrl().processtemplate(os.path.join(self.d, 'a.aridt'), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.cc.processtemplate(os.path.join(self.d, 'a.aridt'), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     def test_ptrelabs(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, 'a.aridt')), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'a.aridt')), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     def test_loadabshere(self):
-        cc = ConfigCtrl()
-        cc.load(os.path.join(self.d, 'h.arid'))
-        self.assertEqual('yay', cc.node.woo)
+        self.cc.load(os.path.join(self.d, 'h.arid'))
+        self.assertEqual('yay', self.c.woo)
 
     @_flip(NoSuchPathException)
     def test_loadrelhere(self):
-        cc = ConfigCtrl()
-        cc.load(os.path.relpath(os.path.join(self.d, 'h.arid')))
-        self.assertEqual('yay', cc.node.woo)
+        self.cc.load(os.path.relpath(os.path.join(self.d, 'h.arid')))
+        self.assertEqual('yay', self.c.woo)
 
     def test_ptabshere(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        ConfigCtrl().processtemplate(os.path.join(self.d, 'h.aridt'), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.cc.processtemplate(os.path.join(self.d, 'h.aridt'), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     @_flip(NoSuchPathException)
     def test_ptrelhere(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, 'h.aridt')), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'h.aridt')), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     def test_loadabscwdfail(self):
-        cc = ConfigCtrl()
         with self.assertRaises(NoSuchPathException) as cm:
-            cc.load(os.path.join(self.d, 'c.arid'))
+            self.cc.load(os.path.join(self.d, 'c.arid'))
         self.assertEqual((('cwd',),), cm.exception.args)
 
     def test_loadrelcwdfail(self):
-        cc = ConfigCtrl()
         with self.assertRaises(NoSuchPathException) as cm:
-            cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
+            self.cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
         self.assertEqual((('cwd',),), cm.exception.args)
 
     def test_ptabscwdfail(self):
-        stream = (BytesIO if ispy2 else StringIO)()
         with self.assertRaises(NoSuchPathException) as cm:
-            ConfigCtrl().processtemplate(os.path.join(self.d, 'c.aridt'), stream)
+            self.cc.processtemplate(os.path.join(self.d, 'c.aridt'), self.buffer)
         self.assertEqual((('cwd',),), cm.exception.args)
 
     def test_ptrelcwdfail(self):
-        stream = (BytesIO if ispy2 else StringIO)()
         with self.assertRaises(NoSuchPathException) as cm:
-            ConfigCtrl().processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), stream)
+            self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), self.buffer)
         self.assertEqual((('cwd',),), cm.exception.args)
 
     def test_loadabscwdabs(self):
-        cc = ConfigCtrl()
-        cc.node.cwd = self.d
-        cc.load(os.path.join(self.d, 'c.arid'))
-        self.assertEqual('yay', cc.node.woo)
+        self.c.cwd = self.d
+        self.cc.load(os.path.join(self.d, 'c.arid'))
+        self.assertEqual('yay', self.c.woo)
 
     def test_loadrelcwdabs(self):
-        cc = ConfigCtrl()
-        cc.node.cwd = self.d
-        cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
-        self.assertEqual('yay', cc.node.woo)
+        self.c.cwd = self.d
+        self.cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
+        self.assertEqual('yay', self.c.woo)
 
     def test_ptabscwdabs(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        cc = ConfigCtrl()
-        cc.node.cwd = self.d
-        cc.processtemplate(os.path.join(self.d, 'c.aridt'), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.c.cwd = self.d
+        self.cc.processtemplate(os.path.join(self.d, 'c.aridt'), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     def test_ptrelcwdabs(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        cc = ConfigCtrl()
-        cc.node.cwd = self.d
-        cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.c.cwd = self.d
+        self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     @_flip(RuntimeError)
     def test_loadabscwdrel(self):
-        cc = ConfigCtrl()
-        cc.node.cwd = os.path.relpath(self.d)
-        cc.load(os.path.join(self.d, 'c.arid'))
-        self.assertEqual('yay', cc.node.woo)
+        self.c.cwd = os.path.relpath(self.d)
+        self.cc.load(os.path.join(self.d, 'c.arid'))
+        self.assertEqual('yay', self.c.woo)
 
     @_flip(RuntimeError)
     def test_loadrelcwdrel(self):
-        cc = ConfigCtrl()
-        cc.node.cwd = os.path.relpath(self.d)
-        cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
-        self.assertEqual('yay', cc.node.woo)
+        self.c.cwd = os.path.relpath(self.d)
+        self.cc.load(os.path.relpath(os.path.join(self.d, 'c.arid')))
+        self.assertEqual('yay', self.c.woo)
 
     def test_ptabscwdrel(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        cc = ConfigCtrl()
-        cc.node.cwd = os.path.relpath(self.d)
-        cc.processtemplate(os.path.join(self.d, 'c.aridt'), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.c.cwd = os.path.relpath(self.d)
+        self.cc.processtemplate(os.path.join(self.d, 'c.aridt'), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
 
     def test_ptrelcwdrel(self):
-        stream = (BytesIO if ispy2 else StringIO)()
-        cc = ConfigCtrl()
-        cc.node.cwd = os.path.relpath(self.d)
-        cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), stream)
-        self.assertEqual('yay', stream.getvalue())
+        self.c.cwd = os.path.relpath(self.d)
+        self.cc.processtemplate(os.path.relpath(os.path.join(self.d, 'c.aridt')), self.buffer)
+        self.assertEqual('yay', self.buffer.getvalue())
