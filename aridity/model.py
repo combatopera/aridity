@@ -318,6 +318,11 @@ class Stream(Resolved):
             for line in self.streamvalue:
                 repl(line)
 
+    def processtemplate(self, scope):
+        from .grammar import templateparser
+        with scope.staticscope().indent.push() as monitor:
+            return templateparser(monitor)(self.streamvalue.read()).resolve(scope).cat()
+
 class Entry(Struct):
 
     wildcard = Text('*')
