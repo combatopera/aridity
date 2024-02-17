@@ -15,10 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from .util import openresource
+from __future__ import division
+from .util import ispy2
 from contextlib import contextmanager
+from importlib import import_module
+from io import BytesIO, TextIOWrapper
 from itertools import chain, islice
-import numbers, os
+import importlib_resources, numbers, os
 
 class Struct(object):
 
@@ -218,9 +221,21 @@ class Resource(Resolved, Openable):
         self.resource_name = resource_name
         self.encoding = encoding
 
+    @contextmanager
     def open(self, write):
         assert not write
-        return openresource(self.package_or_requirement, self.resource_name, self.encoding) # XXX: Inline?
+        m = import_module(self.package_or_requirement)
+        package = m.__package__
+        if package is None:
+            package = self.package_or_requirement if hasattr(m, '__path__') else self.package_or_requirement[:self.package_or_requirement.rindex('.')]
+        path = importlib_resources.files(package)
+        for name in self.resource_name.split('/'):
+            path /= name
+        with path.open('rb') as f:
+            if ispy2:
+                f = BytesIO(f.read())
+            with TextIOWrapper(f, self.encoding) as f:
+                yield f
 
     def slash(self, words, rstrip):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)

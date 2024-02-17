@@ -15,12 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-from contextlib import contextmanager
-from importlib import import_module
 from importlib_metadata import entry_points
-from io import BytesIO, TextIOWrapper
-import collections, importlib_resources, inspect, sys
+import collections, inspect, sys
 
 dotpy = '.py'
 ispy2 = sys.version_info.major < 3
@@ -118,20 +114,9 @@ def allfunctions(clazz):
             realname = name
         yield realname, clazz.__dict__[name]
 
-@contextmanager
 def openresource(package_or_name, resource_name, encoding = 'ascii'):
-    m = import_module(package_or_name)
-    package = m.__package__
-    if package is None:
-        package = package_or_name if hasattr(m, '__path__') else package_or_name[:package_or_name.rindex('.')]
-    path = importlib_resources.files(package)
-    for name in resource_name.split('/'):
-        path /= name
-    with path.open('rb') as f:
-        if ispy2:
-            f = BytesIO(f.read())
-        with TextIOWrapper(f, encoding) as f:
-            yield f
+    from .model import Resource
+    return Resource(package_or_name, resource_name, encoding).open(False)
 
 def solo(v):
     x, = v
