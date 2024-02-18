@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from .functions import _tomlquote
-from .model import Entry, Function, Resource, Text
+from .model import Entry, Function, Locator, Resource, Text
 from .repl import Repl
 from .scope import Scope
 from .util import ispy2, NoSuchPathException
@@ -242,6 +242,34 @@ class TestFunctions(TestCase):
         self.assertIs(sys.exc_info, obj.functionvalue)
         self.assertIs(sys.exc_info, obj.scalar)
         self.assertIs(sys.exc_info, obj.unravel())
+
+    def test_relpyrefresource(self):
+        s = Scope()
+        Resource(__name__, 'test_plugin/pyrefrel.arid').source(s, Entry([]))
+        with self.assertRaises(NoSuchPathException):
+            s.resolved('foolazy')
+        self.assertEqual('this is foo', s.resolved('foo').scalar)
+
+    def test_relpyrefresource2(self):
+        s = Scope()
+        Resource(__name__, 'test_plugin/pyrefrel2.arid').source(s, Entry([]))
+        with self.assertRaises(NoSuchPathException):
+            s.resolved('barlazy')
+        self.assertEqual('this is bar', s.resolved('bar').scalar)
+
+    def test_relpyrefabslocator(self):
+        s = Scope()
+        Locator(os.path.join(os.path.dirname(__file__), 'test_plugin', 'pyrefrel.arid')).source(s, Entry([]))
+        with self.assertRaises(NoSuchPathException):
+            s.resolved('foolazy')
+        self.assertEqual('this is foo', s.resolved('foo').scalar)
+
+    def test_relpyrefrellocator(self):
+        s = Scope()
+        Locator(os.path.relpath(os.path.join(os.path.dirname(__file__), 'test_plugin', 'pyrefrel.arid'))).source(s, Entry([]))
+        with self.assertRaises(NoSuchPathException):
+            s.resolved('foolazy')
+        self.assertEqual('this is foo', s.resolved('foo').scalar)
 
     def test_flat(self):
         s = Scope()

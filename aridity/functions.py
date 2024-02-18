@@ -17,12 +17,13 @@
 
 from __future__ import division
 from .model import Boolean, Number, Text, wrap
-from .util import allfunctions, NoSuchPathException, realname
+from .util import allfunctions, dotpy, NoSuchPathException, realname
 from importlib import import_module
 import itertools, json, re, shlex
 
 xmlentities = dict([c, "&%s;" % w] for c, w in [['"', 'quot'], ["'", 'apos']])
 tomlbasicbadchars = re.compile('[%s]+' % re.escape(r'\"' + ''.join(chr(x) for x in itertools.chain(range(0x08 + 1), range(0x0A, 0x1F + 1), [0x7F]))))
+zeroormoredots = re.compile('[.]*')
 
 def _tomlquote(text):
     def repl(m):
@@ -203,7 +204,24 @@ class Functions:
         return Text(resolvable.resolve(scope).cat().lower())
 
     def pyref(scope, moduleresolvable, qualnameresolvable):
-        pyobj = import_module(moduleresolvable.resolve(scope).cat())
+        def moduleobj():
+            moduleref = moduleresolvable.resolve(scope).cat()
+            leadingdots = len(zeroormoredots.match(moduleref).group())
+            if not leadingdots:
+                return import_module(moduleref)
+            words = moduleref[leadingdots:].split('.')
+            openable = scope.resolved('here').slash(['..'] * (leadingdots - 1) + words[:-1] + [words[-1] + dotpy], False)
+            openablemodule = openable.modulenameornone()
+            if openablemodule is not None:
+                return import_module(openablemodule)
+            class M:
+                def __getattr__(self, name):
+                    return g[name]
+            g = {} # XXX: Set __name__ so it can do its own relative imports?
+            with openable.open(False) as f:
+                exec(f.read(), g)
+            return M()
+        pyobj = moduleobj()
         for name in qualnameresolvable.resolve(scope).cat().split('.'):
             pyobj = getattr(pyobj, name)
         return wrap(pyobj)

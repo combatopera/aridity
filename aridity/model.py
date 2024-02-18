@@ -16,7 +16,7 @@
 # along with aridity.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from .util import ispy2
+from .util import dotpy, ispy2
 from contextlib import contextmanager
 from importlib import import_module
 from io import BytesIO, TextIOWrapper
@@ -210,6 +210,9 @@ class Locator(Resolved, Openable):
     def slash(self, words, rstrip):
         return self._of(os.path.join(os.path.dirname(self.pathvalue) if rstrip else self.pathvalue, *words))
 
+    def modulenameornone(self):
+        pass
+
 class Resource(Resolved, Openable):
 
     @classmethod
@@ -221,13 +224,15 @@ class Resource(Resolved, Openable):
         self.resource_name = resource_name
         self.encoding = encoding
 
+    def _packagename(self):
+        m = import_module(self.package_or_requirement)
+        package = m.__package__
+        return (self.package_or_requirement if hasattr(m, '__path__') else self.package_or_requirement[:self.package_or_requirement.rindex('.')]) if package is None else package
+
     @contextmanager
     def open(self, write):
         assert not write
-        m = import_module(self.package_or_requirement)
-        package = m.__package__
-        if package is None:
-            package = self.package_or_requirement if hasattr(m, '__path__') else self.package_or_requirement[:self.package_or_requirement.rindex('.')]
+        package = self._packagename()
         path = importlib_resources.files(package)
         for name in self.resource_name.split('/'):
             path /= name
@@ -239,6 +244,10 @@ class Resource(Resolved, Openable):
 
     def slash(self, words, rstrip):
         return self._of(self.package_or_requirement, '/'.join(chain(self.resource_name.split('/')[:-1 if rstrip else None], words)), self.encoding)
+
+    def modulenameornone(self):
+        if self.resource_name.endswith(dotpy):
+            return "%s.%s" % (self._packagename(), self.resource_name[:-len(dotpy)].replace('/', '.'))
 
 class Binary(BaseScalar):
 
