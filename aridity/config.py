@@ -171,6 +171,12 @@ class ConfigCtrl:
     def childctrl(self):
         return self._of(self.scope(True).createchild())
 
+    def addname(self, name):
+        return self._of(self.basescope, self.prefix + [name])
+
+    def resolve(self):
+        return self.basescope.resolved(*self.prefix)
+
 class Config(object):
 
     def __getattr__(self, name):
@@ -198,23 +204,21 @@ class Config(object):
 class RConfig(object):
 
     def __getattr__(self, name):
-        ctrl = ctrls[self]
-        path = ctrl.prefix + [name]
+        query = ctrls[self].addname(name)
         try:
-            obj = ctrl.basescope.resolved(*path)
+            obj = query.resolve()
         except NoSuchPathException:
             raise AttributeError
         try:
             return obj.scalar
         except AttributeError:
-            return ctrl._of(ctrl.basescope, path).r
+            return query.r
 
 class WConfig(object):
 
     def __getattr__(self, name):
-        ctrl = ctrls[self]
-        return ctrl._of(ctrl.basescope, ctrl.prefix + [name]).w
+        return ctrls[self].addname(name).w
 
     def __setattr__(self, name, value):
-        ctrl = ctrls[self]
-        ctrl.basescope[tuple(ctrl.prefix + [name])] = wrap(value)
+        query = ctrls[self].addname(name)
+        query.basescope[tuple(query.prefix)] = wrap(value)
