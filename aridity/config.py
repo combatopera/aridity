@@ -27,8 +27,8 @@ import errno, logging, os, sys
 log = logging.getLogger(__name__)
 ctrls = WeakKeyDictionary()
 
-def _newnode(ctrl):
-    node = Config()
+def _newnode(configcls, ctrl):
+    node = configcls()
     ctrls[node] = ctrl
     return node
 
@@ -61,8 +61,16 @@ class ConfigCtrl:
     def _of(cls, *args, **kwargs):
         return cls(*args, **kwargs)
 
+    @property
+    def r(self):
+        return _newnode(RConfig, self)
+
+    @property
+    def w(self):
+        return _newnode(WConfig, self)
+
     def __init__(self, basescope = None, prefix = None):
-        self.node = _newnode(self)
+        self.node = _newnode(Config, self)
         self.basescope = Scope() if basescope is None else basescope
         self.prefix = [] if prefix is None else prefix
 
@@ -186,3 +194,27 @@ class Config(object):
 
     def __setattr__(self, name, value):
         ctrls[self].scope(True)[name,] = wrap(value)
+
+class RConfig(object):
+
+    def __getattr__(self, name):
+        ctrl = ctrls[self]
+        path = ctrl.prefix + [name]
+        try:
+            obj = ctrl.basescope.resolved(*path)
+        except NoSuchPathException:
+            raise AttributeError
+        try:
+            return obj.scalar
+        except AttributeError:
+            return ctrl._of(ctrl.basescope, path).r
+
+class WConfig(object):
+
+    def __getattr__(self, name):
+        ctrl = ctrls[self]
+        return ctrl._of(ctrl.basescope, ctrl.prefix + [name]).w
+
+    def __setattr__(self, name, value):
+        ctrl = ctrls[self]
+        ctrl.basescope[tuple(ctrl.prefix + [name])] = wrap(value)

@@ -322,6 +322,21 @@ y
         self.assertEqual(100, cc.node.y.x.y.x)
         self.assertEqual(200, cc.node.y.x.y.y)
 
+    def test_writemode(self):
+        cc = ConfigCtrl()
+        r = cc.r
+        w = cc.w
+        with self.assertRaises(AttributeError):
+            r.woo
+        w.woo = 'yay'
+        self.assertEqual('yay', r.woo)
+        with self.assertRaises(AttributeError):
+            r.yay
+        w.yay.houpla = 100
+        with self.assertRaises(AttributeError):
+            r.houpla
+        self.assertEqual(100, r.yay.houpla)
+
 class TestLoading(TestCase):
 
     def setUp(self):
